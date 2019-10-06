@@ -30,6 +30,14 @@ object CommandExecutor {
       SgitWriter.createNewBranch(newBranch)
       ConsolePrinter.branchCreated(newBranch)
     }
+  }
 
+  def executeCreateNewTag(newTag: String) = {
+    if (SgitReader.isExistingTag(newTag))
+      ConsolePrinter.tagAlreadyExists(newTag)
+    else {
+      SgitWriter.createNewTag(newTag)
+      ConsolePrinter.tagCreated(newTag)
+    }
   }
 }

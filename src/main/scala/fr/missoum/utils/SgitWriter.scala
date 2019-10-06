@@ -45,4 +45,14 @@ object SgitWriter{
     (new File(".sgit/refs/heads/"+newBranch)).createNewFile
     (new File(".sgit/logs/refs/heads/"+newBranch)).createNewFile
   }
+
+  /**
+   * Creates the parameter tag.
+   * Which means creates all the necessary files for this branch (one file named with the tag name in .sgit/refs/tags/)
+   * To use this function be sure that the .sgit repository exists.
+   * @param newTag : the tag to create
+   */
+  def createNewTag(newTag:String):Unit ={
+    (new File(".sgit/refs/tags/"+newTag)).createNewFile
+  }
 }

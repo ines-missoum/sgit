@@ -21,6 +21,10 @@ object ConsolePrinter {
 
   def branchAlreadyExists(existingBranch: String) = println("fatal: A branch named '" + existingBranch + "' already exists.")
 
+  def tagCreated(newTag: String) = println("Tag '" + newTag + "' created.")
+
+  def tagAlreadyExists(existingTag: String) = println("fatal: tag '" + existingTag + "' already exists.")
+
   def printBranchesAndTags(currentBranch: String, tags: Array[String], branches: Array[String]) = {
     var result = ""
     branches.map(x => if (x.equals(currentBranch)) result = result + "* " + x + "\n" else result = result + x + "\n")

@@ -22,6 +22,13 @@ object SgitReader{
   def isExistingBranch(branch:String) : Boolean = (new File(".sgit/refs/heads/"+branch)).isFile()
 
   /**
+   * Checks if a tag exists.
+   * @param tag : searched tag
+   * @return True if the tag exists, otherwise False.
+   */
+  def isExistingTag(tag:String) : Boolean = (new File(".sgit/refs/tags/"+tag)).isFile()
+
+  /**
    * Retrieves the current branch
    * @return the current branch or None if an error happens
    */
