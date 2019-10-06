@@ -3,11 +3,11 @@ import java.lang.System._
 
 object ConsolePrinter {
 
-  def sgitFolderAlreadyExists() ={
-    println ("Reinitialized existing Git repository in "+System.getProperty("user.dir")+"/.sgit/")
-  }
+  def noCommand() = println("usage: sgit <command> [<args>]")
 
-  def sgitFolderCreated() ={
-    println ("Initialized empty Git repository in "+System.getProperty("user.dir")+"/.sgit/")
-  }
+  def notValidCommand(wrongCommand:String) = println(wrongCommand +" is not a git command.")
+
+  def sgitFolderAlreadyExists() = println("Reinitialized existing Git repository in " + System.getProperty("user.dir") + "/.sgit/")
+
+  def sgitFolderCreated() = println("Initialized empty Git repository in " + System.getProperty("user.dir") + "/.sgit/")
 }
