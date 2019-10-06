@@ -1,26 +1,48 @@
 package fr.missoum.utils
 import java.io._
 
+/**
+ * This object is responsible for all writing actions. Which means create files and folders and update them.
+ */
 object SgitWriter{
 
+  /**
+   * Creates the sgit directory where the command has been executed. It contains all the folders and files necessary.
+   * It also creates the master branch and checkout on the master branch.
+   */
   def createSgitRepository() ={
 
-    //creation of logs files and folders
-    (new File(".sgit/logs/refs/heads")).mkdirs()
-    (new File(".sgit/logs/refs/heads/master")).createNewFile
-    (new File(".sgit/logs/HEAD")).createNewFile
+    //creation of all files and folders
+    val listFolders = List(".sgit/logs/refs/heads", ".sgit/refs/tags", ".sgit/refs/heads",".sgit/objects")
+    val listFiles = List(".sgit/logs/HEAD", ".sgit/HEAD", ".sgit/index")
+    listFolders.map(new File(_).mkdirs())
+    listFiles.map(new File(_).createNewFile)
 
-    //creation of refs files and folders
-    (new File(".sgit/refs/tags")).mkdirs()
-    (new File(".sgit/refs/heads")).mkdir()
-    (new File(".sgit/refs/heads/HEAD")).createNewFile()
+    //creation of the master branch and checkout
+    createNewBranch("master")
+    setHeadBranch("master")
+  }
 
-    //creation of objects files and folders
-    (new File(".sgit/objects")).mkdir()
+  /**
+   * Deletes everything in the HEAD file located on top of the .sgit repository and add a line with the name of the branch in parameter.
+   * To use this function be sure that the .sgit repository and the parameter branch exist.
+   * @param branch : the branch to checkout
+   */
+  def setHeadBranch(branch:String): Unit ={
+    val file = new File(".sgit/HEAD")
+    val bw = new BufferedWriter(new FileWriter(file))
+    bw.write("master")
+    bw.close()
+  }
 
-    //creation of files in top of .sgit folder
-    (new File(".sgit/HEAD")).createNewFile
-    (new File(".sgit/index")).createNewFile
-
+  /**
+   * Creates the parameter branch.
+   * Which means creates all the necessary files for this branch (two files named with the branch name in .sgit/refs/heads/ and .sgit/logs/refs/heads/)
+   * To use this function be sure that the .sgit repository exists.
+   * @param newBranch : the branch to create
+   */
+  def createNewBranch(newBranch:String):Unit ={
+    (new File(".sgit/refs/heads/"+newBranch)).createNewFile
+    (new File(".sgit/logs/refs/heads/"+newBranch)).createNewFile
   }
 }

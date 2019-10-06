@@ -3,22 +3,17 @@ import fr.missoum.utils.{ConsolePrinter, SgitReader, SgitWriter}
 
 object Main extends App {
 
-  if(args.length==0)
-    ConsolePrinter.noCommand()
-  else
-    //check if it's a valid command
-  if(args(0).equals("init")){
-    if(SgitReader.isExistingSgitFolder())
-      ConsolePrinter.sgitFolderAlreadyExists()
-    else {
-      SgitWriter.createSgitRepository()
-      ConsolePrinter.sgitFolderCreated()
+  args match {
+    case a:Array[String] if a.length == 0  => ConsolePrinter.noCommand()
+    case a:Array[String] if a(0).equals("init") => {
+      if (SgitReader.isExistingSgitFolder())
+        ConsolePrinter.sgitFolderAlreadyExists()
+      else {
+        SgitWriter.createSgitRepository()
+        ConsolePrinter.sgitFolderCreated()
+      }
     }
+    case a:Array[String] => ConsolePrinter.notValidCommand(a(0))
   }
-  else
-  ConsolePrinter.notValidCommand(args(0))
-
-
-
 
 }
