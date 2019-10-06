@@ -1,9 +1,12 @@
-package fr.missoum;
+package fr.missoum
+
+;
+
 import fr.missoum.utils.{ConsolePrinter, SgitReader, SgitWriter}
 
-object CommandExecutor{
+object CommandExecutor {
 
-  def executeInit(): Unit ={
+  def executeInit(): Unit = {
     if (SgitReader.isExistingSgitFolder())
       ConsolePrinter.sgitFolderAlreadyExists()
     else {
@@ -12,16 +15,16 @@ object CommandExecutor{
     }
   }
 
-  def executeGetAllBranches()={
-
+  def executeGetAllBranchesAndTags() = {
+    val currentBranch = SgitReader.getCurrentBranch()
+    val tags = SgitReader.getAllTags()
+    val branches = SgitReader.getAllBranches()
+    ConsolePrinter.printBranchesAndTags(currentBranch, tags, branches)
   }
 
-  def executeGetAllBranchesAndInfo()={
-    //TODO implement
-  }
 
-  def executeCreateNewBranch(newBranch:String)={
-    if(SgitReader.isExistingBranch(newBranch))
+  def executeCreateNewBranch(newBranch: String) = {
+    if (SgitReader.isExistingBranch(newBranch))
       ConsolePrinter.branchAlreadyExists(newBranch)
     else {
       SgitWriter.createNewBranch(newBranch)
