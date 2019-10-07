@@ -15,11 +15,16 @@ object CommandExecutor {
     }
   }
 
-  def executeAdd(tail: Array[String]) = {
-    SgitWriter.createBlob("test")
-    SgitWriter.createBlob("test")
-    println(HashHelper.hashFile("test"))
-    //TODO
+  def executeAdd(files: Array[String]) = {
+    //just for array(0)
+
+    val path = System.getProperty("user.dir") + "/" + files(0)
+    val content = SgitReader.getContentOfFile(path)
+
+    SgitWriter.createBlob(content)
+    SgitWriter.addToIndex(HashHelper.hashFile(content), path)
+
+    //TODO for all possible arguments => récursif ?
   }
 
   def executeGetAllBranchesAndTags() = {

@@ -33,10 +33,7 @@ object SgitReader{
    * @return the current branch or None if an error happens
    */
   def getCurrentBranch() : String = {
-    val src = Source.fromFile(".sgit/HEAD")
-    val line = src.getLines.toList.head
-    src.close
-    line
+    readFirstLineFile(".sgit/HEAD")
   }
 
   /**
@@ -51,4 +48,26 @@ object SgitReader{
    * @return an array that contains all tags names
    */
   def getAllTags():Array[String] = (new File(".sgit/refs/tags")).listFiles.map(_.getName)
+
+  def getContentOfFile(path:String): String ={
+    Source.fromFile(path).getLines.mkString("\n")
+  }
+
+  def getSimplePathOfFile(fileName:String)={
+    val simplePath = System.getProperty("user.dir") diff getLocation()
+    simplePath +"/"+fileName
+
+  }
+
+  def getLocation(): String ={
+    readFirstLineFile(".sgit/location")
+  }
+
+  def readFirstLineFile(path:String)={
+    val src = Source.fromFile(path)
+    val line = src.getLines.toList.head
+    src.close
+    line
+  }
+
 }
