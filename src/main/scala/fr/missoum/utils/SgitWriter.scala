@@ -89,10 +89,9 @@ object SgitWriter {
     }
   }
 
-  def addToIndex(hash: String, simpleNameFile: String) = {
-    val lineIndex = hash + " " + simpleNameFile
-    writeInFile(".sgit/index", lineIndex, true)
-  }
+  def addToIndex(contentToAdd: String) = writeInFile(".sgit/index", contentToAdd, true)
+
+  def buildIndexLine(hash: String, pathFile: String) = hash + " " + pathFile + "\n" //TODO : put in another class
 
   /**
    *

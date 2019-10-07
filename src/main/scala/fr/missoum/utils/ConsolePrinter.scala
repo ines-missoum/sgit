@@ -6,6 +6,7 @@ import java.lang.System._
  * Object responsible for communication with the user. This means print messages on the console.
  */
 object ConsolePrinter {
+  def notExistingSgitRepository() = println("fatal: not a sgit repository (or any of the parent directories): .sgit")
 
   def noCommand() = println("usage: sgit <command> [<args>]")
 
@@ -27,10 +28,10 @@ object ConsolePrinter {
 
   def printBranchesAndTags(currentBranch: String, tags: Array[String], branches: Array[String]) = {
     var result = ""
-    branches.map(x => if (x.equals(currentBranch)) result = result + "* " + x + "\n" else result = result + x + "\n")
-    println("__BRANCHES__ \n\n" + result)
+    branches.map(x => if (x.equals(currentBranch)) result += "* " + x + "\n" else result += x + "\n")
+    println("__BRANCHES__ \n" + result)
     if (tags.length != 0)
-      println("__TAGS__ \n\n" + tags.mkString("\n"))
+      println("__TAGS__ \n" + tags.mkString("\n"))
 
   }
 

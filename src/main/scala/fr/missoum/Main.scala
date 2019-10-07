@@ -4,21 +4,27 @@ import fr.missoum.utils.ConsolePrinter
 
 object Main extends App {
 
+
   args match {
-    case a: Array[String] if a.length == 0 => ConsolePrinter.noCommand()
-    //branch
-    case a: Array[String] if a.length == 2 && a(0).equals("branch") && a(1).equals("-av") => CommandExecutor.executeGetAllBranchesAndTags()
-    case a: Array[String] if a.length == 2 && a(0).equals("branch") => CommandExecutor.executeCreateNewBranch(a(1))
-    case a: Array[String] if a(0).equals("branch") => ConsolePrinter.notValidArguments("branch", "'branch -av' or 'branch <branch>'")
-    //tag
-    case a: Array[String] if a.length == 2 && a(0).equals("tag") => CommandExecutor.executeCreateNewTag(a(1))
-    case a: Array[String] if a(0).equals("tag") => ConsolePrinter.notValidArguments("tag", "'tag <tag>'")
-    //add
-    case a: Array[String] if a.length > 1 && a(0).equals("add") => CommandExecutor.executeAdd(a.tail)
-    case a: Array[String] if a(0).equals("add") => ConsolePrinter.notValidArguments("add", "'add <file>'")
     //init
-    case a: Array[String] if a(0).equals("init") => CommandExecutor.executeInit()
+    case Array("init") => CommandExecutor.executeInit()
+    case Array("init", _*) => ConsolePrinter.notValidArguments("init", "just 'init'")
+    //errors
+    case Array(_*) if CommandExecutor.isCommandForbiddenHere() => ConsolePrinter.notExistingSgitRepository()
+    case Array() => ConsolePrinter.noCommand()
+    //branch
+    case Array("branch", "-av") => CommandExecutor.executeGetAllBranchesAndTags()
+    case Array("branch", x: String) => CommandExecutor.executeCreateNewBranch(x)
+    case Array("branch", _*) => ConsolePrinter.notValidArguments("branch", "'branch -av' or 'branch <branch>'")
+    //tag
+    case Array("tag", x: String) => CommandExecutor.executeCreateNewTag(x)
+    case Array("tag", _*) => ConsolePrinter.notValidArguments("tag", "'tag <tag>'")
+    //add
+    case a: Array[String] if a.length > 1 && a(0).equals("add") => CommandExecutor.executeAdd(a.tail, "")
+    case Array("add") => ConsolePrinter.notValidArguments("add", "'add <file>' or 'add <file>*' ")
+
     case a: Array[String] => ConsolePrinter.notValidCommand(a(0))
   }
+
 
 }
