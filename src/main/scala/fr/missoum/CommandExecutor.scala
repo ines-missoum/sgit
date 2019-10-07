@@ -15,6 +15,13 @@ object CommandExecutor {
     }
   }
 
+  def executeAdd(tail: Array[String]) = {
+    SgitWriter.createBlob("test")
+    SgitWriter.createBlob("test")
+    println(HashHelper.hashFile("test"))
+    //TODO
+  }
+
   def executeGetAllBranchesAndTags() = {
     val currentBranch = SgitReader.getCurrentBranch()
     val tags = SgitReader.getAllTags()

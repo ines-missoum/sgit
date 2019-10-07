@@ -38,13 +38,13 @@ object SgitReader{
     src.close
     line
   }
-  def getAllBranches():Array[String] ={
-    (new File(".sgit/refs/heads")).listFiles.map(_.getName)
-    /*val branchesDir = new File(".sgit/refs/heads")
-    branchesDir.listFiles.toList.map(x => if (x.equals(currentBranch)) result = result+"*"+x+"\n"
-    else result = result+x+"\n")
-    "__BRANCHES__ \n"+result*/
-  }
+
+  /**
+   * Retrieves all branches names
+   * @return an array that contains all branches names
+   */
+  def getAllBranches():Array[String] = (new File(".sgit/refs/heads")).listFiles.map(_.getName)
+
 
   /**
    * Retrieves all tags names

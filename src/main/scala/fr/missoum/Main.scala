@@ -13,6 +13,9 @@ object Main extends App {
     //tag
     case a: Array[String] if a.length == 2 && a(0).equals("tag") => CommandExecutor.executeCreateNewTag(a(1))
     case a: Array[String] if a(0).equals("tag") => ConsolePrinter.notValidArguments("tag", "'tag <tag>'")
+    //add
+    case a: Array[String] if a.length > 1 && a(0).equals("add") => CommandExecutor.executeAdd(a.tail)
+    case a: Array[String] if a(0).equals("add") => ConsolePrinter.notValidArguments("add", "'add <file>'")
     //init
     case a: Array[String] if a(0).equals("init") => CommandExecutor.executeInit()
     case a: Array[String] => ConsolePrinter.notValidCommand(a(0))
