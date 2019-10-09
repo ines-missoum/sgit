@@ -1,6 +1,9 @@
-package fr.missoum.utils
+package fr.missoum.utils.io
 
 import java.io._
+
+import fr.missoum.utils.helpers.PathHelper
+
 import scala.io.Source
 
 /**
@@ -14,7 +17,7 @@ object SgitReader {
    *
    * @return True if a .sgit folder exists in the current directory, otherwise False.
    */
-  def isExistingSgitFolder(): Boolean = (new File(".sgit")).isDirectory()
+  def isExistingSgitFolder(): Boolean = !PathHelper.SgitPath.equals("")
 
   /**
    * Checks if a branch exists.
@@ -22,7 +25,7 @@ object SgitReader {
    * @param branch : searched branch
    * @return True if the branch exists, otherwise False.
    */
-  def isExistingBranch(branch: String): Boolean = (new File(".sgit/refs/heads/" + branch)).isFile()
+  def isExistingBranch(branch: String): Boolean = (new File(PathHelper.BranchesDirectory + File.separator + branch)).isFile()
 
   /**
    * Checks if a tag exists.
@@ -30,7 +33,7 @@ object SgitReader {
    * @param tag : searched tag
    * @return True if the tag exists, otherwise False.
    */
-  def isExistingTag(tag: String): Boolean = (new File(".sgit/refs/tags/" + tag)).isFile()
+  def isExistingTag(tag: String): Boolean = (new File(PathHelper.TagsDirectory + File.separator + tag)).isFile()
 
   /**
    * Retrieves the current branch
@@ -38,7 +41,7 @@ object SgitReader {
    * @return the current branch or None if an error happens
    */
   def getCurrentBranch(): String = {
-    readFirstLineFile(".sgit/HEAD")
+    readFirstLineFile(PathHelper.HeadFile)
   }
 
   /**
@@ -46,7 +49,7 @@ object SgitReader {
    *
    * @return an array that contains all branches names
    */
-  def getAllBranches(): Array[String] = (new File(".sgit/refs/heads")).listFiles.map(_.getName)
+  def getAllBranches(): Array[String] = (new File(PathHelper.BranchesDirectory)).listFiles.map(_.getName)
 
 
   /**
@@ -54,22 +57,18 @@ object SgitReader {
    *
    * @return an array that contains all tags names
    */
-  def getAllTags(): Array[String] = (new File(".sgit/refs/tags")).listFiles.map(_.getName)
+  def getAllTags(): Array[String] = (new File(PathHelper.TagsDirectory)).listFiles.map(_.getName)
 
-  def getIndex(): Array[String] = Source.fromFile(".sgit/index").getLines().toArray
+  def getIndex(): Array[String] = Source.fromFile(PathHelper.IndexFile).getLines().toArray
+
+  def getSimplePathOfFile(fileName: String) = {
+    val simplePath = System.getProperty("user.dir") diff PathHelper.SgitPath
+    simplePath + File.separator + fileName
+
+  }
 
   def getContentOfFile(path: String): String = {
     Source.fromFile(path).getLines.mkString("\n")
-  }
-
-  def getSimplePathOfFile(fileName: String) = {
-    val simplePath = System.getProperty("user.dir") diff getLocation()
-    simplePath + "/" + fileName
-
-  }
-
-  def getLocation(): String = {
-    readFirstLineFile(".sgit/location")
   }
 
   def readFirstLineFile(path: String) = {

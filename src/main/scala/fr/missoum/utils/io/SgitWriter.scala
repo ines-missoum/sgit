@@ -1,8 +1,8 @@
-package fr.missoum.utils
+package fr.missoum.utils.io
 
 import java.io._
 
-import fr.missoum.HashHelper
+import fr.missoum.utils.helpers.{HashHelper, PathHelper}
 
 /**
  * This object is responsible for all writing actions. Which means create files and folders and update them.
@@ -16,17 +16,17 @@ object SgitWriter {
   def createSgitRepository() = {
 
     //creation of all files and folders
-    val listFolders = List(".sgit/logs/refs/heads", ".sgit/refs/tags", ".sgit/refs/heads", ".sgit/objects")
-    val listFiles = List(".sgit/logs/HEAD", ".sgit/HEAD", ".sgit/index", ".sgit/location")
-    listFolders.map(new File(_).mkdirs())
+    val listFolders = List(PathHelper.BranchesDirectory, PathHelper.TagsDirectory, PathHelper.LogsDirectory, PathHelper.ObjectDirectory)
+    val listFiles = List(PathHelper.HeadLogFile, PathHelper.HeadFile, PathHelper.IndexFile)
+    listFolders.map({
+      new File(_).mkdirs()
+    })
     listFiles.map(new File(_).createNewFile)
 
     //creation of the master branch and checkout
     createNewBranch("master")
     setHeadBranch("master")
 
-    //set location .sgit
-    setLocation()
   }
 
   /**
@@ -36,14 +36,9 @@ object SgitWriter {
    * @param branch : the branch to checkout
    */
   def setHeadBranch(branch: String): Unit = {
-    writeInFile(".sgit/HEAD", "master", false)
+    writeInFile(PathHelper.HeadFile, "master", false)
 
   }
-
-  /**
-   * Save the creation location of .sgit repository
-   */
-  def setLocation() = writeInFile(".sgit/location", System.getProperty("user.dir"), false)
 
 
   /**
@@ -54,8 +49,8 @@ object SgitWriter {
    * @param newBranch : the branch to create
    */
   def createNewBranch(newBranch: String): Unit = {
-    (new File(".sgit/refs/heads/" + newBranch)).createNewFile
-    (new File(".sgit/logs/refs/heads/" + newBranch)).createNewFile
+    (new File(PathHelper.BranchesDirectory+File.separator + newBranch)).createNewFile
+    (new File(PathHelper.LogsDirectory+File.separator + newBranch)).createNewFile
   }
 
   /**
@@ -66,7 +61,7 @@ object SgitWriter {
    * @param newTag : the tag to create
    */
   def createNewTag(newTag: String): Unit = {
-    (new File(".sgit/refs/tags/" + newTag)).createNewFile
+    (new File(PathHelper.TagsDirectory +File.separator+ newTag)).createNewFile
   }
 
   /**
@@ -78,8 +73,8 @@ object SgitWriter {
 
     //retrieves path from hash of content file
     val hash = HashHelper.hashFile(contentFile)
-    val pathFolder = ".sgit/objects/" + hash.substring(0, 2)
-    val pathFile = pathFolder + "/" + hash.substring(2)
+    val pathFolder = PathHelper.ObjectDirectory+File.separator + hash.substring(0, 2)
+    val pathFile = pathFolder + File.separator + hash.substring(2)
 
     //creation of folder and file if do not exist
     new File(pathFolder).mkdir()
@@ -89,7 +84,7 @@ object SgitWriter {
     }
   }
 
-  def addToIndex(contentToAdd: String) = writeInFile(".sgit/index", contentToAdd, true)
+  def addToIndex(contentToAdd: String) = writeInFile(PathHelper.IndexFile, contentToAdd, true)
 
   def buildIndexLine(hash: String, pathFile: String) = hash + " " + pathFile + "\n" //TODO : put in another class
 

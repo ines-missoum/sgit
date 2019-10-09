@@ -1,4 +1,4 @@
-package fr.missoum
+package fr.missoum.utils.helpers
 
 import java.security.MessageDigest
 

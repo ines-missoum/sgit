@@ -2,13 +2,14 @@ package fr.missoum
 
 ;
 
-import fr.missoum.utils.{ConsolePrinter, SgitReader, SgitWriter}
+import fr.missoum.utils.helpers.{HashHelper, PathHelper}
+import fr.missoum.utils.io.{ConsolePrinter, SgitReader, SgitWriter}
 
 import scala.annotation.tailrec
 
 object CommandExecutor {
 
-  def isCommandForbiddenHere(): Boolean = (System.getProperty("user.dir")) != (SgitReader.getLocation())
+  def isCommandForbiddenHere(): Boolean = !SgitReader.isExistingSgitFolder
 
 
   def executeInit(): Unit = {

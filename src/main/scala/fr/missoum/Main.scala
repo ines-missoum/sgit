@@ -1,6 +1,7 @@
 package fr.missoum
 
-import fr.missoum.utils.ConsolePrinter
+import fr.missoum.utils.helpers.PathHelper
+import fr.missoum.utils.io.ConsolePrinter
 
 object Main extends App {
 

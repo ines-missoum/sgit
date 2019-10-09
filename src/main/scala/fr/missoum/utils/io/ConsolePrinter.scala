@@ -1,6 +1,6 @@
-package fr.missoum.utils
+package fr.missoum.utils.io
 
-import java.lang.System._
+import fr.missoum.utils.helpers.PathHelper
 
 /**
  * Object responsible for communication with the user. This means print messages on the console.
@@ -14,7 +14,7 @@ object ConsolePrinter {
 
   def notValidArguments(command: String, possibleInput: String) = println("The command '" + command + "' cannot accept those arguments. \nTrie " + possibleInput)
 
-  def sgitFolderAlreadyExists() = println("Reinitialized existing Sgit repository in " + System.getProperty("user.dir") + "/.sgit/")
+  def sgitFolderAlreadyExists() = println("Reinitialized existing Sgit repository in " + PathHelper.SgitPath + ".sgit/")
 
   def sgitFolderCreated() = println("Initialized empty Sgit repository in " + System.getProperty("user.dir") + "/.sgit/")
 
