@@ -11,6 +11,8 @@ import scala.io.Source
  * ie: this object retrieves information from .sgit.
  */
 object SgitReader {
+  def fileExists(path: String): Boolean = scala.reflect.io.File(path).exists
+
 
   /**
    * Checks if a .sgit folder already exists in the current directory.
@@ -61,11 +63,7 @@ object SgitReader {
 
   def getIndex(): Array[String] = Source.fromFile(PathHelper.IndexFile).getLines().toArray
 
-  def getSimplePathOfFile(fileName: String) = {
-    val simplePath = System.getProperty("user.dir") diff PathHelper.SgitPath
-    simplePath + File.separator + fileName
-
-  }
+  def getSimplePathOfFile(absoluteFilePath: String): String = absoluteFilePath.toSeq.diff(PathHelper.SgitPath.toSeq).unwrap
 
   def getContentOfFile(path: String): String = {
     Source.fromFile(path).getLines.mkString("\n")

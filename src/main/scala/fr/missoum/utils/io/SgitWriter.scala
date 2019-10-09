@@ -86,7 +86,7 @@ object SgitWriter {
 
   def addToIndex(contentToAdd: String) = writeInFile(PathHelper.IndexFile, contentToAdd, true)
 
-  def buildIndexLine(hash: String, pathFile: String) = hash + " " + pathFile + "\n" //TODO : put in another class
+  def buildIndexLine(hash: String, pathFile: String) = hash + " " + SgitReader.getSimplePathOfFile(pathFile) + "\n" //TODO : put in another class
 
   /**
    *

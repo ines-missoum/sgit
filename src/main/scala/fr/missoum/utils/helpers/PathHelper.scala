@@ -8,6 +8,9 @@ object PathHelper {
 
   //base path
   val SgitRepositoryName = ".sgit"
+  /**
+   * Gives the path of the sgit repository if it exists else an empty String
+   */
   val SgitPath: String = {
     val executingDirectory = new File(System.getProperty("user.dir"))
     val path = findSgitPathFrom(executingDirectory)

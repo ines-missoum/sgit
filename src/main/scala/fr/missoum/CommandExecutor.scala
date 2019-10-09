@@ -1,8 +1,8 @@
 package fr.missoum
 
-;
+import java.io.File.separator
 
-import fr.missoum.utils.helpers.{HashHelper, PathHelper}
+import fr.missoum.utils.helpers.{HashHelper}
 import fr.missoum.utils.io.{ConsolePrinter, SgitReader, SgitWriter}
 
 import scala.annotation.tailrec
@@ -28,20 +28,27 @@ object CommandExecutor {
 
     else {
 
-      var indexLines = linesToAddInIndex
-      val path = System.getProperty("user.dir") + "/" + files(0)
-      val content = SgitReader.getContentOfFile(path)
-      SgitWriter.createBlob(content)
+      val path = System.getProperty("user.dir") + separator + files(0)
+      if (SgitReader.fileExists(path)) {
+        val content = SgitReader.getContentOfFile(path)
+        SgitWriter.createBlob(content)
+        var indexLines = linesToAddInIndex
+        val line = SgitWriter.buildIndexLine(HashHelper.hashFile(content), path)
 
-      val line = SgitWriter.buildIndexLine(HashHelper.hashFile(content), path)
-
-      //if not already staged, added to index
-      if ((SgitReader.getIndex().find(line.contains).isEmpty)) {
-        indexLines += line
-        executeAdd(files.tail, (indexLines))
-      }
-      else
+        //if not already staged, added to index
+        if ((SgitReader.getIndex().find(line.contains).isEmpty)) {
+          indexLines += line
+          executeAdd(files.tail, (indexLines))
+        }
+        else
+        //if already staged => modified ?
+          executeAdd(files.tail, linesToAddInIndex)
+      } else {
+        ConsolePrinter.fileNotExist(files(0))
         executeAdd(files.tail, linesToAddInIndex)
+
+      }
+
     }
     //TODO for regexp and file doesn't exists
   }

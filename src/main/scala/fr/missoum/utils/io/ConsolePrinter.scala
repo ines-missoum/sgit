@@ -6,6 +6,9 @@ import fr.missoum.utils.helpers.PathHelper
  * Object responsible for communication with the user. This means print messages on the console.
  */
 object ConsolePrinter {
+
+  def fileNotExist(fileName: String): Unit = println("fatal: '"+fileName+"' did not match any files")
+
   def notExistingSgitRepository() = println("fatal: not a sgit repository (or any of the parent directories): .sgit")
 
   def noCommand() = println("usage: sgit <command> [<args>]")
