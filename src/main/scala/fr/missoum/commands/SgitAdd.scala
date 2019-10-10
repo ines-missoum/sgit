@@ -55,27 +55,4 @@ object SgitAdd {
     }
   }
 
-  /*@tailrec
-  def reccccAdd(files: Array[String], linesToAddInIndex: String): Unit = {
-
-    if (files.length == 0) SgitWriter.addToIndex(linesToAddInIndex)
-
-    else {
-
-      val content = SgitReader.getContentOfFile(path)
-      SgitWriter.createBlob(content)
-      var indexLines = linesToAddInIndex
-      val line = SgitWriter.buildIndexLine(HashHelper.hashFile(content), path)
-
-      //if not already staged, added to index
-      if ((SgitReader.getIndex().find(line.contains).isEmpty)) {
-        indexLines += line
-        recAdd(files.tail, (indexLines))
-      }
-      else
-      //if already staged => modified ?
-        recAdd(files.tail, linesToAddInIndex)
-
-    }
-  }*/
 }
