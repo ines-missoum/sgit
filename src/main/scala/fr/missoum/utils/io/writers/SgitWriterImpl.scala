@@ -2,7 +2,7 @@ package fr.missoum.utils.io.writers
 
 import java.io.{BufferedWriter, File, FileWriter}
 
-import fr.missoum.utils.EntryTree
+import fr.missoum.logic.EntryTree
 import fr.missoum.utils.helpers.{HashHelper, PathHelper}
 
 /**

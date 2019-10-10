@@ -2,7 +2,7 @@ package fr.missoum.commands
 
 import java.io.File
 
-import fr.missoum.utils.EntryTree
+import fr.missoum.logic.EntryTree
 import fr.missoum.utils.helpers.{HashHelper, PathHelper}
 import fr.missoum.utils.io.readers.{SgitReaderImpl, WorkspaceReaderImpl}
 import fr.missoum.utils.io.writers.SgitWriterImpl

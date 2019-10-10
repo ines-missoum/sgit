@@ -1,6 +1,6 @@
 package fr.missoum.utils.io.writers
 
-import fr.missoum.utils.EntryTree
+import fr.missoum.logic.EntryTree
 
 trait SgitWriter {
 

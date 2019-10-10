@@ -1,4 +1,4 @@
-package fr.missoum.utils
+package fr.missoum.logic
 
 import fr.missoum.utils.helpers.HashHelper
 
