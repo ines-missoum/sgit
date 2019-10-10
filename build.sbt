@@ -7,5 +7,7 @@ scalaVersion := "2.13.1"
 libraryDependencies ++= Seq(
 
   "org.scalactic" %% "scalactic" % "3.0.8",
-  "org.scalatest" %% "scalatest" % "3.0.8" % "test"
+  "org.scalatest" %% "scalatest" % "3.0.8" % "test",
+  "org.mockito" %% "mockito-scala" % "1.5.18" % "test"
+
 )
