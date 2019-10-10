@@ -2,6 +2,7 @@ package fr.missoum.utils.io
 
 import java.io._
 
+import fr.missoum.utils.EntreeTree
 import fr.missoum.utils.helpers.{HashHelper, PathHelper}
 
 /**
@@ -18,9 +19,7 @@ object SgitWriter {
     //creation of all files and folders
     val listFolders = List(PathHelper.BranchesDirectory, PathHelper.TagsDirectory, PathHelper.LogsDirectory, PathHelper.ObjectDirectory)
     val listFiles = List(PathHelper.HeadLogFile, PathHelper.HeadFile, PathHelper.IndexFile)
-    listFolders.map({
-      new File(_).mkdirs()
-    })
+    listFolders.map(new File(_).mkdirs())
     listFiles.map(new File(_).createNewFile)
 
     //creation of the master branch and checkout
@@ -35,10 +34,7 @@ object SgitWriter {
    *
    * @param branch : the branch to checkout
    */
-  def setHeadBranch(branch: String): Unit = {
-    writeInFile(PathHelper.HeadFile, "master", false)
-
-  }
+  def setHeadBranch(branch: String): Unit = writeInFile(PathHelper.HeadFile, "master", false)
 
 
   /**
@@ -49,8 +45,8 @@ object SgitWriter {
    * @param newBranch : the branch to create
    */
   def createNewBranch(newBranch: String): Unit = {
-    (new File(PathHelper.BranchesDirectory+File.separator + newBranch)).createNewFile
-    (new File(PathHelper.LogsDirectory+File.separator + newBranch)).createNewFile
+    (new File(PathHelper.BranchesDirectory + File.separator + newBranch)).createNewFile
+    (new File(PathHelper.LogsDirectory + File.separator + newBranch)).createNewFile
   }
 
   /**
@@ -60,9 +56,7 @@ object SgitWriter {
    *
    * @param newTag : the tag to create
    */
-  def createNewTag(newTag: String): Unit = {
-    (new File(PathHelper.TagsDirectory +File.separator+ newTag)).createNewFile
-  }
+  def createNewTag(newTag: String): Unit = (new File(PathHelper.TagsDirectory + File.separator + newTag)).createNewFile
 
   /**
    * Creates the blob in the .sgit repository if it doesn't already exists
@@ -73,7 +67,7 @@ object SgitWriter {
 
     //retrieves path from hash of content file
     val hash = HashHelper.hashFile(contentFile)
-    val pathFolder = PathHelper.ObjectDirectory+File.separator + hash.substring(0, 2)
+    val pathFolder = PathHelper.ObjectDirectory + File.separator + hash.substring(0, 2)
     val pathFile = pathFolder + File.separator + hash.substring(2)
 
     //creation of folder and file if do not exist
@@ -84,9 +78,10 @@ object SgitWriter {
     }
   }
 
-  def addToIndex(contentToAdd: String) = writeInFile(PathHelper.IndexFile, contentToAdd, true)
+  //def addToIndex(contentToAdd: String) = writeInFile(PathHelper.IndexFile, contentToAdd, true)
+  def updateIndex(index: Array[EntreeTree]) = writeInFile(PathHelper.IndexFile, index.map(_.toString).mkString("\n"), false)
 
-  def buildIndexLine(hash: String, pathFile: String) = hash + " " + SgitReader.getSimplePathOfFile(pathFile) + "\n" //TODO : put in another class
+
 
   /**
    *
@@ -94,7 +89,7 @@ object SgitWriter {
    * @param content        : content to write in the file (everything in the file is deleted and replaced by this content)
    * @param shouldBeAppend : tells if the previous content of the file should be kept (shouldBeAppend==true) or deleted (shouldBeAppend==false)
    */
-  def writeInFile(path: String, content: String, shouldBeAppend: Boolean) = {
+  private def writeInFile(path: String, content: String, shouldBeAppend: Boolean) = {
     val file = new File(path)
     val bw = new BufferedWriter(new FileWriter(file, shouldBeAppend))
     bw.write(content)

@@ -11,8 +11,6 @@ import scala.io.Source
  * ie: this object retrieves information from .sgit.
  */
 object SgitReader {
-  def fileExists(path: String): Boolean = scala.reflect.io.File(path).exists
-
 
   /**
    * Checks if a .sgit folder already exists in the current directory.
@@ -42,9 +40,7 @@ object SgitReader {
    *
    * @return the current branch or None if an error happens
    */
-  def getCurrentBranch(): String = {
-    readFirstLineFile(PathHelper.HeadFile)
-  }
+  def getCurrentBranch(): String = readFirstLineFile(PathHelper.HeadFile)
 
   /**
    * Retrieves all branches names
@@ -63,13 +59,12 @@ object SgitReader {
 
   def getIndex(): Array[String] = Source.fromFile(PathHelper.IndexFile).getLines().toArray
 
-  def getSimplePathOfFile(absoluteFilePath: String): String = absoluteFilePath.toSeq.diff(PathHelper.SgitPath.toSeq).unwrap
 
-  def getContentOfFile(path: String): String = {
-    Source.fromFile(path).getLines.mkString("\n")
-  }
 
-  def readFirstLineFile(path: String) = {
+  def getContentOfFile(path: String): String = Source.fromFile(path).getLines.mkString("\n")
+
+  //private functions
+  private def readFirstLineFile(path: String) = {
     val src = Source.fromFile(path)
     val line = src.getLines.toList.head
     src.close

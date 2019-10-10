@@ -1,11 +1,7 @@
 package fr.missoum
 
-import java.io.File.separator
-
-import fr.missoum.utils.helpers.{HashHelper}
+import fr.missoum.commands.SgitAdd
 import fr.missoum.utils.io.{ConsolePrinter, SgitReader, SgitWriter}
-
-import scala.annotation.tailrec
 
 object CommandExecutor {
 
@@ -21,37 +17,16 @@ object CommandExecutor {
     }
   }
 
-  @tailrec
-  def executeAdd(files: Array[String], linesToAddInIndex: String): Unit = {
-
-    if (files.length == 0) SgitWriter.addToIndex(linesToAddInIndex)
-
-    else {
-
-      val path = System.getProperty("user.dir") + separator + files(0)
-      if (SgitReader.fileExists(path)) {
-        val content = SgitReader.getContentOfFile(path)
-        SgitWriter.createBlob(content)
-        var indexLines = linesToAddInIndex
-        val line = SgitWriter.buildIndexLine(HashHelper.hashFile(content), path)
-
-        //if not already staged, added to index
-        if ((SgitReader.getIndex().find(line.contains).isEmpty)) {
-          indexLines += line
-          executeAdd(files.tail, (indexLines))
-        }
-        else
-        //if already staged => modified ?
-          executeAdd(files.tail, linesToAddInIndex)
-      } else {
-        ConsolePrinter.fileNotExist(files(0))
-        executeAdd(files.tail, linesToAddInIndex)
-
-      }
-
-    }
-    //TODO for regexp and file doesn't exists
+  def executeAdd(filesNames: Array[String], linesToAddInIndex: String): Unit = {
+    val notExistingFiles = SgitAdd.getNotExistingFile(filesNames)
+    //if there's not existing file(s), we inform the user and don't add any files
+    if(!notExistingFiles.isEmpty)
+      notExistingFiles.map(ConsolePrinter.fileNotExist(_))
+    //else we add all the existing files
+    else
+      SgitAdd.addAll(filesNames)
   }
+
 
   def executeGetAllBranchesAndTags() = {
     val currentBranch = SgitReader.getCurrentBranch()
