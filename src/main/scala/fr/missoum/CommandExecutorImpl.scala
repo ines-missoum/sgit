@@ -1,21 +1,25 @@
 package fr.missoum
 
 import fr.missoum.commands.SgitAdd
-import fr.missoum.utils.io.printers.ConsolePrinterImpl
-import fr.missoum.utils.io.readers.SgitReaderImpl
-import fr.missoum.utils.io.writers.SgitWriterImpl
+import fr.missoum.utils.io.printers.{ConsolePrinter, ConsolePrinterImpl}
+import fr.missoum.utils.io.readers.{SgitReader, SgitReaderImpl}
+import fr.missoum.utils.io.writers.{SgitWriter, SgitWriterImpl}
 
 object CommandExecutorImpl extends CommandExecutor {
+
+  var sgitReader: SgitReader = SgitReaderImpl
+  var sgitWriter: SgitWriter = SgitWriterImpl
+  var printer: ConsolePrinter = ConsolePrinterImpl
 
   def isCommandForbiddenHere(): Boolean = !SgitReaderImpl.isExistingSgitFolder
 
 
   def executeInit(): Unit = {
-    if (SgitReaderImpl.isExistingSgitFolder())
-      ConsolePrinterImpl.sgitFolderAlreadyExists()
+    if (sgitReader.isExistingSgitFolder())
+      printer.sgitFolderAlreadyExists()
     else {
-      SgitWriterImpl.createSgitRepository()
-      ConsolePrinterImpl.sgitFolderCreated()
+      sgitWriter.createSgitRepository()
+      printer.sgitFolderCreated()
     }
   }
 
@@ -23,7 +27,7 @@ object CommandExecutorImpl extends CommandExecutor {
     val notExistingFiles = SgitAdd.getNotExistingFile(filesNames)
     //if there's not existing file(s), we inform the user and don't add any files
     if(!notExistingFiles.isEmpty)
-      notExistingFiles.map(ConsolePrinterImpl.fileNotExist(_))
+      notExistingFiles.map(printer.fileNotExist(_))
     //else we add all the existing files
     else
       SgitAdd.addAll(filesNames)
@@ -31,28 +35,30 @@ object CommandExecutorImpl extends CommandExecutor {
 
 
   def executeGetAllBranchesAndTags() = {
-    val currentBranch = SgitReaderImpl.getCurrentBranch()
-    val tags = SgitReaderImpl.getAllTags()
-    val branches = SgitReaderImpl.getAllBranches()
-    ConsolePrinterImpl.printBranchesAndTags(currentBranch, tags, branches)
+    val currentBranch = sgitReader.getCurrentBranch()
+    val tags = sgitReader.getAllTags()
+    val branches = sgitReader.getAllBranches()
+    printer.printBranchesAndTags(currentBranch, tags, branches)
   }
 
 
   def executeCreateNewBranch(newBranch: String) = {
-    if (SgitReaderImpl.isExistingBranch(newBranch))
-      ConsolePrinterImpl.branchAlreadyExists(newBranch)
+    if (sgitReader.isExistingBranch(newBranch))
+      printer.branchAlreadyExists(newBranch)
     else {
-      SgitWriterImpl.createNewBranch(newBranch)
-      ConsolePrinterImpl.branchCreated(newBranch)
+      sgitWriter.createNewBranch(newBranch)
+      printer.branchCreated(newBranch)
     }
   }
 
   def executeCreateNewTag(newTag: String) = {
-    if (SgitReaderImpl.isExistingTag(newTag))
-      ConsolePrinterImpl.tagAlreadyExists(newTag)
+    if (sgitReader.isExistingTag(newTag))
+      printer.tagAlreadyExists(newTag)
     else {
       SgitWriterImpl.createNewTag(newTag)
-      ConsolePrinterImpl.tagCreated(newTag)
+      printer.tagCreated(newTag)
     }
   }
+
+
 }
