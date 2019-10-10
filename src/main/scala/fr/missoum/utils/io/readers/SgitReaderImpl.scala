@@ -1,6 +1,6 @@
-package fr.missoum.utils.io
+package fr.missoum.utils.io.readers
 
-import java.io._
+import java.io.File
 
 import fr.missoum.utils.helpers.PathHelper
 
@@ -10,7 +10,7 @@ import scala.io.Source
  * This object is responsible for accessing (read only) files or directories and doing test on it.
  * ie: this object retrieves information from .sgit.
  */
-object SgitReader {
+object SgitReaderImpl extends SgitReader {
 
   /**
    * Checks if a .sgit folder already exists in the current directory.

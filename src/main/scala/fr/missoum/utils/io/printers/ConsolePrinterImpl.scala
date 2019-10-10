@@ -1,11 +1,11 @@
-package fr.missoum.utils.io
+package fr.missoum.utils.io.printers
 
 import fr.missoum.utils.helpers.PathHelper
 
 /**
  * Object responsible for communication with the user. This means print messages on the console.
  */
-object ConsolePrinter {
+object ConsolePrinterImpl extends ConsolePrinter {
 
   def fileNotExist(fileName: String): Unit = println("fatal: '"+fileName+"' did not match any files")
 

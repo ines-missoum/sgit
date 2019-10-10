@@ -2,28 +2,29 @@ package fr.missoum.commands
 
 import java.io.File
 
-import fr.missoum.utils.EntreeTree
+import fr.missoum.utils.EntryTree
 import fr.missoum.utils.helpers.{HashHelper, PathHelper}
-import fr.missoum.utils.io.{ConsolePrinter, SgitReader, SgitWriter, WorkspaceReader}
+import fr.missoum.utils.io.readers.{SgitReaderImpl, WorkspaceReaderImpl}
+import fr.missoum.utils.io.writers.SgitWriterImpl
 
 import scala.annotation.tailrec
 
 object SgitAdd {
 
   def getNotExistingFile(filesNames: Array[String]) =
-    filesNames.filter(x => !WorkspaceReader.fileExists(System.getProperty("user.dir") + File.separator + x))
+    filesNames.filter(x => !WorkspaceReaderImpl.fileExists(System.getProperty("user.dir") + File.separator + x))
 
   def addAll(filesNames: Array[String]): Unit = {
 
     // we retrieve all the content of the index file in format of array of blobs
-    val indexBlobs = SgitReader.getIndex().map(x => EntreeTree(x))
+    val indexBlobs = SgitReaderImpl.getIndex().map(x => EntryTree(x))
 
     //we create a array of blobs from the array of files names
-    val newFilesBlobs: Array[EntreeTree] = filesNames.map(x => {
+    val newFilesBlobs: Array[EntryTree] = filesNames.map(x => {
       val absolutePath = System.getProperty("user.dir") + File.separator + x
       val simplePath = PathHelper.getSimplePathOfFile(absolutePath)
-      val content = SgitReader.getContentOfFile(absolutePath)
-      EntreeTree.NewBlobWithContent(content, simplePath)
+      val content = SgitReaderImpl.getContentOfFile(absolutePath)
+      EntryTree.NewBlobWithContent(content, simplePath)
     })
 
     //we add all files that need to
@@ -32,12 +33,12 @@ object SgitAdd {
   }
 
   @tailrec
-  def recAdd(filesBlobs: Array[EntreeTree], index: Array[EntreeTree]): Unit = {
+  def recAdd(filesBlobs: Array[EntryTree], index: Array[EntryTree]): Unit = {
     //if no more files to deal with, we save the index
-    if (filesBlobs.length == 0) SgitWriter.updateIndex(index)
+    if (filesBlobs.length == 0) SgitWriterImpl.updateIndex(index)
     else {
       //we create the blob in memory if it doesn't already exists
-      SgitWriter.createBlob(filesBlobs(0).content.get)
+      SgitWriterImpl.createBlob(filesBlobs(0).content.get)
 
       //we update the index:
 

@@ -1,7 +1,7 @@
 package fr.missoum
 
 import fr.missoum.utils.helpers.PathHelper
-import fr.missoum.utils.io.ConsolePrinter
+import fr.missoum.utils.io.printers.ConsolePrinterImpl
 
 object Main {
 
@@ -11,22 +11,22 @@ object Main {
     args match {
       //init
       case Array("init") => executor.executeInit()
-      case Array("init", _*) => ConsolePrinter.notValidArguments("init", "just 'init'")
+      case Array("init", _*) => ConsolePrinterImpl.notValidArguments("init", "just 'init'")
       //errors
-      case Array(_*) if CommandExecutorImpl.isCommandForbiddenHere() => ConsolePrinter.notExistingSgitRepository()
-      case Array() => ConsolePrinter.noCommand()
+      case Array(_*) if CommandExecutorImpl.isCommandForbiddenHere() => ConsolePrinterImpl.notExistingSgitRepository()
+      case Array() => ConsolePrinterImpl.noCommand()
       //branch
       case Array("branch", "-av") => CommandExecutorImpl.executeGetAllBranchesAndTags()
       case Array("branch", x: String) => CommandExecutorImpl.executeCreateNewBranch(x)
-      case Array("branch", _*) => ConsolePrinter.notValidArguments("branch", "'branch -av' or 'branch <branch>'")
+      case Array("branch", _*) => ConsolePrinterImpl.notValidArguments("branch", "'branch -av' or 'branch <branch>'")
       //tag
       case Array("tag", x: String) => CommandExecutorImpl.executeCreateNewTag(x)
-      case Array("tag", _*) => ConsolePrinter.notValidArguments("tag", "'tag <tag>'")
+      case Array("tag", _*) => ConsolePrinterImpl.notValidArguments("tag", "'tag <tag>'")
       //add
       case a: Array[String] if a.length > 1 && a(0).equals("add") => CommandExecutorImpl.executeAdd(a.tail, "")
-      case Array("add") => ConsolePrinter.notValidArguments("add", "'add <file>' or 'add <file>*' ")
+      case Array("add") => ConsolePrinterImpl.notValidArguments("add", "'add <file>' or 'add <file>*' ")
 
-      case a: Array[String] => ConsolePrinter.notValidCommand(a(0))
+      case a: Array[String] => ConsolePrinterImpl.notValidCommand(a(0))
     }
   }
 }

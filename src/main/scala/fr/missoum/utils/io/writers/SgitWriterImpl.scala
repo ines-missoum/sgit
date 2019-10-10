@@ -1,14 +1,14 @@
-package fr.missoum.utils.io
+package fr.missoum.utils.io.writers
 
-import java.io._
+import java.io.{BufferedWriter, File, FileWriter}
 
-import fr.missoum.utils.EntreeTree
+import fr.missoum.utils.EntryTree
 import fr.missoum.utils.helpers.{HashHelper, PathHelper}
 
 /**
  * This object is responsible for all writing actions. Which means create files and folders and update them.
  */
-object SgitWriter {
+object SgitWriterImpl extends  SgitWriter {
 
   /**
    * Creates the sgit directory where the command has been executed. It contains all the folders and files necessary.
@@ -78,8 +78,8 @@ object SgitWriter {
     }
   }
 
-  //def addToIndex(contentToAdd: String) = writeInFile(PathHelper.IndexFile, contentToAdd, true)
-  def updateIndex(index: Array[EntreeTree]) = writeInFile(PathHelper.IndexFile, index.map(_.toString).mkString("\n"), false)
+
+  def updateIndex(index: Array[EntryTree]) = writeInFile(PathHelper.IndexFile, index.map(_.toString).mkString("\n"), false)
 
 
 
