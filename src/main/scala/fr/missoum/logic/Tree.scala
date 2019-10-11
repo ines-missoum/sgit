@@ -1,6 +1,6 @@
 package fr.missoum.logic
 
-case class Tree(val entryType: String, var hash: String, var path: String, var contentString: Option[String],var listEntryTree : Option[List[EntryTree]] ) extends EntryTree
+case class Tree(entryType: String, var hash: String, var path: String, var contentString: Option[String],var listEntryTree : Option[List[EntryTree]] ) extends EntryTree
 
 object Tree {
 
@@ -11,6 +11,10 @@ object Tree {
 
   def apply(hash: String, path: String): EntryTree = {
     new Tree("tree", hash, path, None, None )
+  }
+
+  def apply():EntryTree ={
+    new Tree("tree", "", "", None, Some(List[EntryTree]()))
   }
 
 }

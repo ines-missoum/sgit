@@ -38,7 +38,7 @@ object SgitAdd {
     if (filesBlobs.length == 0) SgitWriterImpl.updateIndex(index)
     else {
       //we create the blob in memory if it doesn't already exists
-      SgitWriterImpl.createBlob(filesBlobs(0).contentString.get)
+      SgitWriterImpl.createObject(filesBlobs(0).contentString.get)
 
       //we update the index:
 

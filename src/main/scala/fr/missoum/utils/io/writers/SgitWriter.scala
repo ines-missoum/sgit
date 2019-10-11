@@ -38,7 +38,7 @@ trait SgitWriter {
    *
    * @param contentFile content of the file for which we want to create the blob
    */
-  def createBlob(contentFile: String)
+  def createObject(contentFile: String):String
 
   def updateIndex(index: Array[EntryTree])
 

@@ -2,13 +2,13 @@ package fr.missoum.utils.io.writers
 
 import java.io.{BufferedWriter, File, FileWriter}
 
-import fr.missoum.logic.EntryTree
+import fr.missoum.logic.{EntryTree, Tree}
 import fr.missoum.utils.helpers.{HashHelper, PathHelper}
 
 /**
  * This object is responsible for all writing actions. Which means create files and folders and update them.
  */
-object SgitWriterImpl extends  SgitWriter {
+object SgitWriterImpl extends SgitWriter {
 
   /**
    * Creates the sgit directory where the command has been executed. It contains all the folders and files necessary.
@@ -58,12 +58,13 @@ object SgitWriterImpl extends  SgitWriter {
    */
   def createNewTag(newTag: String): Unit = (new File(PathHelper.TagsDirectory + File.separator + newTag)).createNewFile
 
+
   /**
-   * Creates the blob in the .sgit repository if it doesn't already exists
-   *
+   * Creates the object in the .sgit repository if it doesn't already exists
    * @param contentFile content of the file for which we want to create the blob
+   * @return the hash of the object created
    */
-  def createBlob(contentFile: String) = {
+  def createObject(contentFile: String):String = {
 
     //retrieves path from hash of content file
     val hash = HashHelper.hashFile(contentFile)
@@ -76,11 +77,10 @@ object SgitWriterImpl extends  SgitWriter {
     if (isNew) {
       writeInFile(pathFile, contentFile, false)
     }
+    hash
   }
 
-
   def updateIndex(index: Array[EntryTree]) = writeInFile(PathHelper.IndexFile, index.map(_.toString).mkString("\n"), false)
-
 
 
   /**

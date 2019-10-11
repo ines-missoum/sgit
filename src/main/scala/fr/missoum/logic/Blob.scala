@@ -2,17 +2,17 @@ package fr.missoum.logic
 
 import fr.missoum.utils.helpers.HashHelper
 
-case class Blob(val entryType: String, var hash: String, var path: String, var contentString: Option[String]) extends EntryTree
+case class Blob(val entryType: String, var hash: String, var path: String, var contentString: Option[String],var listEntryTree : Option[List[EntryTree]] ) extends EntryTree
 
 object Blob{
 
   def apply(line: String): EntryTree = {
     val values = line.split(" ")
-    new Blob("blob", values(1), values(2), None)
+    new Blob("blob", values(1), values(2), None, None)
   }
 
-  def apply(hash: String, path: String): EntryTree = new Blob("blob", hash, path, None)
+  def apply(hash: String, path: String): EntryTree = new Blob("blob", hash, path, None, None)
 
-  def NewBlobWithContent(content: String, path: String): EntryTree = new Blob("blob", HashHelper.hashFile(content), path, Some(content))
+  def NewBlobWithContent(content: String, path: String): EntryTree = new Blob("blob", HashHelper.hashFile(content), path, Some(content), None)
 
 }
