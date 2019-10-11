@@ -46,5 +46,7 @@ trait SgitReader{
 
   def getContentOfFile(path: String): String
 
+  def isExistingCommit(): Boolean
+
 
 }

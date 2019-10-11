@@ -59,7 +59,14 @@ object SgitReaderImpl extends SgitReader {
 
   def getIndex(): Array[String] = Source.fromFile(PathHelper.IndexFile).getLines().toArray
 
-
+  /**
+   * Check if the already is a commit for the current branch.
+   * @return True if a commit exists, otherwise False.
+   */
+  def isExistingCommit(): Boolean = {
+    val commits = getContentOfFile(PathHelper.BranchesDirectory+File.separator+getCurrentBranch)
+    !commits.isEmpty
+  }
 
   def getContentOfFile(path: String): String = Source.fromFile(path).getLines.mkString("\n")
 
@@ -70,5 +77,7 @@ object SgitReaderImpl extends SgitReader {
     src.close
     line
   }
+
+
 
 }

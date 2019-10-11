@@ -1,6 +1,7 @@
 package fr.missoum
 
-import fr.missoum.commands.SgitAdd
+import fr.missoum.commands.{SgitAdd, SgitCommit, SgitCommitImpl}
+import fr.missoum.logic.Blob
 import fr.missoum.utils.io.printers.{ConsolePrinter, ConsolePrinterImpl}
 import fr.missoum.utils.io.readers.{SgitReader, SgitReaderImpl}
 import fr.missoum.utils.io.writers.{SgitWriter, SgitWriterImpl}
@@ -10,6 +11,7 @@ object CommandExecutorImpl extends CommandExecutor {
   var sgitReader: SgitReader = SgitReaderImpl
   var sgitWriter: SgitWriter = SgitWriterImpl
   var printer: ConsolePrinter = ConsolePrinterImpl
+  var commitHelper: SgitCommit = SgitCommitImpl
 
   def isCommandForbiddenHere(): Boolean = !SgitReaderImpl.isExistingSgitFolder
 
@@ -26,7 +28,7 @@ object CommandExecutorImpl extends CommandExecutor {
   def executeAdd(filesNames: Array[String], linesToAddInIndex: String): Unit = {
     val notExistingFiles = SgitAdd.getNotExistingFile(filesNames)
     //if there's not existing file(s), we inform the user and don't add any files
-    if(!notExistingFiles.isEmpty)
+    if (!notExistingFiles.isEmpty)
       notExistingFiles.map(printer.fileNotExist(_))
     //else we add all the existing files
     else
@@ -60,7 +62,12 @@ object CommandExecutorImpl extends CommandExecutor {
     }
   }
 
-  def executeCommit() ={
+  def executeCommit() = {
+    if (sgitReader.isExistingCommit())
+      commitHelper.commit()
+    else
+    //if first commit
+      commitHelper.firstCommit()
 
   }
 

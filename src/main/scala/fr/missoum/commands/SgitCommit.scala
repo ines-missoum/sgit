@@ -2,13 +2,14 @@ package fr.missoum.commands
 
 import fr.missoum.logic.EntryTree
 
-object SgitCommit{
+trait SgitCommit {
 
-  def commit(listOfBlobsToCommit:Array[EntryTree]): Unit ={
+  def firstCommit()
 
-  }
+  def commit()
 
-  def createAllTrees(listOfBlobsToCommit:Array[EntryTree]): Unit ={
-    
-  }
+  def createAllTrees(listOfBlobsToCommit: Array[EntryTree])
+
+  def retrieveAllCommittedBlobs()
+
 }

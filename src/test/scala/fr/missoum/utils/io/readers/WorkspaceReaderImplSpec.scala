@@ -5,7 +5,7 @@ import java.io.File
 import org.mockito.IdiomaticMockito
 import org.scalatest.{FlatSpec, Matchers}
 
-class WorkspaceReaderSpec extends FlatSpec with Matchers with IdiomaticMockito {
+class WorkspaceReaderImplSpec extends FlatSpec with Matchers with IdiomaticMockito {
 
   behavior of "fileExists method"
 
