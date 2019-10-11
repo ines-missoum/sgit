@@ -1,13 +1,29 @@
 package fr.missoum.logic
 
-import fr.missoum.utils.helpers.HashHelper
+trait EntryTree {
 
-object EntryTree {
-
+  //const
   val Blob = "blob"
   val Tree = "tree"
 
-  def NewBlobWithContent(content: String, path: String): EntryTree = {
+  //attributes
+  val entryType: String
+  var path: String
+  var hash: String
+  var contentString: Option[String]
+
+  //functions
+  def isTree(): Boolean = entryType.equals(Tree)
+
+  def isBlob(): Boolean = entryType.equals(Blob)
+
+  override def toString: String = this.entryType + " " + this.hash + " " + this.path
+
+}
+
+/*object EntryTree {
+
+ def NewBlobWithContent(content: String, path: String): EntryTree = {
     new EntryTree(EntryTree.Blob, HashHelper.hashFile(content), path, Some(content))
   }
   def NewBlob(hash: String, path: String): EntryTree = {
@@ -22,15 +38,9 @@ object EntryTree {
     val values = line.split(" ")
     new EntryTree(values(0), values(1), values(2), None)
   }
-}
+}*/
 
-case class EntryTree(var entreeType: String, var hash: String, var path: String, var content : Option[String]) {
-  override def toString: String = this.entreeType+" "+ this.hash +" "+this.path
 
-  def isTree(): Boolean = this.entreeType.equals(EntryTree.Tree)
-
-  def isBlob(): Boolean = this.entreeType.equals(EntryTree.Blob)
-}
 
 
 

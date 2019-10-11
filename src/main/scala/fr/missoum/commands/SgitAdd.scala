@@ -2,7 +2,7 @@ package fr.missoum.commands
 
 import java.io.File
 
-import fr.missoum.logic.EntryTree
+import fr.missoum.logic.{Blob, EntryTree}
 import fr.missoum.utils.helpers.{HashHelper, PathHelper}
 import fr.missoum.utils.io.readers.{SgitReaderImpl, WorkspaceReaderImpl}
 import fr.missoum.utils.io.writers.SgitWriterImpl
@@ -17,14 +17,14 @@ object SgitAdd {
   def addAll(filesNames: Array[String]): Unit = {
 
     // we retrieve all the content of the index file in format of array of blobs
-    val indexBlobs = SgitReaderImpl.getIndex().map(x => EntryTree(x))
+    val indexBlobs = SgitReaderImpl.getIndex().map(x => Blob(x))
 
     //we create a array of blobs from the array of files names
     val newFilesBlobs: Array[EntryTree] = filesNames.map(x => {
       val absolutePath = System.getProperty("user.dir") + File.separator + x
       val simplePath = PathHelper.getSimplePathOfFile(absolutePath)
       val content = SgitReaderImpl.getContentOfFile(absolutePath)
-      EntryTree.NewBlobWithContent(content, simplePath)
+      Blob.NewBlobWithContent(content, simplePath)
     })
 
     //we add all files that need to
@@ -38,7 +38,7 @@ object SgitAdd {
     if (filesBlobs.length == 0) SgitWriterImpl.updateIndex(index)
     else {
       //we create the blob in memory if it doesn't already exists
-      SgitWriterImpl.createBlob(filesBlobs(0).content.get)
+      SgitWriterImpl.createBlob(filesBlobs(0).contentString.get)
 
       //we update the index:
 
