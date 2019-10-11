@@ -1,32 +1,35 @@
 package fr.missoum
 
-import fr.missoum.utils.helpers.PathHelper
-import fr.missoum.utils.io.printers.ConsolePrinterImpl
+import fr.missoum.utils.io.printers.{ConsolePrinter, ConsolePrinterImpl}
 
 object Main {
 
   var executor :CommandExecutor = CommandExecutorImpl
+  var printer : ConsolePrinter = ConsolePrinterImpl
+
   def main(args: Array[String]): Unit = {
 
     args match {
       //init
       case Array("init") => executor.executeInit()
-      case Array("init", _*) => ConsolePrinterImpl.notValidArguments("init", "just 'init'")
+      case Array("init", _*) => printer.notValidArguments("init", "just 'init'")
       //errors
-      case Array(_*) if CommandExecutorImpl.isCommandForbiddenHere() => ConsolePrinterImpl.notExistingSgitRepository()
-      case Array() => ConsolePrinterImpl.noCommand()
+      case Array(_*) if executor.isCommandForbiddenHere() => printer.notExistingSgitRepository()
+      case Array() => printer.noCommand()
       //branch
-      case Array("branch", "-av") => CommandExecutorImpl.executeGetAllBranchesAndTags()
-      case Array("branch", x: String) => CommandExecutorImpl.executeCreateNewBranch(x)
-      case Array("branch", _*) => ConsolePrinterImpl.notValidArguments("branch", "'branch -av' or 'branch <branch>'")
+      case Array("branch", "-av") => executor.executeGetAllBranchesAndTags()
+      case Array("branch", x: String) => executor.executeCreateNewBranch(x)
+      case Array("branch", _*) => printer.notValidArguments("branch", "'branch -av' or 'branch <branch>'")
       //tag
-      case Array("tag", x: String) => CommandExecutorImpl.executeCreateNewTag(x)
-      case Array("tag", _*) => ConsolePrinterImpl.notValidArguments("tag", "'tag <tag>'")
+      case Array("tag", x: String) => executor.executeCreateNewTag(x)
+      case Array("tag", _*) => printer.notValidArguments("tag", "'tag <tag>'")
       //add
-      case a: Array[String] if a.length > 1 && a(0).equals("add") => CommandExecutorImpl.executeAdd(a.tail, "")
-      case Array("add") => ConsolePrinterImpl.notValidArguments("add", "'add <file>' or 'add <file>*' ")
-
-      case a: Array[String] => ConsolePrinterImpl.notValidCommand(a(0))
+      case a: Array[String] if a.length > 1 && a(0).equals("add") => executor.executeAdd(a.tail, "")
+      case Array("add") => printer.notValidArguments("add", "'add <file>' or 'add <file>*' ")
+        //commit
+      case Array("commit") => executor.executeCommit()
+      case Array("commit", _*) => printer.notValidArguments("commit", "just 'commit'")
+      case a: Array[String] => printer.notValidCommand(a(0))
     }
   }
 }

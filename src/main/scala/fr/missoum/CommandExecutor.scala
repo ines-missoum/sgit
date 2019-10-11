@@ -22,4 +22,6 @@ trait CommandExecutor {
 
   def executeCreateNewTag(newTag: String)
 
+  def executeCommit()
+
 }

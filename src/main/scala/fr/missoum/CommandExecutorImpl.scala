@@ -60,5 +60,9 @@ object CommandExecutorImpl extends CommandExecutor {
     }
   }
 
+  def executeCommit() ={
+
+  }
+
 
 }
