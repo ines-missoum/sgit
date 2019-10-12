@@ -1,6 +1,7 @@
 package fr.missoum
 
 import fr.missoum.commands.SgitCommit
+import fr.missoum.utils.io.inputs.UserInput
 import fr.missoum.utils.io.printers.ConsolePrinter
 import fr.missoum.utils.io.readers.SgitReader
 import fr.missoum.utils.io.writers.SgitWriter
@@ -67,9 +68,11 @@ class CommandExecutorSpec extends FlatSpec with Matchers with IdiomaticMockito {
     //given
     val mockReader = mock[SgitReader]
     val mockCommitHelper = mock[SgitCommit]
+    val mockInputManager = mock[UserInput]
     val objectTested = CommandExecutorImpl
     objectTested.sgitReader = mockReader
     objectTested.commitHelper = mockCommitHelper
+    objectTested.inputManager = mockInputManager
     //when
     objectTested.executeCommit()
     //then

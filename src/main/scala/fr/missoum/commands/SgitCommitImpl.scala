@@ -8,11 +8,11 @@ import fr.missoum.utils.io.writers.SgitWriterImpl
 
 object SgitCommitImpl extends SgitCommit {
 
-  def firstCommit(message:String) = {
+  def firstCommit(message: String) = {
 
     val commitTree = createAllTrees(SgitReaderImpl.getIndex().map(x => Blob(x)))
     val currentBranch = SgitReaderImpl.getCurrentBranch
-    SgitWriterImpl.createCommit(Commit.noParentHash,commitTree,currentBranch,message)
+    SgitWriterImpl.createCommit(Commit.noParentHash, commitTree, currentBranch, message)
     //TODO create commit + everywhere add this commit = branches log ... and ?
     //TODO tests
     //TODO check if pure
@@ -22,7 +22,7 @@ object SgitCommitImpl extends SgitCommit {
   }
 
 
-  def commit(message:String): Unit = {
+  def commit(message: String): Unit = {
 
     /*val commitTree = createAllTrees(????)
     val parentCommit = SgitReaderImpl.getParentCommitOfCurrentBranch
@@ -31,6 +31,11 @@ object SgitCommitImpl extends SgitCommit {
 
   }
 
+  def retrievePreviousBlobsCommitted(commitHash: String): Array[EntryTree] = {
+    val hashTemp = "3c9e8fe4f5daf8e44b7fc2c57e31fda879a77b13"
+    val result = Array[EntryTree]()
+    result
+  }
 
   def recPrint(tree: EntryTree): Unit = {
     println("TREE : " + tree.path)
@@ -46,7 +51,7 @@ object SgitCommitImpl extends SgitCommit {
     val commitTree: EntryTree = Tree() //to change
     val result = createAllTreesRec(gatherBlobs, commitTree)
     commitTree.listEntryTree = Some(result._1)
-    commitTree.hash =result._2
+    commitTree.hash = result._2
     commitTree
 
   }

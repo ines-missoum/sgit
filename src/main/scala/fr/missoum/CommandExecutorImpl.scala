@@ -2,6 +2,7 @@ package fr.missoum
 
 import fr.missoum.commands.{SgitAdd, SgitCommit, SgitCommitImpl}
 import fr.missoum.logic.Blob
+import fr.missoum.utils.io.inputs.{UserInput, UserInputImpl}
 import fr.missoum.utils.io.printers.{ConsolePrinter, ConsolePrinterImpl}
 import fr.missoum.utils.io.readers.{SgitReader, SgitReaderImpl}
 import fr.missoum.utils.io.writers.{SgitWriter, SgitWriterImpl}
@@ -12,6 +13,7 @@ object CommandExecutorImpl extends CommandExecutor {
   var sgitWriter: SgitWriter = SgitWriterImpl
   var printer: ConsolePrinter = ConsolePrinterImpl
   var commitHelper: SgitCommit = SgitCommitImpl
+  var inputManager: UserInput = UserInputImpl
 
   def isCommandForbiddenHere(): Boolean = !SgitReaderImpl.isExistingSgitFolder
 
@@ -64,7 +66,7 @@ object CommandExecutorImpl extends CommandExecutor {
 
   def executeCommit() = {
     printer.askEnterMessageCommits
-    val message = scala.io.StdIn.readLine()
+    val message = inputManager.retrieveUserCommitMessage()
     if (sgitReader.isExistingCommit())
       commitHelper.commit(message)
     else
