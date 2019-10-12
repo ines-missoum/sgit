@@ -38,4 +38,8 @@ trait ConsolePrinter {
 
   def untrackedFiles(untrackedFiles: Array[String])
 
+  def changesToBeCommitted(news: Array[String], modified: Array[String], deleted: Array[String])
+
+  def branch(branch: String)
+
 }

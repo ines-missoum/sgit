@@ -83,18 +83,26 @@ object CommandExecutorImpl extends CommandExecutor {
   }
 
   def executeStatus() = {
+    //retrieve data
+    val branch = sgitReader.getCurrentBranch()
     val workspace = workspaceReader.getAllBlobsOfWorkspace()
     val index = sgitReader.getIndex().map(x => Blob(x))
     val lastCommit = commitHelper.retrievePreviousBlobsCommitted()
 
+    //process
     val untrackedFiles = statusHelper.getUntrackedFiles(workspace, index)
     val (modifiedNotStaged, deletedNotStaged) = statusHelper.getChangesNotStagedForCommit(index, workspace)
+    val (newsToCommit, modifiedToCommit, deletedToCommit) = statusHelper.getChangesToBeCommitted(index, lastCommit)
 
+    //print
+    printer.branch(branch)
+    if (!(newsToCommit.isEmpty && modifiedToCommit.isEmpty && deletedToCommit.isEmpty))
+      printer.changesToBeCommitted(newsToCommit, modifiedToCommit, deletedToCommit)
     if (!(modifiedNotStaged.isEmpty && deletedNotStaged.isEmpty))
       printer.changesNotStagedForCommit(modifiedNotStaged, deletedNotStaged)
     if (!untrackedFiles.isEmpty)
       printer.untrackedFiles(untrackedFiles)
-
+    //when only not staged => no changes added to commit (use "git add" and/or "git commit -a")
   }
 
 

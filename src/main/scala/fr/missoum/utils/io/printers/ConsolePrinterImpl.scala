@@ -57,5 +57,15 @@ object ConsolePrinterImpl extends ConsolePrinter {
       + Console.RED + deleted + "\n" + modified + "\n" + Console.WHITE)
   }
 
+  def changesToBeCommitted(news: Array[String], modified: Array[String], deleted: Array[String]) = {
+    val newsPrint = news.map("\tnew file:    " + _).mkString("\n")
+    val deletedPrint = deleted.map("\tdeleted:    " + _).mkString("\n")
+    val modifiedPrint = modified.map("\tmodified:   " + _).mkString("\n")
+    println("Changes to be committed:\n  (use \"git reset HEAD <file>...\" to unstage)\n\n"
+      + Console.GREEN + newsPrint + deletedPrint + "\n" + modifiedPrint + "\n" + Console.WHITE)
+  }
 
+  def branch(branch: String) = {
+    println("On branch " + branch)
+  }
 }
