@@ -1,9 +1,11 @@
 package fr.missoum.utils.io.printers
 
-trait ConsolePrinter{
-  def NothingToCommit(branch: String)
+import fr.missoum.logic.EntryTree
 
-  def CommitCreatedMessage(branch: String,message:String,nbFilesChanged:Int)
+trait ConsolePrinter {
+  def nothingToCommit(branch: String)
+
+  def commitCreatedMessage(branch: String, message: String, nbFilesChanged: Int)
 
   def fileNotExist(fileName: String)
 
@@ -30,5 +32,7 @@ trait ConsolePrinter{
   def printBranchesAndTags(currentBranch: String, tags: Array[String], branches: Array[String])
 
   def askEnterMessageCommits()
+
+  def untrackedFiles(untrackedFiles: Array[String])
 
 }

@@ -1,18 +1,21 @@
 package fr.missoum
 
-import fr.missoum.commands.{SgitAdd, SgitCommit, SgitCommitImpl}
+import fr.missoum.commands.{SgitAdd, SgitCommit, SgitCommitImpl, SgitStatus, SgitStatusImpl}
+import fr.missoum.logic.Blob
 import fr.missoum.utils.io.inputs.{UserInput, UserInputImpl}
 import fr.missoum.utils.io.printers.{ConsolePrinter, ConsolePrinterImpl}
-import fr.missoum.utils.io.readers.{SgitReader, SgitReaderImpl, WorkspaceReaderImpl}
+import fr.missoum.utils.io.readers.{SgitReader, SgitReaderImpl, WorkspaceReader, WorkspaceReaderImpl}
 import fr.missoum.utils.io.writers.{SgitWriter, SgitWriterImpl}
 
 object CommandExecutorImpl extends CommandExecutor {
 
   var sgitReader: SgitReader = SgitReaderImpl
+  var workspaceReader: WorkspaceReader = WorkspaceReaderImpl
   var sgitWriter: SgitWriter = SgitWriterImpl
   var printer: ConsolePrinter = ConsolePrinterImpl
   var commitHelper: SgitCommit = SgitCommitImpl
   var inputManager: UserInput = UserInputImpl
+  var statusHelper: SgitStatus = SgitStatusImpl
 
   def isCommandForbiddenHere(): Boolean = !SgitReaderImpl.isExistingSgitFolder
 
@@ -69,18 +72,24 @@ object CommandExecutorImpl extends CommandExecutor {
     val branch = sgitReader.getCurrentBranch()
     //if nothing to commmit
     if (blobsToCommit.isEmpty)
-      printer.NothingToCommit(branch)
+      printer.nothingToCommit(branch)
     else {
       //if commit needed
       printer.askEnterMessageCommits
       val message = inputManager.retrieveUserCommitMessage()
-      val nbFilesChanged =commitHelper.commit(blobsToCommit, message)
-      printer.CommitCreatedMessage(branch,message,nbFilesChanged)
+      val nbFilesChanged = commitHelper.commit(blobsToCommit, message)
+      printer.commitCreatedMessage(branch, message, nbFilesChanged)
     }
   }
 
-  def executeStatus() ={
-    WorkspaceReaderImpl.getAllBlobsOfWorkspace()
+  def executeStatus() = {
+    val workspace = workspaceReader.getAllBlobsOfWorkspace()
+    val index = sgitReader.getIndex().map(x => Blob(x))
+    val lastCommit = commitHelper.retrievePreviousBlobsCommitted()
+    val untrackedFiles = statusHelper.getUntrackedFiles(workspace, index)
+    if (!untrackedFiles.isEmpty)
+      printer.untrackedFiles(untrackedFiles)
+
   }
 
 

@@ -1,5 +1,6 @@
 package fr.missoum.utils.io.printers
 
+import fr.missoum.logic.EntryTree
 import fr.missoum.utils.helpers.PathHelper
 
 /**
@@ -40,7 +41,13 @@ object ConsolePrinterImpl extends ConsolePrinter {
 
   def askEnterMessageCommits() = println("Please enter the commit message for your changes : ")
 
-  def CommitCreatedMessage(branch: String,message:String,nbFilesChanged:Int) = println("\n["+branch+"] "+message+" \n"+nbFilesChanged+" file(s) changed")
+  def commitCreatedMessage(branch: String, message: String, nbFilesChanged: Int) = println("\n[" + branch + "] " + message + " \n" + nbFilesChanged + " file(s) changed")
 
-  def NothingToCommit(branch: String) = println("On branch "+branch+"\nnothing to commit, working tree clean")
+  def nothingToCommit(branch: String) = println("On branch " + branch + "\nnothing to commit, working tree clean")
+
+  def untrackedFiles(untrackedFiles: Array[String]) = {
+    val files = untrackedFiles.map("\t" + _).mkString("\n")
+    println("Untracked files:\n  (use \"git add <file>...\" to include in what will be committed)\n\n" + Console.RED + files)
+  }
+
 }

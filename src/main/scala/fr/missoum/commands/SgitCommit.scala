@@ -12,4 +12,6 @@ trait SgitCommit {
 
   def retrieveAllCommittedBlobs()
 
+  def retrievePreviousBlobsCommitted(): Array[EntryTree]
+
 }
