@@ -6,15 +6,15 @@ object Tree {
 
   def apply(line: String): EntryTree = {
     val values = line.split(" ")
-    new Tree("tree", values(1), values(2), None, None)
+    new Tree(EntryTree.TreeType, values(1), values(2), None, None)
   }
 
   def apply(hash: String, path: String): EntryTree = {
-    new Tree("tree", hash, path, None, None )
+    new Tree(EntryTree.TreeType, hash, path, None, None )
   }
 
   def apply():EntryTree ={
-    new Tree("tree", "", "", None, Some(List[EntryTree]()))
+    new Tree(EntryTree.TreeType, "", "", None, Some(List[EntryTree]()))
   }
 
 }

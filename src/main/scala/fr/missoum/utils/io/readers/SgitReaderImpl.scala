@@ -2,6 +2,7 @@ package fr.missoum.utils.io.readers
 
 import java.io.File
 
+import fr.missoum.logic.{Blob, Commit, EntryTree}
 import fr.missoum.utils.helpers.PathHelper
 
 import scala.io.Source
@@ -69,6 +70,19 @@ object SgitReaderImpl extends SgitReader {
   }
 
   def getContentOfFile(path: String): String = Source.fromFile(path).getLines.mkString("\n")
+
+  def getContentOfObjectInEntries(hash: String):Array[EntryTree] = {
+    val pathObject = PathHelper.ObjectDirectory+File.separator+hash.substring(0, 2)+File.separator+hash.substring(2)
+    Source.fromFile(pathObject).getLines.map(x => EntryTree(x)).toArray
+  }
+
+
+  def getLastCommitTreeHash():String = {
+    val hashCommit = getParentCommitOfCurrentBranch
+    val pathCommit = PathHelper.ObjectDirectory+File.separator+hashCommit.substring(0, 2)+File.separator+hashCommit.substring(2)
+    val content = getContentOfFile(pathCommit)
+    Commit.getCommitTreeHashFromContent(content)
+  }
 
   def getParentCommitOfCurrentBranch:String =  readFirstLineFile(PathHelper.BranchesDirectory+File.separator+getCurrentBranch)
 

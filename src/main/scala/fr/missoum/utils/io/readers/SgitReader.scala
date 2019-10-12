@@ -1,6 +1,6 @@
 package fr.missoum.utils.io.readers
 
-trait SgitReader{
+trait SgitReader {
 
   def isExistingSgitFolder(): Boolean
 
@@ -48,7 +48,9 @@ trait SgitReader{
 
   def isExistingCommit(): Boolean
 
-  def getParentCommitOfCurrentBranch:String
+  def getLastCommitTreeHash(): String
+
+  def getParentCommitOfCurrentBranch: String
 
 
 }

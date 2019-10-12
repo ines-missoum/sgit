@@ -8,11 +8,11 @@ object Blob{
 
   def apply(line: String): EntryTree = {
     val values = line.split(" ")
-    new Blob("blob", values(1), values(2), None, None)
+    new Blob(EntryTree.BlobType, values(1), values(2), None, None)
   }
 
-  def apply(hash: String, path: String): EntryTree = new Blob("blob", hash, path, None, None)
+  def apply(hash: String, path: String): EntryTree = new Blob(EntryTree.BlobType, hash, path, None, None)
 
-  def NewBlobWithContent(content: String, path: String): EntryTree = new Blob("blob", HashHelper.hashFile(content), path, Some(content), None)
+  def NewBlobWithContent(content: String, path: String): EntryTree = new Blob(EntryTree.BlobType, HashHelper.hashFile(content), path, Some(content), None)
 
 }

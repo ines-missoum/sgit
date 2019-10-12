@@ -38,5 +38,5 @@ object ConsolePrinterImpl extends ConsolePrinter {
 
   }
 
-  def askEnterMessageCommits() = println(" Please enter the commit message for your changes\n")
+  def askEnterMessageCommits() = println("Please enter the commit message for your changes\n")
 }
