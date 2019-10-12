@@ -50,4 +50,6 @@ object PathHelper {
   val HeadLogFile = SgitPath + SgitRepositoryName + File.separator + "logs" + File.separator + "HEAD"
 
   def getSimplePathOfFile(absoluteFilePath: String): String = absoluteFilePath.toSeq.diff(SgitPath.toSeq).unwrap
+
+  def getAbsolutePathOfFile(simplePath: String): String = SgitPath + simplePath
 }
