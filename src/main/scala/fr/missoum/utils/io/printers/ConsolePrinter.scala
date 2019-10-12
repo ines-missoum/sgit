@@ -3,6 +3,9 @@ package fr.missoum.utils.io.printers
 import fr.missoum.logic.EntryTree
 
 trait ConsolePrinter {
+
+  def changesNotStagedForCommit(modifiedNotStaged: Array[String], deletedNotStaged: Array[String])
+
   def nothingToCommit(branch: String)
 
   def commitCreatedMessage(branch: String, message: String, nbFilesChanged: Int)

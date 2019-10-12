@@ -86,7 +86,12 @@ object CommandExecutorImpl extends CommandExecutor {
     val workspace = workspaceReader.getAllBlobsOfWorkspace()
     val index = sgitReader.getIndex().map(x => Blob(x))
     val lastCommit = commitHelper.retrievePreviousBlobsCommitted()
+
     val untrackedFiles = statusHelper.getUntrackedFiles(workspace, index)
+    val (modifiedNotStaged, deletedNotStaged) = statusHelper.getChangesNotStagedForCommit(index, workspace)
+
+    if (!(modifiedNotStaged.isEmpty && deletedNotStaged.isEmpty))
+      printer.changesNotStagedForCommit(modifiedNotStaged, deletedNotStaged)
     if (!untrackedFiles.isEmpty)
       printer.untrackedFiles(untrackedFiles)
 

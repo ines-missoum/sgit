@@ -47,7 +47,15 @@ object ConsolePrinterImpl extends ConsolePrinter {
 
   def untrackedFiles(untrackedFiles: Array[String]) = {
     val files = untrackedFiles.map("\t" + _).mkString("\n")
-    println("Untracked files:\n  (use \"git add <file>...\" to include in what will be committed)\n\n" + Console.RED + files)
+    println("Untracked files:\n  (use \"git add <file>...\" to include in what will be committed)\n\n" + Console.RED + files + "\n" + Console.WHITE)
   }
+
+  def changesNotStagedForCommit(modifiedNotStaged: Array[String], deletedNotStaged: Array[String]) = {
+    val deleted = deletedNotStaged.map("\tdeleted:    " + _).mkString("\n")
+    val modified = modifiedNotStaged.map("\tmodified:   " + _).mkString("\n")
+    println("Changes not staged for commit:\n  (use \"git add/rm <file>...\" to update what will be committed)\n  (use \"git checkout -- <file>...\" to discard changes in working directory)\n\n"
+      + Console.RED + deleted + "\n" + modified + "\n" + Console.WHITE)
+  }
+
 
 }
