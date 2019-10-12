@@ -63,11 +63,13 @@ object CommandExecutorImpl extends CommandExecutor {
   }
 
   def executeCommit() = {
+    printer.askEnterMessageCommits
+    val message = scala.io.StdIn.readLine()
     if (sgitReader.isExistingCommit())
-      commitHelper.commit()
+      commitHelper.commit(message)
     else
     //if first commit
-      commitHelper.firstCommit()
+      commitHelper.firstCommit(message)
 
   }
 

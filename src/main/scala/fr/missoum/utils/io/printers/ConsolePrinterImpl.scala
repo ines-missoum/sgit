@@ -7,7 +7,7 @@ import fr.missoum.utils.helpers.PathHelper
  */
 object ConsolePrinterImpl extends ConsolePrinter {
 
-  def fileNotExist(fileName: String): Unit = println("fatal: '"+fileName+"' did not match any files")
+  def fileNotExist(fileName: String): Unit = println("fatal: '" + fileName + "' did not match any files")
 
   def notExistingSgitRepository() = println("fatal: not a sgit repository (or any of the parent directories): .sgit")
 
@@ -38,4 +38,5 @@ object ConsolePrinterImpl extends ConsolePrinter {
 
   }
 
+  def askEnterMessageCommits() = println(" Please enter the commit message for your changes\n")
 }

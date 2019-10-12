@@ -26,4 +26,6 @@ trait ConsolePrinter{
 
   def printBranchesAndTags(currentBranch: String, tags: Array[String], branches: Array[String])
 
-  }
+  def askEnterMessageCommits()
+
+}

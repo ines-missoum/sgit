@@ -85,11 +85,11 @@ object SgitWriterImpl extends SgitWriter {
   def updateIndex(index: Array[EntryTree]) = writeInFile(PathHelper.IndexFile, index.map(_.toString).mkString("\n"), false)
 
 
-  def createCommit(hashParentCommit: String, commitTree: EntryTree, currentBranch: String): Commit = {
+  def createCommit(hashParentCommit: String, commitTree: EntryTree, currentBranch: String, commitMessage:String): Commit = {
 
 
     //create commit
-    val commitCreated = Commit(hashParentCommit, commitTree.hash, Instant.now().toString)
+    val commitCreated = Commit(hashParentCommit, commitTree.hash, Instant.now().toString, commitMessage)
     //create the commit
     commitCreated.hash = createObject(commitCreated.buildContent)
     //commit added to the logs

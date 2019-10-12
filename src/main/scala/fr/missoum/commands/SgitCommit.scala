@@ -4,9 +4,9 @@ import fr.missoum.logic.EntryTree
 
 trait SgitCommit {
 
-  def firstCommit()
+  def firstCommit(message:String)
 
-  def commit()
+  def commit(message:String)
 
   def createAllTrees(listOfBlobsToCommit: Array[EntryTree]):EntryTree
 
