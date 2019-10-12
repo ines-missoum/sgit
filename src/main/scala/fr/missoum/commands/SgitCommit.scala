@@ -8,7 +8,7 @@ trait SgitCommit {
 
   def commit()
 
-  def createAllTrees(listOfBlobsToCommit: Array[EntryTree])
+  def createAllTrees(listOfBlobsToCommit: Array[EntryTree]):EntryTree
 
   def retrieveAllCommittedBlobs()
 

@@ -2,7 +2,7 @@ package fr.missoum.commands
 
 import java.io.File
 
-import fr.missoum.logic.{Blob, EntryTree, Tree}
+import fr.missoum.logic.{Blob, Commit, EntryTree, Tree}
 import fr.missoum.utils.io.readers.SgitReaderImpl
 import fr.missoum.utils.io.writers.SgitWriterImpl
 
@@ -10,7 +10,9 @@ object SgitCommitImpl extends SgitCommit {
 
   def firstCommit() = {
 
-    createAllTrees(SgitReaderImpl.getIndex().map(x => Blob(x)))
+    val commitTree = createAllTrees(SgitReaderImpl.getIndex().map(x => Blob(x)))
+    val currentBranch = SgitReaderImpl.getCurrentBranch
+    SgitWriterImpl.createCommit(Commit.noParentHash,commitTree,currentBranch)
     //TODO create commit + everywhere add this commit = branches log ... and ?
     //TODO tests
     //TODO check if pure
@@ -21,6 +23,11 @@ object SgitCommitImpl extends SgitCommit {
 
 
   def commit(): Unit = {
+
+    /*val commitTree = createAllTrees(????)
+    val parentCommit = SgitReaderImpl.getParentCommitOfCurrentBranch
+    val currentBranch = SgitReaderImpl.getCurrentBranch
+    SgitWriterImpl.createCommit(parentCommit,commitTree,currentBranch)*/
 
   }
 
@@ -34,12 +41,13 @@ object SgitCommitImpl extends SgitCommit {
 
   }
 
-  def createAllTrees(listOfBlobsToCommit: Array[EntryTree] /*, step: Int*/): Unit = {
+  def createAllTrees(listOfBlobsToCommit: Array[EntryTree]): EntryTree = {
     val gatherBlobs: Map[String, Array[EntryTree]] = this.gatherBlobs(listOfBlobsToCommit)
     val commitTree: EntryTree = Tree() //to change
     val result = createAllTreesRec(gatherBlobs, commitTree)
     commitTree.listEntryTree = Some(result._1)
     commitTree.hash =result._2
+    commitTree
 
   }
 

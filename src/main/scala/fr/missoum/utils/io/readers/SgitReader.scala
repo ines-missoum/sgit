@@ -48,5 +48,7 @@ trait SgitReader{
 
   def isExistingCommit(): Boolean
 
+  def getParentCommitOfCurrentBranch:String
+
 
 }

@@ -70,6 +70,8 @@ object SgitReaderImpl extends SgitReader {
 
   def getContentOfFile(path: String): String = Source.fromFile(path).getLines.mkString("\n")
 
+  def getParentCommitOfCurrentBranch:String =  readFirstLineFile(PathHelper.BranchesDirectory+File.separator+getCurrentBranch)
+
   //private functions
   private def readFirstLineFile(path: String) = {
     val src = Source.fromFile(path)

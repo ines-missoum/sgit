@@ -1,6 +1,6 @@
 package fr.missoum.utils.io.writers
 
-import fr.missoum.logic.EntryTree
+import fr.missoum.logic.{Commit, EntryTree}
 
 trait SgitWriter {
 
@@ -42,5 +42,6 @@ trait SgitWriter {
 
   def updateIndex(index: Array[EntryTree])
 
+  def createCommit(hashParentCommit:String, commitTree: EntryTree, currentBranch: String):Commit
 
 }

@@ -1,8 +1,9 @@
 package fr.missoum.utils.io.writers
 
 import java.io.{BufferedWriter, File, FileWriter}
+import java.time.Instant
 
-import fr.missoum.logic.{EntryTree, Tree}
+import fr.missoum.logic.{Commit, EntryTree, Tree}
 import fr.missoum.utils.helpers.{HashHelper, PathHelper}
 
 /**
@@ -61,10 +62,11 @@ object SgitWriterImpl extends SgitWriter {
 
   /**
    * Creates the object in the .sgit repository if it doesn't already exists
+   *
    * @param contentFile content of the file for which we want to create the blob
    * @return the hash of the object created
    */
-  def createObject(contentFile: String):String = {
+  def createObject(contentFile: String): String = {
 
     //retrieves path from hash of content file
     val hash = HashHelper.hashFile(contentFile)
@@ -82,6 +84,22 @@ object SgitWriterImpl extends SgitWriter {
 
   def updateIndex(index: Array[EntryTree]) = writeInFile(PathHelper.IndexFile, index.map(_.toString).mkString("\n"), false)
 
+
+  def createCommit(hashParentCommit: String, commitTree: EntryTree, currentBranch: String): Commit = {
+
+
+    //create commit
+    val commitCreated = Commit(hashParentCommit, commitTree.hash, Instant.now().toString)
+    //create the commit
+    commitCreated.hash = createObject(commitCreated.buildContent)
+    //commit added to the logs
+    writeInFile(PathHelper.HeadLogFile, commitCreated.toString, true)
+    writeInFile(PathHelper.LogsDirectory + File.separator + currentBranch, commitCreated.toString, true)
+    //change the pointer commit of the branch
+    writeInFile(PathHelper.BranchesDirectory + File.separator + currentBranch, commitCreated.hash, false)
+
+    commitCreated
+  }
 
   /**
    *
