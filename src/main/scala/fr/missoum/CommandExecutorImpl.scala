@@ -3,7 +3,7 @@ package fr.missoum
 import fr.missoum.commands.{SgitAdd, SgitCommit, SgitCommitImpl}
 import fr.missoum.utils.io.inputs.{UserInput, UserInputImpl}
 import fr.missoum.utils.io.printers.{ConsolePrinter, ConsolePrinterImpl}
-import fr.missoum.utils.io.readers.{SgitReader, SgitReaderImpl}
+import fr.missoum.utils.io.readers.{SgitReader, SgitReaderImpl, WorkspaceReaderImpl}
 import fr.missoum.utils.io.writers.{SgitWriter, SgitWriterImpl}
 
 object CommandExecutorImpl extends CommandExecutor {
@@ -77,7 +77,10 @@ object CommandExecutorImpl extends CommandExecutor {
       val nbFilesChanged =commitHelper.commit(blobsToCommit, message)
       printer.CommitCreatedMessage(branch,message,nbFilesChanged)
     }
+  }
 
+  def executeStatus() ={
+    WorkspaceReaderImpl.getAllBlobsOfWorkspace()
   }
 
 

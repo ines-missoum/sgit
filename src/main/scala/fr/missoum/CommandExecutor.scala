@@ -28,4 +28,6 @@ trait CommandExecutor {
 
   def executeCommit()
 
+  def executeStatus()
+
 }

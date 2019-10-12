@@ -4,8 +4,8 @@ import fr.missoum.utils.io.printers.{ConsolePrinter, ConsolePrinterImpl}
 
 object Main {
 
-  var executor :CommandExecutor = CommandExecutorImpl
-  var printer : ConsolePrinter = ConsolePrinterImpl
+  var executor: CommandExecutor = CommandExecutorImpl
+  var printer: ConsolePrinter = ConsolePrinterImpl
 
   def main(args: Array[String]): Unit = {
 
@@ -26,9 +26,13 @@ object Main {
       //add
       case a: Array[String] if a.length > 1 && a(0).equals("add") => executor.executeAdd(a.tail, "")
       case Array("add") => printer.notValidArguments("add", "'add <file>' or 'add <file>*' ")
-        //commit
+      //commit
       case Array("commit") => executor.executeCommit()
       case Array("commit", _*) => printer.notValidArguments("commit", "just 'commit'")
+      //status
+      case Array("status") => executor.executeStatus()
+      case Array("status", _*) => printer.notValidArguments("status", "just 'status'")
+      //default case
       case a: Array[String] => printer.notValidCommand(a(0))
     }
   }
