@@ -68,10 +68,10 @@ object CommandExecutorImpl extends CommandExecutor {
     printer.askEnterMessageCommits
     val message = inputManager.retrieveUserCommitMessage()
     if (sgitReader.isExistingCommit())
-      commitHelper.commit(message)
+      println(commitHelper.commit(message))
     else
     //if first commit
-      commitHelper.firstCommit(message)
+      println("F "+commitHelper.firstCommit(message))
 
   }
 

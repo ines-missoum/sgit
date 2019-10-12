@@ -8,9 +8,10 @@ import fr.missoum.utils.io.writers.SgitWriterImpl
 
 object SgitCommitImpl extends SgitCommit {
 
-  def firstCommit(message: String) = {
+  def firstCommit(message: String): Int = {
 
-    val commitTree = createAllTrees(SgitReaderImpl.getIndex().map(x => Blob(x)))
+    val index = SgitReaderImpl.getIndex().map(x => Blob(x))
+    val commitTree = createAllTrees(index)
     val currentBranch = SgitReaderImpl.getCurrentBranch()
     SgitWriterImpl.createCommit(Commit.noParentHash, commitTree, currentBranch, message)
     //TODO create commit + everywhere add this commit = branches log ... and ?
@@ -18,20 +19,25 @@ object SgitCommitImpl extends SgitCommit {
     //TODO check if pure
     // TODO clean
     //case when nothing to commit
+    index.length
 
   }
 
 
-  def commit(message: String): Unit = {
-    retrievePreviousBlobsCommitted("")
-    /*val commitTree = createAllTrees(????)
+  def commit(message: String): Int = {
+    val index = SgitReaderImpl.getIndex().map(x => Blob(x))
+    val previousCommit = retrievePreviousBlobsCommitted()
+    val blobsToCommit = index.filter(x =>( !previousCommit.exists(y => x.path.equals(y.path) && x.hash.equals(y.hash))))
+    val commitTree = createAllTrees(blobsToCommit)
+
     val parentCommit = SgitReaderImpl.getParentCommitOfCurrentBranch
     val currentBranch = SgitReaderImpl.getCurrentBranch
-    SgitWriterImpl.createCommit(parentCommit,commitTree,currentBranch)*/
+    SgitWriterImpl.createCommit(parentCommit, commitTree, currentBranch, message)
+    blobsToCommit.length
 
   }
 
-  def retrievePreviousBlobsCommitted(commitHash: String): Array[EntryTree] = {
+  def retrievePreviousBlobsCommitted(): Array[EntryTree] = {
     val treeCommit = Tree()
     treeCommit.hash = SgitReaderImpl.getLastCommitTreeHash()
     val result = retrievePreviousBlobsCommittedRec(Array(treeCommit))
