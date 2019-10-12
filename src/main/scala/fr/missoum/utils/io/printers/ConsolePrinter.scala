@@ -1,8 +1,11 @@
 package fr.missoum.utils.io.printers
 
 trait ConsolePrinter{
+  def NothingToCommit(branch: String)
 
-  def fileNotExist(fileName: String): Unit
+  def CommitCreatedMessage(branch: String,message:String,nbFilesChanged:Int)
+
+  def fileNotExist(fileName: String)
 
   def notExistingSgitRepository()
 

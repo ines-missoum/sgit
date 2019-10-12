@@ -38,5 +38,9 @@ object ConsolePrinterImpl extends ConsolePrinter {
 
   }
 
-  def askEnterMessageCommits() = println("Please enter the commit message for your changes\n")
+  def askEnterMessageCommits() = println("Please enter the commit message for your changes : ")
+
+  def CommitCreatedMessage(branch: String,message:String,nbFilesChanged:Int) = println("\n["+branch+"] "+message+" \n"+nbFilesChanged+" file(s) changed")
+
+  def NothingToCommit(branch: String) = println("On branch "+branch+"\nnothing to commit, working tree clean")
 }

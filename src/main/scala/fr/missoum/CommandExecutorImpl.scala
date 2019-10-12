@@ -1,7 +1,6 @@
 package fr.missoum
 
 import fr.missoum.commands.{SgitAdd, SgitCommit, SgitCommitImpl}
-import fr.missoum.logic.Blob
 import fr.missoum.utils.io.inputs.{UserInput, UserInputImpl}
 import fr.missoum.utils.io.printers.{ConsolePrinter, ConsolePrinterImpl}
 import fr.missoum.utils.io.readers.{SgitReader, SgitReaderImpl}
@@ -65,13 +64,19 @@ object CommandExecutorImpl extends CommandExecutor {
   }
 
   def executeCommit() = {
-    printer.askEnterMessageCommits
-    val message = inputManager.retrieveUserCommitMessage()
-    if (sgitReader.isExistingCommit())
-      println(commitHelper.commit(message))
-    else
-    //if first commit
-      println("F "+commitHelper.firstCommit(message))
+
+    val blobsToCommit = commitHelper.getBlobsToCommit()
+    val branch = sgitReader.getCurrentBranch()
+    //if nothing to commmit
+    if (blobsToCommit.isEmpty)
+      printer.NothingToCommit(branch)
+    else {
+      //if commit needed
+      printer.askEnterMessageCommits
+      val message = inputManager.retrieveUserCommitMessage()
+      val nbFilesChanged =commitHelper.commit(blobsToCommit, message)
+      printer.CommitCreatedMessage(branch,message,nbFilesChanged)
+    }
 
   }
 

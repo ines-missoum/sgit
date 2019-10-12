@@ -66,6 +66,7 @@ class CommandExecutorSpec extends FlatSpec with Matchers with IdiomaticMockito {
 
   it should "check if it's a first commit" in {
     //given
+    pending
     val mockReader = mock[SgitReader]
     val mockCommitHelper = mock[SgitCommit]
     val mockInputManager = mock[UserInput]

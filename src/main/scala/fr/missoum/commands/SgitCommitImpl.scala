@@ -8,33 +8,38 @@ import fr.missoum.utils.io.writers.SgitWriterImpl
 
 object SgitCommitImpl extends SgitCommit {
 
-  def firstCommit(message: String): Int = {
+  /**
+   *
+   * @param blobsToCommit
+   * @param message
+   * @return the nb of files modified from last commit(if exists)
+   */
+  def commit(blobsToCommit: Array[EntryTree], message: String): Int = {
+    var parentCommit = ""
+    //if first commit
+    if (!SgitReaderImpl.isExistingCommit())
+      parentCommit = Commit.noParentHash
+    else
+      parentCommit = SgitReaderImpl.getParentCommitOfCurrentBranch
 
-    val index = SgitReaderImpl.getIndex().map(x => Blob(x))
-    val commitTree = createAllTrees(index)
-    val currentBranch = SgitReaderImpl.getCurrentBranch()
-    SgitWriterImpl.createCommit(Commit.noParentHash, commitTree, currentBranch, message)
-    //TODO create commit + everywhere add this commit = branches log ... and ?
-    //TODO tests
-    //TODO check if pure
-    // TODO clean
-    //case when nothing to commit
-    index.length
-
-  }
-
-
-  def commit(message: String): Int = {
-    val index = SgitReaderImpl.getIndex().map(x => Blob(x))
-    val previousCommit = retrievePreviousBlobsCommitted()
-    val blobsToCommit = index.filter(x =>( !previousCommit.exists(y => x.path.equals(y.path) && x.hash.equals(y.hash))))
     val commitTree = createAllTrees(blobsToCommit)
-
-    val parentCommit = SgitReaderImpl.getParentCommitOfCurrentBranch
     val currentBranch = SgitReaderImpl.getCurrentBranch
     SgitWriterImpl.createCommit(parentCommit, commitTree, currentBranch, message)
     blobsToCommit.length
+  }
 
+  def getBlobsToCommit(): Array[EntryTree] = {
+    val index = SgitReaderImpl.getIndex().map(x => Blob(x))
+
+    //if first commit we commit all the content of the index
+    if (!SgitReaderImpl.isExistingCommit())
+      index
+    //else we commit the differences between the index and the last commit
+    else {
+      val previousCommit = retrievePreviousBlobsCommitted()
+      val blobsToCommit = index.filter(x => (!previousCommit.exists(y => x.path.equals(y.path) && x.hash.equals(y.hash))))
+      blobsToCommit
+    }
   }
 
   def retrievePreviousBlobsCommitted(): Array[EntryTree] = {
