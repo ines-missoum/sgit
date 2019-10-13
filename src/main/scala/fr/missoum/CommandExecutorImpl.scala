@@ -87,7 +87,7 @@ object CommandExecutorImpl extends CommandExecutor {
     val branch = sgitReader.getCurrentBranch()
     val workspace = workspaceReader.getAllBlobsOfWorkspace()
     val index = sgitReader.getIndex().map(x => Blob(x))
-    val lastCommit = commitHelper.retrievePreviousBlobsCommitted()
+    val lastCommit = commitHelper.getAllBlobsCommitted()
 
     //process
     val untrackedFiles = statusHelper.getUntrackedFiles(workspace, index)

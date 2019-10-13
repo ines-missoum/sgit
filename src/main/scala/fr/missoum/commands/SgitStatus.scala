@@ -2,7 +2,7 @@ package fr.missoum.commands
 
 import fr.missoum.logic.EntryTree
 
-trait SgitStatus {
+trait SgitStatus extends SgitCommandHelper{
 
   def getChangesToBeCommitted(index: Array[EntryTree], lastCommit: Array[EntryTree]): (Array[String], Array[String], Array[String])
 

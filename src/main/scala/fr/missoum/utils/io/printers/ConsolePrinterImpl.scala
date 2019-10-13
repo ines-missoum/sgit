@@ -51,18 +51,18 @@ object ConsolePrinterImpl extends ConsolePrinter {
   }
 
   def changesNotStagedForCommit(modifiedNotStaged: Array[String], deletedNotStaged: Array[String]) = {
-    val deleted = deletedNotStaged.map("\tdeleted:    " + _).mkString("\n")
-    val modified = modifiedNotStaged.map("\tmodified:   " + _).mkString("\n")
+    val deleted = deletedNotStaged.map("\tdeleted:     " + _).mkString("\n")
+    val modified = modifiedNotStaged.map("\tmodified:    " + _).mkString("\n")
     println("Changes not staged for commit:\n  (use \"git add/rm <file>...\" to update what will be committed)\n  (use \"git checkout -- <file>...\" to discard changes in working directory)\n\n"
       + Console.RED + deleted + "\n" + modified + "\n" + Console.WHITE)
   }
 
   def changesToBeCommitted(news: Array[String], modified: Array[String], deleted: Array[String]) = {
     val newsPrint = news.map("\tnew file:    " + _).mkString("\n")
-    val deletedPrint = deleted.map("\tdeleted:    " + _).mkString("\n")
-    val modifiedPrint = modified.map("\tmodified:   " + _).mkString("\n")
+    val deletedPrint = deleted.map("\tdeleted:     " + _).mkString("\n")
+    val modifiedPrint = modified.map("\tmodified:    " + _).mkString("\n")
     println("Changes to be committed:\n  (use \"git reset HEAD <file>...\" to unstage)\n\n"
-      + Console.GREEN + newsPrint + deletedPrint + "\n" + modifiedPrint + "\n" + Console.WHITE)
+      + Console.GREEN + newsPrint + "\n" + deletedPrint + "\n" + modifiedPrint + "\n" + Console.WHITE)
   }
 
   def branch(branch: String) = {

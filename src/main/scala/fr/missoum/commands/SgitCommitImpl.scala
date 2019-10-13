@@ -6,6 +6,8 @@ import fr.missoum.logic.{Blob, Commit, EntryTree, Tree}
 import fr.missoum.utils.io.readers.SgitReaderImpl
 import fr.missoum.utils.io.writers.SgitWriterImpl
 
+import scala.annotation.tailrec
+
 object SgitCommitImpl extends SgitCommit {
 
   /**
@@ -16,12 +18,12 @@ object SgitCommitImpl extends SgitCommit {
    */
   def commit(blobsToCommit: Array[EntryTree], message: String): Int = {
     var parentCommit = ""
-    //if first commit
-    if (!SgitReaderImpl.isExistingCommit())
-      parentCommit = Commit.noParentHash
-    else
-      parentCommit = SgitReaderImpl.getParentCommitOfCurrentBranch
 
+    //if it's the first commit then it has no parent else we retrieve it's parent commit
+    if (!SgitReaderImpl.isExistingCommit()) parentCommit = Commit.noParentHash
+    else parentCommit = SgitReaderImpl.getLastCommitHash
+
+    //we create the commit and save it
     val commitTree = createAllTrees(blobsToCommit)
     val currentBranch = SgitReaderImpl.getCurrentBranch
     SgitWriterImpl.createCommit(parentCommit, commitTree, currentBranch, message)
@@ -29,44 +31,53 @@ object SgitCommitImpl extends SgitCommit {
   }
 
   def getBlobsToCommit(): Array[EntryTree] = {
-    val index = SgitReaderImpl.getIndex().map(x => Blob(x))
 
+    val index = SgitReaderImpl.getIndex().map(x => Blob(x))
     //if first commit we commit all the content of the index
-    if (!SgitReaderImpl.isExistingCommit())
-      index
+    if (!SgitReaderImpl.isExistingCommit()) index
     //else we commit the differences between the index and the last commit
     else {
-      val previousCommit = retrievePreviousBlobsCommitted()
+      val previousCommit = getAllBlobsCommitted()
       val blobsToCommit = index.filter(x => (!previousCommit.exists(y => x.path.equals(y.path) && x.hash.equals(y.hash))))
       blobsToCommit
     }
   }
 
-  def retrievePreviousBlobsCommitted(): Array[EntryTree] = {
-    val treeCommit = Tree()
-    treeCommit.hash = SgitReaderImpl.getLastCommitTreeHash()
-    val result = retrievePreviousBlobsCommittedRec(Array(treeCommit))
-    result
+  def getAllBlobsCommitted(): Array[EntryTree] = {
+
+    if (!SgitReaderImpl.isExistingCommit()) Array[EntryTree]()
+    else
+      getAllBlobsCommittedRec(SgitReaderImpl.getLastCommit, Array[EntryTree]())
   }
 
-  def retrievePreviousBlobsCommittedRec(entries: Array[EntryTree]): Array[EntryTree] = {
+  @tailrec
+  def getAllBlobsCommittedRec(commit: Commit, result: Array[EntryTree]): Array[EntryTree] = {
+    // we retrieve the blobs of the commit
+    val treeCommit = Tree()
+    treeCommit.hash = commit.treeHash
+    val blobsOfCommit = getBlobsOfACommitRec(Array(treeCommit))
+    val newResult = result ++ inFirstListButNotInSecond(blobsOfCommit, result)
+
+    // end if it's the first commit
+    if (commit.hashParentCommit.equals(Commit.noParentHash))
+      newResult
+    else {
+      val nexCommit = SgitReaderImpl.getCommit(commit.hashParentCommit)
+      //we want only the last version of each blobs
+      getAllBlobsCommittedRec(nexCommit, newResult)
+    }
+
+  }
+
+  def getBlobsOfACommitRec(entries: Array[EntryTree]): Array[EntryTree] = {
     val blobs = entries.filter(_.isBlob())
     val trees = entries.filter(_.isTree())
 
-    if (trees.isEmpty)
-      blobs
+    if (trees.isEmpty) blobs
     else {
       val entriesOfTree = trees.map(x => SgitReaderImpl.getContentOfObjectInEntries(x.hash)).flatten
-      blobs ++ retrievePreviousBlobsCommittedRec(entriesOfTree)
-
+      blobs ++ getBlobsOfACommitRec(entriesOfTree)
     }
-  }
-
-  def recPrint(tree: EntryTree): Unit = {
-    println("TREE : " + tree.path)
-    val list: List[EntryTree] = tree.listEntryTree.get
-    list.map(x => x.toString).foreach(println(_))
-    list.filter(_.isTree()).foreach(recPrint(_))
   }
 
   def createAllTrees(listOfBlobsToCommit: Array[EntryTree]): EntryTree = {
@@ -122,7 +133,4 @@ object SgitCommitImpl extends SgitCommit {
     (list, SgitWriterImpl.createObject(list.map(_.toString()).mkString("\n")))
   }
 
-  def retrieveAllCommittedBlobs(): Unit = {
-
-  }
 }

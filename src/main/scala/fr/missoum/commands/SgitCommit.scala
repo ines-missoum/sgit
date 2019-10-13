@@ -2,16 +2,14 @@ package fr.missoum.commands
 
 import fr.missoum.logic.EntryTree
 
-trait SgitCommit {
+trait SgitCommit extends SgitCommandHelper{
 
   def getBlobsToCommit(): Array[EntryTree]
 
   def commit(blobsToCommit: Array[EntryTree], message: String): Int
 
-  def createAllTrees(listOfBlobsToCommit: Array[EntryTree]):EntryTree
+  def getAllBlobsCommitted(): Array[EntryTree]
 
-  def retrieveAllCommittedBlobs()
-
-  def retrievePreviousBlobsCommitted(): Array[EntryTree]
+  def createAllTrees(listOfBlobsToCommit: Array[EntryTree]): EntryTree
 
 }

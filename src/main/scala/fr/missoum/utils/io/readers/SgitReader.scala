@@ -1,5 +1,7 @@
 package fr.missoum.utils.io.readers
 
+import fr.missoum.logic.{Commit, EntryTree}
+
 trait SgitReader {
 
   def isExistingSgitFolder(): Boolean
@@ -48,9 +50,13 @@ trait SgitReader {
 
   def isExistingCommit(): Boolean
 
-  def getLastCommitTreeHash(): String
+  def getContentOfObjectInEntries(hash: String): Array[EntryTree]
 
-  def getParentCommitOfCurrentBranch: String
+  def getLastCommit: Commit
+
+  def getCommit(hashCommit: String): Commit
+
+  def getLastCommitHash: String
 
 
 }

@@ -87,10 +87,8 @@ object SgitWriterImpl extends SgitWriter {
 
   def createCommit(hashParentCommit: String, commitTree: EntryTree, currentBranch: String, commitMessage:String): Commit = {
 
-
-    //create commit
+    //creation commit
     val commitCreated = Commit(hashParentCommit, commitTree.hash, Instant.now().toString, commitMessage)
-    //create the commit
     commitCreated.hash = createObject(commitCreated.buildContent)
     //commit added to the logs
     writeInFile(PathHelper.HeadLogFile, commitCreated.toString, true)
