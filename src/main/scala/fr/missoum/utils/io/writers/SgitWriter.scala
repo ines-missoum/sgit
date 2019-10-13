@@ -42,6 +42,6 @@ trait SgitWriter {
 
   def updateIndex(index: Array[EntryTree])
 
-  def createCommit(hashParentCommit:String, commitTree: EntryTree, currentBranch: String,commitMessage:String):Commit
+  def saveCommit(commitToSave:Commit, currentBranch: String): Commit
 
 }

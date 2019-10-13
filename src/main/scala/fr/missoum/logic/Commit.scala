@@ -11,17 +11,13 @@ object Commit {
 
   val noParentHash = "0000000000000000000000000000000000000000"
 
-  def apply(hashParentCommit: String, treeHash: String, date: String, commitMessage: String): Commit = {
-    new Commit(hashParentCommit, "", treeHash, date, "Default user", commitMessage)
-  }
-
-  def apply(hashParentCommit: String, treeHash: String, hash: String): Commit = {
-    new Commit(hashParentCommit, hash, treeHash, "", "Default user", "")
+  def apply(hashParentCommit: String, treeHash: String, commitMessage: String): Commit = {
+    new Commit(hashParentCommit, "", treeHash, "", "Default user", commitMessage)
   }
 
   def getCommitFromContent(content: String, hash: String): Commit = {
     val values = content.split("\n").map(x => x.split(" ")).flatten
-    Commit(values(3), values(1), hash)
+    new Commit(values(3), hash, values(1), "", "Default user", "")
   }
 
 }

@@ -3,102 +3,144 @@ package fr.missoum.commands
 import java.io.File
 
 import fr.missoum.logic.{Blob, Commit, EntryTree, Tree}
-import fr.missoum.utils.io.readers.SgitReaderImpl
-import fr.missoum.utils.io.writers.SgitWriterImpl
+import fr.missoum.utils.io.readers.{SgitReader, SgitReaderImpl}
+import fr.missoum.utils.io.writers.{SgitWriter, SgitWriterImpl}
 
 import scala.annotation.tailrec
 
 object SgitCommitImpl extends SgitCommit {
 
   /**
-   *
-   * @param blobsToCommit
-   * @param message
-   * @return the nb of files modified from last commit(if exists)
+   * Responsible for reading in memory
    */
-  def commit(blobsToCommit: Array[EntryTree], message: String): Int = {
+  var sgitReader: SgitReader = SgitReaderImpl
+  /**
+   * Responsible for writing in memory
+   */
+  var sgitWriter: SgitWriter = SgitWriterImpl
+  /**
+   * Creates the commit object and creates the trees in memory
+   *
+   * @param isFirstCommit Indicates if it's the first commit or not
+   * @param currentBranch Branch where the commit needs to be recorded
+   * @param blobsToCommit List of blobs to add to the commit
+   * @param message Message of the commit
+   * @return
+   */
+  def commit(isFirstCommit: Boolean, currentBranch: String, blobsToCommit: Array[EntryTree], message: String): (Commit, Int) = {
+
+    // we  retrieve the parent commit
     var parentCommit = ""
+    if (isFirstCommit) parentCommit = Commit.noParentHash
+    else parentCommit = sgitReader.getLastCommitHash
 
-    //if it's the first commit then it has no parent else we retrieve it's parent commit
-    if (!SgitReaderImpl.isExistingCommit()) parentCommit = Commit.noParentHash
-    else parentCommit = SgitReaderImpl.getLastCommitHash
-
-    //we create the commit and save it
+    //creation of the commit
     val commitTree = createAllTrees(blobsToCommit)
-    val currentBranch = SgitReaderImpl.getCurrentBranch
-    SgitWriterImpl.createCommit(parentCommit, commitTree, currentBranch, message)
-    blobsToCommit.length
+    val commitCreated = Commit(parentCommit, commitTree.hash, message)
+
+    (commitCreated, blobsToCommit.length)
   }
 
-  def getBlobsToCommit(): Array[EntryTree] = {
+  /**
+   * Gives the list of all the blobs to commit (ie: blobs that have been created or modified since the previous commits)
+   * @param isFirstCommit Indicates if it's the first commit or not
+   * @return The list of all the blobs to commit
+   */
+  def getBlobsToCommit(isFirstCommit: Boolean): Array[EntryTree] = {
 
-    val index = SgitReaderImpl.getIndex().map(x => Blob(x))
+    val index = sgitReader.getIndex().map(x => Blob(x))
     //if first commit we commit all the content of the index
-    if (!SgitReaderImpl.isExistingCommit()) index
+    if (isFirstCommit) index
     //else we commit the differences between the index and the last commit
     else {
-      val previousCommit = getAllBlobsCommitted()
-      val blobsToCommit = index.filter(x => (!previousCommit.exists(y => x.path.equals(y.path) && x.hash.equals(y.hash))))
+      val previousCommit = getAllBlobsCommitted(isFirstCommit)
+      val blobsToCommit = index.filter(x => !previousCommit.exists(y => x.path.equals(y.path) && x.hash.equals(y.hash)))
       blobsToCommit
     }
   }
 
-  def getAllBlobsCommitted(): Array[EntryTree] = {
+  /**
+   * Retrieve all the last version of all blobs committed in the previous commits
+   * @return The list of blobs committed in the previous commits in their last version
+   */
+  def getAllBlobsCommitted(isFirstCommit: Boolean): Array[EntryTree] = {
 
-    if (!SgitReaderImpl.isExistingCommit()) Array[EntryTree]()
+    if (isFirstCommit) Array[EntryTree]()
     else
-      getAllBlobsCommittedRec(SgitReaderImpl.getLastCommit, Array[EntryTree]())
+      getAllBlobsCommittedRec(sgitReader.getLastCommit, Array[EntryTree]())
   }
 
+  /**
+   * Retrieve all the last version of all blobs committed in the previous commits (since the commit parameter)
+   * @param commit Current commit for whom we want to retrieve the committed blobs
+   * @param result Current result (tail rec)
+   * @return The list of blobs committed in the previous commits in their last version
+   */
   @tailrec
-  def getAllBlobsCommittedRec(commit: Commit, result: Array[EntryTree]): Array[EntryTree] = {
+  private def getAllBlobsCommittedRec(commit: Commit, result: Array[EntryTree]): Array[EntryTree] = {
     // we retrieve the blobs of the commit
     val treeCommit = Tree()
     treeCommit.hash = commit.treeHash
-    val blobsOfCommit = getBlobsOfACommitRec(Array(treeCommit))
+    val blobsOfCommit = getBlobsRec(Array(treeCommit))
     val newResult = result ++ inFirstListButNotInSecond(blobsOfCommit, result)
 
     // end if it's the first commit
     if (commit.hashParentCommit.equals(Commit.noParentHash))
       newResult
     else {
-      val nexCommit = SgitReaderImpl.getCommit(commit.hashParentCommit)
+      val nexCommit = sgitReader.getCommit(commit.hashParentCommit)
       //we want only the last version of each blobs
       getAllBlobsCommittedRec(nexCommit, newResult)
     }
 
   }
 
-  def getBlobsOfACommitRec(entries: Array[EntryTree]): Array[EntryTree] = {
+  /**
+   * Retrieves all the blobs from the entries
+   * @param entries List of entries tree
+   * @return The list of blobs of the entries
+   */
+  private def getBlobsRec(entries: Array[EntryTree]): Array[EntryTree] = {
     val blobs = entries.filter(_.isBlob())
     val trees = entries.filter(_.isTree())
 
     if (trees.isEmpty) blobs
     else {
-      val entriesOfTree = trees.map(x => SgitReaderImpl.getContentOfObjectInEntries(x.hash)).flatten
-      blobs ++ getBlobsOfACommitRec(entriesOfTree)
+      val entriesOfTree = trees.map(x => sgitReader.getContentOfObjectInEntries(x.hash)).flatten
+      blobs ++ getBlobsRec(entriesOfTree)
     }
   }
 
+  /**
+   * From the list of blobs to commit, it constructs all the trees and blobs and link them together
+   * @param listOfBlobsToCommit list of blobs to commit
+   * @return The commit tree well constructed with all its trees and blobs
+   */
   def createAllTrees(listOfBlobsToCommit: Array[EntryTree]): EntryTree = {
     val gatherBlobs: Map[String, Array[EntryTree]] = this.gatherBlobs(listOfBlobsToCommit)
-    val commitTree: EntryTree = Tree() //to change
-    val result = createAllTreesRec(gatherBlobs, commitTree)
-    commitTree.listEntryTree = Some(result._1)
-    commitTree.hash = result._2
+    val commitTree: EntryTree = Tree()
+    val (commitTreeListEntries, hashCommitTree) = createAllTreesRec(gatherBlobs, commitTree)
+    commitTree.listEntryTree = Some(commitTreeListEntries)
+    commitTree.hash = hashCommitTree
     commitTree
 
   }
 
-  //ok
-  def gatherBlobs(listOfBlobsToCommit: Array[EntryTree]): Map[String, Array[EntryTree]] = {
-    //we put all the blobs of the same directory together
-    //key = path without file name
-    listOfBlobsToCommit.groupBy(_.path.split(File.separator).dropRight(1).mkString(File.separator))
+  /**
+   * Puts all the blobs of the same directory together
+   * @param blobs Blobs to gathered
+   * @return A map that gathered the blobs by path (key = path without file name)
+   */
+  private def gatherBlobs(blobs: Array[EntryTree]): Map[String, Array[EntryTree]] =
+    blobs.groupBy(_.path.split(File.separator).dropRight(1).mkString(File.separator))
 
-  }
-
-  def createAllTreesRec(gatherBlobs: Map[String, Array[EntryTree]], tree: EntryTree): (List[EntryTree], String) = {
+  /**
+   * From the gatherBlobs, it constructs recursively all the trees and blobs and link them together
+   * @param gatherBlobs A map where the blobs are gathered by path (key = path without file name)
+   * @param tree Starting tree : tree from whom all its trees and blobs will be built and linked
+   * @return The hash of the commit tree and its list of entries (blobs and trees)
+   */
+  private def createAllTreesRec(gatherBlobs: Map[String, Array[EntryTree]], tree: EntryTree): (List[EntryTree], String) = {
 
     var list: List[EntryTree] = List[EntryTree]()
     //RETRIEVE BLOBS
@@ -121,7 +163,7 @@ object SgitCommitImpl extends SgitCommit {
       treesPaths.map(x => list = list :+ Tree("", tree.path + File.separator + x))
     }
 
-    //SET THE ENTRIES FOR THE ENTRIES TREES
+    //REC : SET THE ENTRIES FOR THE CHILDREN TREES
     val treesRec = list.filter(_.isTree())
 
     treesRec.map(x => {
@@ -130,7 +172,8 @@ object SgitCommitImpl extends SgitCommit {
       x.hash = result._2
     })
 
-    (list, SgitWriterImpl.createObject(list.map(_.toString()).mkString("\n")))
+    //CREATION IN MEMORY
+    (list, sgitWriter.createObject(list.map(_.toString()).mkString("\n")))
   }
 
 }

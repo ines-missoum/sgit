@@ -1,7 +1,7 @@
 package fr.missoum
 
 import fr.missoum.commands.{SgitAdd, SgitCommit, SgitCommitImpl, SgitStatus, SgitStatusImpl}
-import fr.missoum.logic.Blob
+import fr.missoum.logic.{Blob, Commit}
 import fr.missoum.utils.io.inputs.{UserInput, UserInputImpl}
 import fr.missoum.utils.io.printers.{ConsolePrinter, ConsolePrinterImpl}
 import fr.missoum.utils.io.readers.{SgitReader, SgitReaderImpl, WorkspaceReader, WorkspaceReaderImpl}
@@ -68,16 +68,19 @@ object CommandExecutorImpl extends CommandExecutor {
 
   def executeCommit() = {
 
-    val blobsToCommit = commitHelper.getBlobsToCommit()
+    val isFirstCommit = !sgitReader.isExistingCommit()
+    val blobsToCommit = commitHelper.getBlobsToCommit(isFirstCommit)
     val branch = sgitReader.getCurrentBranch()
-    //if nothing to commmit
+
+    //if nothing to commit
     if (blobsToCommit.isEmpty)
       printer.nothingToCommit(branch)
     else {
       //if commit needed
       printer.askEnterMessageCommits
       val message = inputManager.retrieveUserCommitMessage()
-      val nbFilesChanged = commitHelper.commit(blobsToCommit, message)
+      val (commit, nbFilesChanged) = commitHelper.commit(isFirstCommit, branch, blobsToCommit, message)
+      sgitWriter.saveCommit(commit, branch)
       printer.commitCreatedMessage(branch, message, nbFilesChanged)
     }
   }
@@ -87,7 +90,8 @@ object CommandExecutorImpl extends CommandExecutor {
     val branch = sgitReader.getCurrentBranch()
     val workspace = workspaceReader.getAllBlobsOfWorkspace()
     val index = sgitReader.getIndex().map(x => Blob(x))
-    val lastCommit = commitHelper.getAllBlobsCommitted()
+    val isFirstCommit = !sgitReader.isExistingCommit()
+    val lastCommit = commitHelper.getAllBlobsCommitted(isFirstCommit)
 
     //process
     val untrackedFiles = statusHelper.getUntrackedFiles(workspace, index)
