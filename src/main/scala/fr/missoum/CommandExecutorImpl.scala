@@ -1,6 +1,6 @@
 package fr.missoum
 
-import fr.missoum.commands.{SgitAdd, SgitCommit, SgitCommitImpl, SgitStatus, SgitStatusImpl}
+import fr.missoum.commands.{SgitAddImpl, SgitCommit, SgitCommitImpl, SgitStatus, SgitStatusImpl}
 import fr.missoum.logic.{Blob, Commit}
 import fr.missoum.utils.io.inputs.{UserInput, UserInputImpl}
 import fr.missoum.utils.io.printers.{ConsolePrinter, ConsolePrinterImpl}
@@ -30,13 +30,13 @@ object CommandExecutorImpl extends CommandExecutor {
   }
 
   def executeAdd(filesNames: Array[String], linesToAddInIndex: String): Unit = {
-    val notExistingFiles = SgitAdd.getNotExistingFile(filesNames)
+    val notExistingFiles = SgitAddImpl.getNotExistingFile(filesNames)
     //if there's not existing file(s), we inform the user and don't add any files
     if (!notExistingFiles.isEmpty)
       notExistingFiles.map(printer.fileNotExist(_))
     //else we add all the existing files
     else
-      SgitAdd.addAll(filesNames)
+      SgitAddImpl.addAll(filesNames)
   }
 
 
