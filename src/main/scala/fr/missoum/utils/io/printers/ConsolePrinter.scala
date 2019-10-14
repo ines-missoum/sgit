@@ -44,4 +44,6 @@ trait ConsolePrinter {
 
   def displayAllCommits(commits: Array[Commit], branch: String): Unit
 
+  def noLog(branch:String):Unit
+
 }

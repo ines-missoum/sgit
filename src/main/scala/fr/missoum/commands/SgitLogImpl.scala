@@ -13,8 +13,14 @@ object SgitLogImpl extends SgitLog {
    * @return the list of all the commits
    */
   def retrieveAllCommits(): Array[Commit] = {
-    val logs = sgitReader.getLog().split("\n")
-    retrieveAllCommitRec(logs)
+
+    if (sgitReader.getLog().isEmpty)
+      Array[Commit]()
+    else {
+      val logs = sgitReader.getLog().split("\n")
+      retrieveAllCommitRec(logs)
+    }
+
   }
 
   def retrieveAllCommitRec(logs: Array[String]): Array[Commit] = {

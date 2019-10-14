@@ -109,8 +109,16 @@ object CommandExecutorImpl extends CommandExecutor {
     //when only not staged => no changes added to commit (use "git add" and/or "git commit -a")
   }
 
-  def executeLog(): Unit =
-    printer.displayAllCommits(logHelper.retrieveAllCommits(),sgitReader.getCurrentBranch)
+  def executeLog(): Unit ={
+
+    val branch = sgitReader.getCurrentBranch
+    val logs = logHelper.retrieveAllCommits()
+
+    if (logs.isEmpty)
+      printer.noLog(branch)
+    else
+      printer.displayAllCommits(logs, branch)
+  }
 
 }
 

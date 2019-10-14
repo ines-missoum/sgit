@@ -76,4 +76,6 @@ object ConsolePrinterImpl extends ConsolePrinter {
       .mkString("\n")
     println(allCommits)
   }
+
+  def noLog(branch: String): Unit = println("fatal: your current branch '" + branch + "' does not have any commits yet")
 }
