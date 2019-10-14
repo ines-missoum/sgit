@@ -4,8 +4,8 @@ import java.io.File
 
 import fr.missoum.logic.{Blob, EntryTree}
 import fr.missoum.utils.helpers.PathHelper
-import fr.missoum.utils.io.readers.{SgitReader, SgitReaderImpl, WorkspaceReader, WorkspaceReaderImpl}
-import fr.missoum.utils.io.writers.{SgitWriter, SgitWriterImpl}
+import fr.missoum.utils.io.readers._
+import fr.missoum.utils.io.writers._
 
 import scala.annotation.tailrec
 
@@ -17,6 +17,7 @@ object SgitAddImpl extends SgitAdd {
 
   /**
    * Checks if the file name exists
+   *
    * @param fileName : Name of the file
    * @return True if the file do not exists either in workspace nor in index, otherwise false
    */
@@ -30,6 +31,7 @@ object SgitAddImpl extends SgitAdd {
 
   /**
    * Builds the blobs to update the index and recursively makes the changes in the index
+   *
    * @param filesNames : List of files names that exist in the index
    */
   def addAll(filesNames: Array[String]): Unit = {
@@ -47,34 +49,40 @@ object SgitAddImpl extends SgitAdd {
       .map(x => Blob.newBlobWithContent(sgitReader.getContentOfFile(x), PathHelper.getSimplePathOfFile(x)))
 
     //we add all files that need to
-    recAdd(newFilesBlobs ++ blobsToRemove, sgitReader.getIndex())
+    val indexUpdated = recAdd(newFilesBlobs ++ blobsToRemove, sgitReader.getIndex())
+    sgitWriter.updateIndex(indexUpdated)
 
   }
 
+  /**
+   * From the files blobs update the index
+   * @param filesBlobs blobs modified that need to be save in the index
+   * @param index index to update
+   * @return the index updated
+   */
   @tailrec
-  def recAdd(filesBlobs: Array[EntryTree], index: Array[EntryTree]): Unit = {
+  def recAdd(filesBlobs: Array[EntryTree], index: Array[EntryTree]): Array[EntryTree] = {
     //if no more files to deal with, we save the index
-    if (filesBlobs.length == 0) sgitWriter.updateIndex(index)
+    if (filesBlobs.length == 0) index
+    //else we update the index and deal with the next blob
     else {
-      //blob to delete, we update the index
-      if (filesBlobs(0).hash.isEmpty) {
-        recAdd(filesBlobs.tail, index.filter(x => !x.path.equals(filesBlobs(0).path)))
-      }
-      //else blob to add or update
+      //if blob to delete
+      if (filesBlobs(0).hash.isEmpty)
+        recAdd(filesBlobs.tail, index.filter(!_.path.equals(filesBlobs(0).path)))
+      //else blob to add or to update
       else {
         //we create the blob in memory if it doesn't already exists
         sgitWriter.createObject(filesBlobs(0).contentString.get)
-        //we update the index:
 
         //new blob
-        if (index.filter(_.path.equals(filesBlobs(0).path)).isEmpty)
+        if (!index.exists(_.path.equals(filesBlobs(0).path)))
           recAdd(filesBlobs.tail, index :+ filesBlobs(0))
-
         //blob updated
         else {
-          index.map(x =>
+          val indexUpdated = index
+          indexUpdated.map(x =>
             if (x.path.equals(filesBlobs(0).path)) x.hash = filesBlobs(0).hash)
-          recAdd(filesBlobs.tail, index)
+          recAdd(filesBlobs.tail, indexUpdated)
         }
       }
     }
