@@ -15,6 +15,7 @@ object CommandExecutorImpl extends CommandExecutor {
   var commitHelper: SgitCommit = SgitCommitImpl
   var statusHelper: SgitStatus = SgitStatusImpl
   var addHelper: SgitAdd = SgitAddImpl
+  var logHelper: SgitLog = SgitLogImpl
 
   def isCommandForbiddenHere(): Boolean = !sgitReader.isExistingSgitFolder
 
@@ -108,5 +109,8 @@ object CommandExecutorImpl extends CommandExecutor {
     //when only not staged => no changes added to commit (use "git add" and/or "git commit -a")
   }
 
+  def executeLog(): Unit =
+    printer.displayAllCommits(logHelper.retrieveAllCommits(),sgitReader.getCurrentBranch)
 
 }
+

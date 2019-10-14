@@ -94,6 +94,7 @@ object SgitReaderImpl extends SgitReader {
 
   /**
    * Reads all the content of an object save in memory
+   *
    * @param hash hash of the object
    * @return all the lines of the content of the object
    */
@@ -107,6 +108,7 @@ object SgitReaderImpl extends SgitReader {
 
   /**
    * Retrieve the last commit
+   *
    * @return the last commit done
    */
   def getLastCommit: Commit = {
@@ -116,12 +118,22 @@ object SgitReaderImpl extends SgitReader {
 
   /**
    * Retrieves the commit that corresponds to a hash
+   *
    * @param hashCommit hash of a commit
    * @return the commit that corresponds to the hash in parameter
    */
   def getCommit(hashCommit: String): Commit = {
     val pathCommit = PathHelper.ObjectDirectory + File.separator + hashCommit.substring(0, 2) + File.separator + hashCommit.substring(2)
     Commit.getCommitFromContent(getContentOfFile(pathCommit), hashCommit)
+  }
+
+  /**
+   * Retrieve the logs of the current branch
+   *
+   * @return the logs of the current branch
+   */
+  def getLog(): String = {
+    getContentOfFile(PathHelper.HeadLogFile)
   }
 
   /**

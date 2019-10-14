@@ -32,6 +32,9 @@ object Main {
       //status
       case Array("status") => executor.executeStatus()
       case Array("status", _*) => printer.notValidArguments("status", "just 'status'")
+      //log
+      case Array("log") => executor.executeLog()
+      case Array("log", _*) => printer.notValidArguments("log", "just 'log'")
       //default case
       case a: Array[String] => printer.notValidCommand(a(0))
     }

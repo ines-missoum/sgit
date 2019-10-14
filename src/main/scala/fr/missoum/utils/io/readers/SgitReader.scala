@@ -100,5 +100,11 @@ trait SgitReader {
    */
   def getLastCommitHash: String
 
+  /**
+   * Retrieve the logs of the current branch
+   *
+   * @return the logs of the current branch
+   */
+  def getLog(): String
 
 }
