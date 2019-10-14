@@ -95,21 +95,29 @@ object CommandExecutorImpl extends CommandExecutor {
 
     //process
     val untrackedFiles = statusHelper.getUntrackedFiles(workspace, index)
-    val (modifiedNotStaged, deletedNotStaged) = statusHelper.getChangesNotStagedForCommit(index, workspace)
-    val (newsToCommit, modifiedToCommit, deletedToCommit) = statusHelper.getChangesToBeCommitted(index, lastCommit)
-
+    val notStaged = statusHelper.getChangesNotStagedForCommit(index, workspace)
+    val toBeCommitted = statusHelper.getChangesToBeCommitted(index, lastCommit)
+    var printed = false
     //print
     printer.branch(branch)
-    if (!(newsToCommit.isEmpty && modifiedToCommit.isEmpty && deletedToCommit.isEmpty))
-      printer.changesToBeCommitted(newsToCommit, modifiedToCommit, deletedToCommit)
-    if (!(modifiedNotStaged.isEmpty && deletedNotStaged.isEmpty))
-      printer.changesNotStagedForCommit(modifiedNotStaged, deletedNotStaged)
-    if (!untrackedFiles.isEmpty)
-      printer.untrackedFiles(untrackedFiles)
-    //when only not staged => no changes added to commit (use "git add" and/or "git commit -a")
+
+    if (!toBeCommitted.isEmpty) {
+      printer.changesToBeCommitted(toBeCommitted.get._1, toBeCommitted.get._2, toBeCommitted.get._3)
+      printed = true
+    }
+    if (!notStaged.isEmpty) {
+      printed = true
+      printer.changesNotStagedForCommit(notStaged.get._1, notStaged.get._2)
+    }
+    if (!untrackedFiles.isEmpty) {
+      printed = true
+      printer.untrackedFiles(untrackedFiles.get)
+    }
+    if (!printed)
+      printer.statusAllGood()
   }
 
-  def executeLog(): Unit ={
+  def executeLog(): Unit = {
 
     val branch = sgitReader.getCurrentBranch
     val logs = logHelper.retrieveAllCommits()

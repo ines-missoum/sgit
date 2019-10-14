@@ -53,7 +53,7 @@ object ConsolePrinterImpl extends ConsolePrinter {
   def changesNotStagedForCommit(modifiedNotStaged: Array[String], deletedNotStaged: Array[String]): Unit = {
     val deleted = deletedNotStaged.map("\tdeleted:     " + _).mkString("\n")
     val modified = modifiedNotStaged.map("\tmodified:    " + _).mkString("\n")
-    println("Changes not staged for commit:\n  (use \"git add/rm <file>...\" to update what will be committed)\n  (use \"git checkout -- <file>...\" to discard changes in working directory)\n\n"
+    println("Changes not staged for commit:\n  (use \"git add <file>...\" to update what will be committed)\n  (use \"git checkout -- <file>...\" to discard changes in working directory)\n\n"
       + Console.RED + deleted + "\n" + modified + "\n" + Console.WHITE)
   }
 
@@ -78,4 +78,6 @@ object ConsolePrinterImpl extends ConsolePrinter {
   }
 
   def noLog(branch: String): Unit = println("fatal: your current branch '" + branch + "' does not have any commits yet")
+
+  def statusAllGood(): Unit = println("nothing to commit, working tree clean")
 }

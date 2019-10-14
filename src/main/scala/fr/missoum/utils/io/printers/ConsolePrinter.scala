@@ -46,4 +46,6 @@ trait ConsolePrinter {
 
   def noLog(branch:String):Unit
 
+  def statusAllGood(): Unit
+
 }
