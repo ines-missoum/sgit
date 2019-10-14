@@ -58,7 +58,7 @@ object SgitReaderImpl extends SgitReader {
    */
   def getAllTags(): Array[String] = (new File(PathHelper.TagsDirectory)).listFiles.map(_.getName)
 
-  def getIndex(): Array[String] = Source.fromFile(PathHelper.IndexFile).getLines().toArray
+  def getIndex(): Array[EntryTree] = Source.fromFile(PathHelper.IndexFile).getLines().toArray.map(x => Blob(x))
 
   /**
    * Check if the already is a commit for the current branch.

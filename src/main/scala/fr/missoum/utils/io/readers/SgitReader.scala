@@ -44,7 +44,7 @@ trait SgitReader {
    */
   def getAllTags(): Array[String]
 
-  def getIndex(): Array[String]
+  def getIndex(): Array[EntryTree]
 
   def getContentOfFile(path: String): String
 

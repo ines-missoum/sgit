@@ -48,7 +48,7 @@ object SgitCommitImpl extends SgitCommit {
    */
   def getBlobsToCommit(isFirstCommit: Boolean): Array[EntryTree] = {
 
-    val index = sgitReader.getIndex().map(x => Blob(x))
+    val index = sgitReader.getIndex()
     //if first commit we commit all the content of the index
     if (isFirstCommit) index
     //else we commit the differences between the index and the last commit

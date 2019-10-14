@@ -1,23 +1,22 @@
 package fr.missoum
 
-import fr.missoum.commands.{SgitAddImpl, SgitCommit, SgitCommitImpl, SgitStatus, SgitStatusImpl}
-import fr.missoum.logic.{Blob, Commit}
-import fr.missoum.utils.io.inputs.{UserInput, UserInputImpl}
-import fr.missoum.utils.io.printers.{ConsolePrinter, ConsolePrinterImpl}
-import fr.missoum.utils.io.readers.{SgitReader, SgitReaderImpl, WorkspaceReader, WorkspaceReaderImpl}
-import fr.missoum.utils.io.writers.{SgitWriter, SgitWriterImpl}
+import fr.missoum.commands._
+import fr.missoum.utils.io.{inputs, printers, readers, writers}, inputs._, printers._, readers._, writers._
 
 object CommandExecutorImpl extends CommandExecutor {
 
+  // io managers
   var sgitReader: SgitReader = SgitReaderImpl
   var workspaceReader: WorkspaceReader = WorkspaceReaderImpl
   var sgitWriter: SgitWriter = SgitWriterImpl
   var printer: ConsolePrinter = ConsolePrinterImpl
-  var commitHelper: SgitCommit = SgitCommitImpl
   var inputManager: UserInput = UserInputImpl
+  //commands helpers
+  var commitHelper: SgitCommit = SgitCommitImpl
   var statusHelper: SgitStatus = SgitStatusImpl
+  var addHelper: SgitAdd = SgitAddImpl
 
-  def isCommandForbiddenHere(): Boolean = !SgitReaderImpl.isExistingSgitFolder
+  def isCommandForbiddenHere(): Boolean = !sgitReader.isExistingSgitFolder
 
 
   def executeInit(): Unit = {
@@ -30,17 +29,17 @@ object CommandExecutorImpl extends CommandExecutor {
   }
 
   def executeAdd(filesNames: Array[String], linesToAddInIndex: String): Unit = {
-    val notExistingFiles = SgitAddImpl.getNotExistingFile(filesNames)
+    val notExistingFiles = filesNames.filter(addHelper.isNotExistingFile(_))
     //if there's not existing file(s), we inform the user and don't add any files
     if (!notExistingFiles.isEmpty)
-      notExistingFiles.map(printer.fileNotExist(_))
+      printer.fileNotExist(notExistingFiles(0))
     //else we add all the existing files
     else
-      SgitAddImpl.addAll(filesNames)
+      addHelper.addAll(filesNames)
   }
 
 
-  def executeGetAllBranchesAndTags() = {
+  def executeGetAllBranchesAndTags(): Unit = {
     val currentBranch = sgitReader.getCurrentBranch()
     val tags = sgitReader.getAllTags()
     val branches = sgitReader.getAllBranches()
@@ -48,7 +47,7 @@ object CommandExecutorImpl extends CommandExecutor {
   }
 
 
-  def executeCreateNewBranch(newBranch: String) = {
+  def executeCreateNewBranch(newBranch: String): Unit = {
     if (sgitReader.isExistingBranch(newBranch))
       printer.branchAlreadyExists(newBranch)
     else {
@@ -57,16 +56,16 @@ object CommandExecutorImpl extends CommandExecutor {
     }
   }
 
-  def executeCreateNewTag(newTag: String) = {
+  def executeCreateNewTag(newTag: String): Unit = {
     if (sgitReader.isExistingTag(newTag))
       printer.tagAlreadyExists(newTag)
     else {
-      SgitWriterImpl.createNewTag(newTag)
+      sgitWriter.createNewTag(newTag)
       printer.tagCreated(newTag)
     }
   }
 
-  def executeCommit() = {
+  def executeCommit(): Unit = {
 
     val isFirstCommit = !sgitReader.isExistingCommit()
     val blobsToCommit = commitHelper.getBlobsToCommit(isFirstCommit)
@@ -77,7 +76,7 @@ object CommandExecutorImpl extends CommandExecutor {
       printer.nothingToCommit(branch)
     else {
       //if commit needed
-      printer.askEnterMessageCommits
+      printer.askEnterMessageCommits()
       val message = inputManager.retrieveUserCommitMessage()
       val (commit, nbFilesChanged) = commitHelper.commit(isFirstCommit, branch, blobsToCommit, message)
       sgitWriter.saveCommit(commit, branch)
@@ -85,11 +84,11 @@ object CommandExecutorImpl extends CommandExecutor {
     }
   }
 
-  def executeStatus() = {
+  def executeStatus(): Unit = {
     //retrieve data
     val branch = sgitReader.getCurrentBranch()
     val workspace = workspaceReader.getAllBlobsOfWorkspace()
-    val index = sgitReader.getIndex().map(x => Blob(x))
+    val index = sgitReader.getIndex()
     val isFirstCommit = !sgitReader.isExistingCommit()
     val lastCommit = commitHelper.getAllBlobsCommitted(isFirstCommit)
 

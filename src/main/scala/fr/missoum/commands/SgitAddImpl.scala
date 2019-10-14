@@ -3,63 +3,58 @@ package fr.missoum.commands
 import java.io.File
 
 import fr.missoum.logic.{Blob, EntryTree}
-import fr.missoum.utils.helpers.{HashHelper, PathHelper}
-import fr.missoum.utils.io.readers.{SgitReaderImpl, WorkspaceReaderImpl}
-import fr.missoum.utils.io.writers.SgitWriterImpl
+import fr.missoum.utils.helpers.PathHelper
+import fr.missoum.utils.io.readers.{SgitReader, SgitReaderImpl, WorkspaceReader, WorkspaceReaderImpl}
+import fr.missoum.utils.io.writers.{SgitWriter, SgitWriterImpl}
 
 import scala.annotation.tailrec
 
-object SgitAddImpl extends SgitAdd{
+object SgitAddImpl extends SgitAdd {
 
-  def isNotInWorkspace(fileName: String): Boolean =
-    !WorkspaceReaderImpl.fileExists(System.getProperty("user.dir") + File.separator + fileName)
+  var workspaceReader: WorkspaceReader = WorkspaceReaderImpl
+  var sgitReader: SgitReader = SgitReaderImpl
+  var sgitWriter: SgitWriter = SgitWriterImpl
 
+  /**
+   * Checks if the file name exists
+   * @param fileName : Name of the file
+   * @return True if the file do not exists either in workspace nor in index, otherwise false
+   */
   def isNotExistingFile(fileName: String): Boolean = {
-    val indexBlobsAbsolutePaths = SgitReaderImpl.getIndex().map(x => Blob(x)).map(x => PathHelper.getAbsolutePathOfFile(x.path))
-    val absolutePath = System.getProperty("user.dir") + File.separator + fileName
-    val isExistInWorkspace = WorkspaceReaderImpl.fileExists(absolutePath)
-    val isExistingInIndex = indexBlobsAbsolutePaths.exists(_.equals(absolutePath))
-    // do not exists either in workspace nor in index
+    val indexBlobsAbsolutePaths = sgitReader.getIndex().map(x => PathHelper.getAbsolutePathOfFile(x.path))
+    val fileAbsolutePath = System.getProperty("user.dir") + File.separator + fileName
+    val isExistInWorkspace = workspaceReader.fileExists(fileAbsolutePath)
+    val isExistingInIndex = indexBlobsAbsolutePaths.exists(_.equals(fileAbsolutePath))
     !isExistInWorkspace && !isExistingInIndex
   }
 
-  def getNotExistingFile(filesNames: Array[String]) =
-    filesNames.filter(x => isNotExistingFile(x))
-
   /**
-   *
-   * @param filesNames : pre: all the files exist in index
+   * Builds the blobs to update the index and recursively makes the changes in the index
+   * @param filesNames : List of files names that exist in the index
    */
   def addAll(filesNames: Array[String]): Unit = {
 
-    // we retrieve all the content of the index file in format of array of blobs
-    val indexBlobs = SgitReaderImpl.getIndex().map(x => Blob(x))
-    //we create an array of blobs from the array of files names:
+    val filesAbsolutePath = filesNames
+      .map(System.getProperty("user.dir") + File.separator + _)
 
     //files to delete <=> files that don't exist but that are contain in the index
-    val blobsToRemove = filesNames.filter(isNotInWorkspace(_)).map(x => {
-      val absolutePath = System.getProperty("user.dir") + File.separator + x
-      val simplePath = PathHelper.getSimplePathOfFile(absolutePath)
-      Blob("", simplePath)
-    })
-
+    val blobsToRemove = filesAbsolutePath
+      .filter(!workspaceReader.fileExists(_))
+      .map(x => Blob("", PathHelper.getSimplePathOfFile(x)))
     //files to add or update
-    val newFilesBlobs: Array[EntryTree] = filesNames.filter(!isNotInWorkspace(_)).map(x => {
-      val absolutePath = System.getProperty("user.dir") + File.separator + x
-      val simplePath = PathHelper.getSimplePathOfFile(absolutePath)
-      val content = SgitReaderImpl.getContentOfFile(absolutePath)
-      Blob.newBlobWithContent(content, simplePath)
-    })
+    val newFilesBlobs: Array[EntryTree] = filesAbsolutePath
+      .filter(workspaceReader.fileExists(_))
+      .map(x => Blob.newBlobWithContent(sgitReader.getContentOfFile(x), PathHelper.getSimplePathOfFile(x)))
 
     //we add all files that need to
-    recAdd(newFilesBlobs ++ blobsToRemove, indexBlobs)
+    recAdd(newFilesBlobs ++ blobsToRemove, sgitReader.getIndex())
 
   }
 
   @tailrec
   def recAdd(filesBlobs: Array[EntryTree], index: Array[EntryTree]): Unit = {
     //if no more files to deal with, we save the index
-    if (filesBlobs.length == 0) SgitWriterImpl.updateIndex(index)
+    if (filesBlobs.length == 0) sgitWriter.updateIndex(index)
     else {
       //blob to delete, we update the index
       if (filesBlobs(0).hash.isEmpty) {
@@ -68,7 +63,7 @@ object SgitAddImpl extends SgitAdd{
       //else blob to add or update
       else {
         //we create the blob in memory if it doesn't already exists
-        SgitWriterImpl.createObject(filesBlobs(0).contentString.get)
+        sgitWriter.createObject(filesBlobs(0).contentString.get)
         //we update the index:
 
         //new blob
