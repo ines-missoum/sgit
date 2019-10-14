@@ -23,7 +23,7 @@ object Commit {
 
   def getCommitFromToString(content: String): Commit = {
     val values = content.split("\n").map(x => x.split(" ")).flatten
-    new Commit(values(0), values(1), values(2), values(3), values(2), values.drop(4).mkString(" "))
+    new Commit(values(0), values(1), values(2), values(3).replace("-", " "), values(2), values.drop(4).mkString(" "))
   }
 
 }

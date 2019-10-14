@@ -1,7 +1,7 @@
 package fr.missoum.utils.io.writers
 
 import java.io.{BufferedWriter, File, FileWriter}
-import java.time.Instant
+import java.util.Calendar
 
 import fr.missoum.logic.{Commit, EntryTree}
 import fr.missoum.utils.helpers.{HashHelper, PathHelper}
@@ -84,13 +84,15 @@ object SgitWriterImpl extends SgitWriter {
 
   /**
    * Save the index in parameter
+   *
    * @param index list of blobs to put in the index
    */
   def updateIndex(index: Array[EntryTree]): Unit = writeInFile(PathHelper.IndexFile, index.map(_.toString).mkString("\n"), shouldBeAppend = false)
 
   /**
    * Create the commit in memory
-   * @param commitToSave the commit to save
+   *
+   * @param commitToSave  the commit to save
    * @param currentBranch the branch where the commit should be saved
    * @return the commit created
    */
@@ -99,8 +101,7 @@ object SgitWriterImpl extends SgitWriter {
     //creation commit
     val commitCreated: Commit = commitToSave.copy()
     commitCreated.hash = createObject(commitCreated.buildContent)
-    commitCreated.date = Instant.now().toString
-
+    commitCreated.date = Calendar.getInstance().getTime().toString.replace(" ", "-")
     //commit added to the logs
     writeInFile(PathHelper.HeadLogFile, commitCreated.toString, shouldBeAppend = true)
     writeInFile(PathHelper.LogsDirectory + File.separator + currentBranch, commitCreated.toString, shouldBeAppend = true)
