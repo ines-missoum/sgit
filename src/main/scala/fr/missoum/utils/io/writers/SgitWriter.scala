@@ -2,6 +2,9 @@ package fr.missoum.utils.io.writers
 
 import fr.missoum.logic.{Commit, EntryTree}
 
+/**
+ * This trait gives the role of accessor of files or directories of sgit repository (in writing).
+ */
 trait SgitWriter {
 
   def createSgitRepository()
@@ -40,8 +43,17 @@ trait SgitWriter {
    */
   def createObject(contentFile: String):String
 
+  /**
+   * Save the index in parameter
+   * @param index list of blobs to put in the index
+   */
   def updateIndex(index: Array[EntryTree])
-
+  /**
+   * Create the commit in memory
+   * @param commitToSave the commit to save
+   * @param currentBranch the branch where the commit should be saved
+   * @return the commit created
+   */
   def saveCommit(commitToSave:Commit, currentBranch: String): Commit
 
 }

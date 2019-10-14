@@ -23,7 +23,7 @@ class SgitReaderImplSpec extends FlatSpec with Matchers with IdiomaticMockito {
     setUpSgitRepository
     new PrintWriter(PathHelper.BranchesDirectory+File.separator+"master") { write("file contents"); close }
     //when
-    val result = SgitReaderImpl.isExistingCommit()
+    val result = SgitReaderImpl.isExistingCommit
     //then
     result shouldBe true
     //clean
@@ -34,7 +34,7 @@ class SgitReaderImplSpec extends FlatSpec with Matchers with IdiomaticMockito {
     //given
     setUpSgitRepository
     //when
-    val result = SgitReaderImpl.isExistingCommit()
+    val result = SgitReaderImpl.isExistingCommit
     //then
     result shouldBe false
     //clean

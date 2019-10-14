@@ -5,20 +5,17 @@ import java.io.File
 import fr.missoum.utils.helpers.PathHelper
 import fr.missoum.utils.io.printers.ConsolePrinter
 import org.mockito.IdiomaticMockito
-import org.mockito.MockitoSugar
-import org.mockito.internal.matchers
-import org.mockito.internal.matchers.Any
 import org.scalatest.{FlatSpec, Matchers}
 
 class MainSpec extends FlatSpec with Matchers with IdiomaticMockito {
 
-  private def setupSgitRepo: Unit ={
+  private def setupSgitRepo(): Unit ={
     val nameFolder = PathHelper.SgitRepositoryName
     val file: File = new File(nameFolder)
     file.createNewFile
   }
 
-  private def cleanSgitRepo: Unit ={
+  private def cleanSgitRepo(): Unit ={
     val nameFolder = PathHelper.SgitRepositoryName
     val file: File = new File(nameFolder)
     file.delete
@@ -32,7 +29,7 @@ class MainSpec extends FlatSpec with Matchers with IdiomaticMockito {
     val classTested = Main
     classTested.executor = mockExecutor
     //when
-    val main = Main.main(arg)
+    Main.main(arg)
     //then
     mockExecutor.executeInit was called
 
@@ -48,7 +45,7 @@ class MainSpec extends FlatSpec with Matchers with IdiomaticMockito {
     classTested.executor = mockExecutor
     classTested.printer = mockPrinter
     //when
-    val main = Main.main(arg)
+    Main.main(arg)
     //then
     mockExecutor.executeInit wasNever  called
     mockPrinter.notValidArguments("init","just 'init'") was called
@@ -59,25 +56,25 @@ class MainSpec extends FlatSpec with Matchers with IdiomaticMockito {
 
   it should "execute commit command when argument is commit and sgit repository exists" in {
     //given
-    setupSgitRepo
+    setupSgitRepo()
     val arg = Array("commit")
     val mockExecutor = mock[CommandExecutor]
     val classTested = Main
     classTested.executor = mockExecutor
     //when
-    val main = Main.main(arg)
+    Main.main(arg)
     //then
     mockExecutor.executeCommit() was called
 
     //clean
-    cleanSgitRepo
+    cleanSgitRepo()
 
   }
 
   it should "not execute commit command when first argument is commit and others arguments are invalid and sgit repository exists" in {
 
     //given
-    setupSgitRepo
+    setupSgitRepo()
     val arg = Array("commit","testCommand")
     val mockExecutor = mock[CommandExecutor]
     val mockPrinter = mock[ConsolePrinter]
@@ -85,13 +82,13 @@ class MainSpec extends FlatSpec with Matchers with IdiomaticMockito {
     classTested.executor = mockExecutor
     classTested.printer = mockPrinter
     //when
-    val main = Main.main(arg)
+    Main.main(arg)
     //then
     mockExecutor.executeCommit wasNever  called
     mockPrinter.notValidArguments("commit","just 'commit'") was called
 
     //clean
-    cleanSgitRepo
+    cleanSgitRepo()
 
   }
 
@@ -106,7 +103,7 @@ class MainSpec extends FlatSpec with Matchers with IdiomaticMockito {
     classTested.printer = mockPrinter
     mockExecutor.isCommandForbiddenHere() returns true
     //when
-    val main = Main.main(arg)
+    Main.main(arg)
     //then
     mockExecutor.executeCommit() wasNever  called
     mockPrinter.notExistingSgitRepository() was called

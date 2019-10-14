@@ -2,7 +2,7 @@ package fr.missoum.commands
 
 import java.io.File
 
-import fr.missoum.logic.{Blob, Commit, EntryTree, Tree}
+import fr.missoum.logic.{Commit, EntryTree, Tree}
 import fr.missoum.utils.io.readers.{SgitReader, SgitReaderImpl}
 import fr.missoum.utils.io.writers.{SgitWriter, SgitWriterImpl}
 
@@ -48,7 +48,7 @@ object SgitCommitImpl extends SgitCommit {
    */
   def getBlobsToCommit(isFirstCommit: Boolean): Array[EntryTree] = {
 
-    val index = sgitReader.getIndex()
+    val index = sgitReader.getIndex
     //if first commit we commit all the content of the index
     if (isFirstCommit) index
     //else we commit the differences between the index and the last commit
@@ -154,12 +154,18 @@ object SgitCommitImpl extends SgitCommit {
 
     //if commit tree
     if (tree.path.equals("")) {
-      treesPaths = treesPaths.groupBy(_.split(File.separator)(0)).keySet.filter(!_.equals(""))
+      treesPaths = treesPaths.groupBy(_.split(File.separator)(0))
+        .keySet
+        .filter(!_.equals(""))
       treesPaths.map(x => list = list :+ Tree("", x))
     }
     else {
-      val entriesFiltered = gatherBlobs.view.filterKeys(_.startsWith(tree.path + File.separator)).toMap
-      treesPaths = entriesFiltered.keySet.groupBy(_.toSeq.diff(tree.path.toSeq).unwrap.split(File.separator)(1)).keySet
+      val entriesFiltered = gatherBlobs.view
+        .filterKeys(_.startsWith(tree.path + File.separator))
+        .toMap
+      treesPaths = entriesFiltered.keySet
+        .groupBy(_.toSeq.diff(tree.path.toSeq).unwrap.split(File.separator)(1))
+        .keySet
       treesPaths.map(x => list = list :+ Tree("", tree.path + File.separator + x))
     }
 

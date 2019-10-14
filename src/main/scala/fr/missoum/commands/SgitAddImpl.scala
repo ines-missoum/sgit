@@ -22,7 +22,7 @@ object SgitAddImpl extends SgitAdd {
    * @return True if the file do not exists either in workspace nor in index, otherwise false
    */
   def isNotExistingFile(fileName: String): Boolean = {
-    val indexBlobsAbsolutePaths = sgitReader.getIndex().map(x => PathHelper.getAbsolutePathOfFile(x.path))
+    val indexBlobsAbsolutePaths = sgitReader.getIndex.map(x => PathHelper.getAbsolutePathOfFile(x.path))
     val fileAbsolutePath = System.getProperty("user.dir") + File.separator + fileName
     val isExistInWorkspace = workspaceReader.fileExists(fileAbsolutePath)
     val isExistingInIndex = indexBlobsAbsolutePaths.exists(_.equals(fileAbsolutePath))
@@ -49,7 +49,7 @@ object SgitAddImpl extends SgitAdd {
       .map(x => Blob.newBlobWithContent(sgitReader.getContentOfFile(x), PathHelper.getSimplePathOfFile(x)))
 
     //we add all files that need to
-    val indexUpdated = recAdd(newFilesBlobs ++ blobsToRemove, sgitReader.getIndex())
+    val indexUpdated = recAdd(newFilesBlobs ++ blobsToRemove, sgitReader.getIndex)
     sgitWriter.updateIndex(indexUpdated)
 
   }

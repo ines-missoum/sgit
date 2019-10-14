@@ -24,7 +24,7 @@ class CommandExecutorSpec extends FlatSpec with Matchers with IdiomaticMockito {
     //when
     objectTested.executeInit()
     //then
-    mockReader.isExistingSgitFolder() was called
+    mockReader.isExistingSgitFolder was called
   }
 
   it should "create a new sgit repository if it not already exists and inform user" in {
@@ -36,7 +36,7 @@ class CommandExecutorSpec extends FlatSpec with Matchers with IdiomaticMockito {
     objectTested.sgitReader = mockReader
     objectTested.sgitWriter = mockWriter
     objectTested.printer = mockPrinter
-    mockReader.isExistingSgitFolder() returns false
+    mockReader.isExistingSgitFolder returns false
     //when
     objectTested.executeInit()
     //then
@@ -54,7 +54,7 @@ class CommandExecutorSpec extends FlatSpec with Matchers with IdiomaticMockito {
     objectTested.sgitReader = mockReader
     objectTested.sgitWriter = mockWriter
     objectTested.printer = mockPrinter
-    mockReader.isExistingSgitFolder() returns true
+    mockReader.isExistingSgitFolder returns true
     //when
     objectTested.executeInit()
     //then
@@ -77,7 +77,7 @@ class CommandExecutorSpec extends FlatSpec with Matchers with IdiomaticMockito {
     //when
     objectTested.executeCommit()
     //then
-    mockReader.isExistingCommit() was called
+    mockReader.isExistingCommit was called
 
   }
 }

@@ -2,9 +2,17 @@ package fr.missoum.utils.io.readers
 
 import fr.missoum.logic.{Commit, EntryTree}
 
+/**
+ * This trait gives the role of accessor of files or directories of sgit repository (in reading only).
+ */
 trait SgitReader {
 
-  def isExistingSgitFolder(): Boolean
+  /**
+   * Checks if a .sgit folder already exists in the current directory.
+   *
+   * @return True if a .sgit folder exists in the current directory, otherwise False.
+   */
+  def isExistingSgitFolder: Boolean
 
   /**
    * Checks if a branch exists.
@@ -27,14 +35,14 @@ trait SgitReader {
    *
    * @return the current branch or None if an error happens
    */
-  def getCurrentBranch(): String
+  def getCurrentBranch: String
 
   /**
    * Retrieves all branches names
    *
    * @return an array that contains all branches names
    */
-  def getAllBranches(): Array[String]
+  def getAllBranches: Array[String]
 
 
   /**
@@ -42,20 +50,54 @@ trait SgitReader {
    *
    * @return an array that contains all tags names
    */
-  def getAllTags(): Array[String]
+  def getAllTags: Array[String]
 
-  def getIndex(): Array[EntryTree]
+  /**
+   *
+   * @return all the blobs of the index
+   */
+  def getIndex: Array[EntryTree]
 
+  /**
+   * Check if the already is a commit for the current branch.
+   *
+   * @return True if a commit exists, otherwise False.
+   */
+  def isExistingCommit: Boolean
+
+  /**
+   * Reads the content of a file
+   *
+   * @param path absolute path of the file
+   * @return the content of the file
+   */
   def getContentOfFile(path: String): String
 
-  def isExistingCommit(): Boolean
-
+  /**
+   * Reads all the content of an object save in memory
+   *
+   * @param hash hash of the object
+   * @return all the lines of the content of the object
+   */
   def getContentOfObjectInEntries(hash: String): Array[EntryTree]
 
+  /**
+   * Retrieve the last commit
+   * @return the last commit done
+   */
   def getLastCommit: Commit
 
+  /**
+   * Retrieves the commit that corresponds to a hash
+   * @param hashCommit hash of a commit
+   * @return the commit that corresponds to the hash in parameter
+   */
   def getCommit(hashCommit: String): Commit
 
+  /**
+   *
+   * @return the hash of the last commit
+   */
   def getLastCommitHash: String
 
 

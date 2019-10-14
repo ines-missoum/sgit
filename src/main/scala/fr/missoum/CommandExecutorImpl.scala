@@ -20,7 +20,7 @@ object CommandExecutorImpl extends CommandExecutor {
 
 
   def executeInit(): Unit = {
-    if (sgitReader.isExistingSgitFolder())
+    if (sgitReader.isExistingSgitFolder)
       printer.sgitFolderAlreadyExists()
     else {
       sgitWriter.createSgitRepository()
@@ -40,9 +40,9 @@ object CommandExecutorImpl extends CommandExecutor {
 
 
   def executeGetAllBranchesAndTags(): Unit = {
-    val currentBranch = sgitReader.getCurrentBranch()
-    val tags = sgitReader.getAllTags()
-    val branches = sgitReader.getAllBranches()
+    val currentBranch = sgitReader.getCurrentBranch
+    val tags = sgitReader.getAllTags
+    val branches = sgitReader.getAllBranches
     printer.printBranchesAndTags(currentBranch, tags, branches)
   }
 
@@ -67,9 +67,9 @@ object CommandExecutorImpl extends CommandExecutor {
 
   def executeCommit(): Unit = {
 
-    val isFirstCommit = !sgitReader.isExistingCommit()
+    val isFirstCommit = !sgitReader.isExistingCommit
     val blobsToCommit = commitHelper.getBlobsToCommit(isFirstCommit)
-    val branch = sgitReader.getCurrentBranch()
+    val branch = sgitReader.getCurrentBranch
 
     //if nothing to commit
     if (blobsToCommit.isEmpty)
@@ -86,10 +86,10 @@ object CommandExecutorImpl extends CommandExecutor {
 
   def executeStatus(): Unit = {
     //retrieve data
-    val branch = sgitReader.getCurrentBranch()
+    val branch = sgitReader.getCurrentBranch
     val workspace = workspaceReader.getAllBlobsOfWorkspace()
-    val index = sgitReader.getIndex()
-    val isFirstCommit = !sgitReader.isExistingCommit()
+    val index = sgitReader.getIndex
+    val isFirstCommit = !sgitReader.isExistingCommit
     val lastCommit = commitHelper.getAllBlobsCommitted(isFirstCommit)
 
     //process

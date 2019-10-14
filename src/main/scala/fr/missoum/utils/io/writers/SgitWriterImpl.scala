@@ -3,11 +3,11 @@ package fr.missoum.utils.io.writers
 import java.io.{BufferedWriter, File, FileWriter}
 import java.time.Instant
 
-import fr.missoum.logic.{Commit, EntryTree, Tree}
+import fr.missoum.logic.{Commit, EntryTree}
 import fr.missoum.utils.helpers.{HashHelper, PathHelper}
 
 /**
- * This object is responsible for all writing actions. Which means create files and folders and update them.
+ * This object is responsible for all writing actions in sgit repository. Which means create files and folders and update them.
  */
 object SgitWriterImpl extends SgitWriter {
 
@@ -15,7 +15,7 @@ object SgitWriterImpl extends SgitWriter {
    * Creates the sgit directory where the command has been executed. It contains all the folders and files necessary.
    * It also creates the master branch and checkout on the master branch.
    */
-  def createSgitRepository() = {
+  def createSgitRepository(): Unit = {
 
     //creation of all files and folders
     val listFolders = List(PathHelper.BranchesDirectory, PathHelper.TagsDirectory, PathHelper.LogsDirectory, PathHelper.ObjectDirectory)
@@ -35,7 +35,7 @@ object SgitWriterImpl extends SgitWriter {
    *
    * @param branch : the branch to checkout
    */
-  def setHeadBranch(branch: String): Unit = writeInFile(PathHelper.HeadFile, "master", false)
+  def setHeadBranch(branch: String): Unit = writeInFile(PathHelper.HeadFile, "master", shouldBeAppend = false)
 
 
   /**
@@ -46,8 +46,8 @@ object SgitWriterImpl extends SgitWriter {
    * @param newBranch : the branch to create
    */
   def createNewBranch(newBranch: String): Unit = {
-    (new File(PathHelper.BranchesDirectory + File.separator + newBranch)).createNewFile
-    (new File(PathHelper.LogsDirectory + File.separator + newBranch)).createNewFile
+    new File(PathHelper.BranchesDirectory + File.separator + newBranch).createNewFile
+    new File(PathHelper.LogsDirectory + File.separator + newBranch).createNewFile
   }
 
   /**
@@ -57,7 +57,7 @@ object SgitWriterImpl extends SgitWriter {
    *
    * @param newTag : the tag to create
    */
-  def createNewTag(newTag: String): Unit = (new File(PathHelper.TagsDirectory + File.separator + newTag)).createNewFile
+  def createNewTag(newTag: String): Unit = new File(PathHelper.TagsDirectory + File.separator + newTag).createNewFile
 
 
   /**
@@ -77,26 +77,35 @@ object SgitWriterImpl extends SgitWriter {
     new File(pathFolder).mkdir()
     val isNew = new File(pathFile).createNewFile
     if (isNew) {
-      writeInFile(pathFile, contentFile, false)
+      writeInFile(pathFile, contentFile, shouldBeAppend = false)
     }
     hash
   }
 
-  def updateIndex(index: Array[EntryTree]) = writeInFile(PathHelper.IndexFile, index.map(_.toString).mkString("\n"), false)
+  /**
+   * Save the index in parameter
+   * @param index list of blobs to put in the index
+   */
+  def updateIndex(index: Array[EntryTree]): Unit = writeInFile(PathHelper.IndexFile, index.map(_.toString).mkString("\n"), shouldBeAppend = false)
 
-
-  def saveCommit(commitToSave:Commit, currentBranch: String): Commit = {
+  /**
+   * Create the commit in memory
+   * @param commitToSave the commit to save
+   * @param currentBranch the branch where the commit should be saved
+   * @return the commit created
+   */
+  def saveCommit(commitToSave: Commit, currentBranch: String): Commit = {
 
     //creation commit
-    val commitCreated:Commit = commitToSave.copy()
+    val commitCreated: Commit = commitToSave.copy()
     commitCreated.hash = createObject(commitCreated.buildContent)
     commitCreated.date = Instant.now().toString
 
     //commit added to the logs
-    writeInFile(PathHelper.HeadLogFile, commitCreated.toString, true)
-    writeInFile(PathHelper.LogsDirectory + File.separator + currentBranch, commitCreated.toString, true)
+    writeInFile(PathHelper.HeadLogFile, commitCreated.toString, shouldBeAppend = true)
+    writeInFile(PathHelper.LogsDirectory + File.separator + currentBranch, commitCreated.toString, shouldBeAppend = true)
     //change the pointer commit of the branch
-    writeInFile(PathHelper.BranchesDirectory + File.separator + currentBranch, commitCreated.hash, false)
+    writeInFile(PathHelper.BranchesDirectory + File.separator + currentBranch, commitCreated.hash, shouldBeAppend = false)
 
     commitCreated
   }
@@ -107,7 +116,7 @@ object SgitWriterImpl extends SgitWriter {
    * @param content        : content to write in the file (everything in the file is deleted and replaced by this content)
    * @param shouldBeAppend : tells if the previous content of the file should be kept (shouldBeAppend==true) or deleted (shouldBeAppend==false)
    */
-  private def writeInFile(path: String, content: String, shouldBeAppend: Boolean) = {
+  private def writeInFile(path: String, content: String, shouldBeAppend: Boolean): Unit = {
     val file = new File(path)
     val bw = new BufferedWriter(new FileWriter(file, shouldBeAppend))
     bw.write(content)
