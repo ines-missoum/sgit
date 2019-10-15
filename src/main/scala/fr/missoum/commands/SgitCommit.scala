@@ -15,6 +15,12 @@ trait SgitCommit extends SgitCommandHelper {
    */
   var sgitWriter: SgitWriter
 
+  /**
+   *
+   * @param index the index blobs
+   * @param blobsOfLastCommit the blobs of the last commit
+   * @return the number of changes (creations + modifications)
+   */
   def nbFilesChangedSinceLastCommit(index: List[EntryTree], blobsOfLastCommit: List[EntryTree]): Option[Int]
   /*/**
    * Gives the list of all the blobs to commit (ie: blobs that have been created or modified since the previous commits)
@@ -35,6 +41,11 @@ trait SgitCommit extends SgitCommandHelper {
    */
   def commit(isFirstCommit: Boolean, currentBranch: String, blobsToCommit: List[EntryTree], message: String): Commit
 
+  /**
+   *
+   * @param isFirstCommit indicates if it's a first commit or not
+   * @return the list of the blobs of the last commit
+   */
   def getBlobsLastCommit(isFirstCommit: Boolean): List[EntryTree]
  /* /**
    * Retrieve all the last version of all blobs committed in the previous commits

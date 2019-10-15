@@ -44,6 +44,11 @@ object SgitCommitImpl extends SgitCommit {
 
   }
 
+  /**
+   *
+   * @param isFirstCommit indicates if it's a first commit or not
+   * @return the list of the blobs of the last commit
+   */
   def getBlobsLastCommit(isFirstCommit: Boolean): List[EntryTree] = {
 
     if (isFirstCommit) List[EntryTree]()
@@ -56,6 +61,12 @@ object SgitCommitImpl extends SgitCommit {
 
   }
 
+  /**
+   *
+   * @param index the index blobs
+   * @param blobsOfLastCommit the blobs of the last commit
+   * @return the number of changes (creations + modifications)
+   */
   def nbFilesChangedSinceLastCommit(index: List[EntryTree], blobsOfLastCommit: List[EntryTree]): Option[Int] = {
     val statusCommit = sgitStatus.getChangesToBeCommitted(index, blobsOfLastCommit)
     if (statusCommit.isEmpty) {
