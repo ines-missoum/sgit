@@ -69,19 +69,21 @@ object CommandExecutorImpl extends CommandExecutor {
   def executeCommit(): Unit = {
 
     val isFirstCommit = !sgitReader.isExistingCommit
-    val blobsToCommit = commitHelper.getBlobsToCommit(isFirstCommit)
+    val index = sgitReader.getIndex
+    val blobsLastCommit = commitHelper.getBlobsLastCommit(isFirstCommit)
+    val nbFilesChanged = commitHelper.nbFilesChangedSinceLastCommit(index, blobsLastCommit)
     val branch = sgitReader.getCurrentBranch
 
     //if nothing to commit
-    if (blobsToCommit.isEmpty)
+    if (nbFilesChanged.isEmpty)
       printer.nothingToCommit(branch)
     else {
       //if commit needed
       printer.askEnterMessageCommits()
       val message = inputManager.retrieveUserCommitMessage()
-      val (commit, nbFilesChanged) = commitHelper.commit(isFirstCommit, branch, blobsToCommit, message)
+      val commit = commitHelper.commit(isFirstCommit, branch, index, message)
       sgitWriter.saveCommit(commit, branch)
-      printer.commitCreatedMessage(branch, message, nbFilesChanged)
+      printer.commitCreatedMessage(branch, message, nbFilesChanged.get)
     }
   }
 
@@ -91,7 +93,7 @@ object CommandExecutorImpl extends CommandExecutor {
     val workspace = workspaceReader.getAllBlobsOfWorkspace()
     val index = sgitReader.getIndex
     val isFirstCommit = !sgitReader.isExistingCommit
-    val lastCommit = commitHelper.getAllBlobsCommitted(isFirstCommit)
+    val lastCommit = commitHelper.getBlobsLastCommit(isFirstCommit)
 
     //process
     val untrackedFiles = statusHelper.getUntrackedFiles(workspace, index)

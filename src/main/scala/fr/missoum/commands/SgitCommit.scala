@@ -15,13 +15,14 @@ trait SgitCommit extends SgitCommandHelper {
    */
   var sgitWriter: SgitWriter
 
-  /**
+  def nbFilesChangedSinceLastCommit(index: Array[EntryTree], blobsOfLastCommit: Array[EntryTree]): Option[Int]
+  /*/**
    * Gives the list of all the blobs to commit (ie: blobs that have been created or modified since the previous commits)
    *
    * @param isFirstCommit Indicates if it's the first commit or not
    * @return The list of all the blobs to commit
    */
-  def getBlobsToCommit(isFirstCommit: Boolean): Array[EntryTree]
+  def getBlobsToCommit(isFirstCommit: Boolean): Array[EntryTree]*/
 
   /**
    * Creates the commit object and creates the trees in memory
@@ -32,13 +33,14 @@ trait SgitCommit extends SgitCommandHelper {
    * @param message       Message of the commit
    * @return
    */
-  def commit(isFirstCommit: Boolean, currentBranch: String, blobsToCommit: Array[EntryTree], message: String): (Commit, Int)
+  def commit(isFirstCommit: Boolean, currentBranch: String, blobsToCommit: Array[EntryTree], message: String): Commit
 
-  /**
+  def getBlobsLastCommit(isFirstCommit: Boolean): Array[EntryTree]
+ /* /**
    * Retrieve all the last version of all blobs committed in the previous commits
    * @return The list of blobs committed in the previous commits in their last version
    */
-  def getAllBlobsCommitted(isFirstCommit: Boolean): Array[EntryTree]
+  def getAllBlobsCommitted(isFirstCommit: Boolean): Array[EntryTree]*/
 
   /**
    * From the list of blobs to commit, it constructs all the trees and blobs and link them together
