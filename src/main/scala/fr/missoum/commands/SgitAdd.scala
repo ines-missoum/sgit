@@ -20,7 +20,7 @@ trait SgitAdd {
    * Builds the blobs to update the index and recursively makes the changes in the index
    * @param filesNames : List of files names that exist in the index
    */
-  def addAll(filesNames: Array[String]): Unit
+  def addAll(filesNames: List[String]): Unit
 
 
 }

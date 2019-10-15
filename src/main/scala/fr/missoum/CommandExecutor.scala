@@ -21,7 +21,7 @@ trait CommandExecutor {
 
   def executeInit(): Unit
 
-  def executeAdd(filesNames: Array[String], linesToAddInIndex: String): Unit
+  def executeAdd(filesNames: List[String], linesToAddInIndex: String): Unit
 
   def executeGetAllBranchesAndTags()
 

@@ -4,7 +4,7 @@ import fr.missoum.logic.Commit
 
 trait ConsolePrinter {
 
-  def changesNotStagedForCommit(modifiedNotStaged: Array[String], deletedNotStaged: Array[String]): Unit
+  def changesNotStagedForCommit(modifiedNotStaged: List[String], deletedNotStaged: List[String]): Unit
 
   def nothingToCommit(branch: String): Unit
 
@@ -32,17 +32,17 @@ trait ConsolePrinter {
 
   def tagAlreadyExists(existingTag: String)
 
-  def printBranchesAndTags(currentBranch: String, tags: Array[String], branches: Array[String])
+  def printBranchesAndTags(currentBranch: String, tags: List[String], branches: List[String])
 
   def askEnterMessageCommits()
 
-  def untrackedFiles(untrackedFiles: Array[String])
+  def untrackedFiles(untrackedFiles: List[String])
 
-  def changesToBeCommitted(news: Array[String], modified: Array[String], deleted: Array[String])
+  def changesToBeCommitted(news: List[String], modified: List[String], deleted: List[String])
 
   def branch(branch: String)
 
-  def displayAllCommits(commits: Array[Commit], branch: String): Unit
+  def displayAllCommits(commits: List[Commit], branch: String): Unit
 
   def noLog(branch:String):Unit
 

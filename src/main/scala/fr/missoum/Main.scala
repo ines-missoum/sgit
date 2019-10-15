@@ -24,7 +24,7 @@ object Main {
       case Array("tag", x: String) => executor.executeCreateNewTag(x)
       case Array("tag", _*) => printer.notValidArguments("tag", "'tag <tag>'")
       //add
-      case a: Array[String] if a.length > 1 && a(0).equals("add") => executor.executeAdd(a.tail, "")
+      case a: Array[String] if a.length > 1 && a(0).equals("add") => executor.executeAdd(a.tail.toList, "")
       case Array("add") => printer.notValidArguments("add", "'add <file>' or 'add <file>*' ")
       //commit
       case Array("commit") => executor.executeCommit()

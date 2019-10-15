@@ -9,5 +9,5 @@ trait WorkspaceReader {
 
   def fileExists(path: String): Boolean
 
-  def getAllBlobsOfWorkspace(): Array[EntryTree]
+  def getAllBlobsOfWorkspace(): List[EntryTree]
 }

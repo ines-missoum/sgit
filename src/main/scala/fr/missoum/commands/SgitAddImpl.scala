@@ -34,7 +34,7 @@ object SgitAddImpl extends SgitAdd {
    *
    * @param filesNames : List of files names that exist in the index
    */
-  def addAll(filesNames: Array[String]): Unit = {
+  def addAll(filesNames: List[String]): Unit = {
 
     val filesAbsolutePath = filesNames
       .map(System.getProperty("user.dir") + File.separator + _)
@@ -44,7 +44,7 @@ object SgitAddImpl extends SgitAdd {
       .filter(!workspaceReader.fileExists(_))
       .map(x => Blob("", PathHelper.getSimplePathOfFile(x)))
     //files to add or update
-    val newFilesBlobs: Array[EntryTree] = filesAbsolutePath
+    val newFilesBlobs: List[EntryTree] = filesAbsolutePath
       .filter(workspaceReader.fileExists(_))
       .map(x => Blob.newBlobWithContent(sgitReader.getContentOfFile(x), PathHelper.getSimplePathOfFile(x)))
 
@@ -61,7 +61,7 @@ object SgitAddImpl extends SgitAdd {
    * @return the index updated
    */
   @tailrec
-  def recAdd(filesBlobs: Array[EntryTree], index: Array[EntryTree]): Array[EntryTree] = {
+  def recAdd(filesBlobs: List[EntryTree], index: List[EntryTree]): List[EntryTree] = {
     //if no more files to deal with, we save the index
     if (filesBlobs.length == 0) index
     //else we update the index and deal with the next blob

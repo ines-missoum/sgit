@@ -30,7 +30,7 @@ object ConsolePrinterImpl extends ConsolePrinter {
 
   def tagAlreadyExists(existingTag: String): Unit = println("fatal: tag '" + existingTag + "' already exists.")
 
-  def printBranchesAndTags(currentBranch: String, tags: Array[String], branches: Array[String]): Unit = {
+  def printBranchesAndTags(currentBranch: String, tags: List[String], branches: List[String]): Unit = {
     var result = ""
     branches.map(x => if (x.equals(currentBranch)) result += "* " + x + "\n" else result += x + "\n")
     println("__BRANCHES__ \n" + result)
@@ -45,19 +45,19 @@ object ConsolePrinterImpl extends ConsolePrinter {
 
   def nothingToCommit(branch: String): Unit = println("On branch " + branch + "\nnothing to commit, working tree clean")
 
-  def untrackedFiles(untrackedFiles: Array[String]): Unit = {
+  def untrackedFiles(untrackedFiles: List[String]): Unit = {
     val files = untrackedFiles.map("\t" + _).mkString("\n")
     println("Untracked files:\n  (use \"git add <file>...\" to include in what will be committed)\n\n" + Console.RED + files + "\n" + Console.WHITE)
   }
 
-  def changesNotStagedForCommit(modifiedNotStaged: Array[String], deletedNotStaged: Array[String]): Unit = {
+  def changesNotStagedForCommit(modifiedNotStaged: List[String], deletedNotStaged: List[String]): Unit = {
     val deleted = deletedNotStaged.map("\tdeleted:     " + _).mkString("\n")
     val modified = modifiedNotStaged.map("\tmodified:    " + _).mkString("\n")
     println("Changes not staged for commit:\n  (use \"git add <file>...\" to update what will be committed)\n  (use \"git checkout -- <file>...\" to discard changes in working directory)\n\n"
       + Console.RED + deleted + "\n" + modified + "\n" + Console.WHITE)
   }
 
-  def changesToBeCommitted(news: Array[String], modified: Array[String], deleted: Array[String]): Unit = {
+  def changesToBeCommitted(news: List[String], modified: List[String], deleted: List[String]): Unit = {
     val newsPrint = news.map("\tnew file:    " + _).mkString("\n")
     val deletedPrint = deleted.map("\tdeleted:     " + _).mkString("\n")
     val modifiedPrint = modified.map("\tmodified:    " + _).mkString("\n")
@@ -69,7 +69,7 @@ object ConsolePrinterImpl extends ConsolePrinter {
     println("On branch " + branch)
   }
 
-  def displayAllCommits(commits: Array[Commit], branch: String): Unit = {
+  def displayAllCommits(commits: List[Commit], branch: String): Unit = {
     val allCommits = commits.map(c =>
       Console.YELLOW + "commit " + c.hash + "(" + Console.CYAN + "HEAD -> " + Console.GREEN + branch + Console.YELLOW + ")" +
         Console.WHITE + "\nAuthor: " + c.author + "\nDate: " + c.date + "\n\n\t" + c.message + "\n")

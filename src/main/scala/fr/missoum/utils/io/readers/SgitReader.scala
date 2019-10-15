@@ -40,23 +40,23 @@ trait SgitReader {
   /**
    * Retrieves all branches names
    *
-   * @return an array that contains all branches names
+   * @return an List that contains all branches names
    */
-  def getAllBranches: Array[String]
+  def getAllBranches: List[String]
 
 
   /**
    * Retrieves all tags names
    *
-   * @return an array that contains all tags names
+   * @return an List that contains all tags names
    */
-  def getAllTags: Array[String]
+  def getAllTags: List[String]
 
   /**
    *
    * @return all the blobs of the index
    */
-  def getIndex: Array[EntryTree]
+  def getIndex: List[EntryTree]
 
   /**
    * Check if the already is a commit for the current branch.
@@ -79,7 +79,7 @@ trait SgitReader {
    * @param hash hash of the object
    * @return all the lines of the content of the object
    */
-  def getContentOfObjectInEntries(hash: String): Array[EntryTree]
+  def getContentOfObjectInEntries(hash: String): List[EntryTree]
 
   /**
    * Retrieve the last commit

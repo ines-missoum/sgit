@@ -46,25 +46,25 @@ object SgitReaderImpl extends SgitReader {
   /**
    * Retrieves all branches names
    *
-   * @return an array that contains all branches names
+   * @return an List that contains all branches names
    */
-  def getAllBranches: Array[String] = new File(PathHelper.BranchesDirectory).listFiles.map(_.getName)
+  def getAllBranches: List[String] = new File(PathHelper.BranchesDirectory).listFiles.map(_.getName).toList
 
 
   /**
    * Retrieves all tags names
    *
-   * @return an array that contains all tags names
+   * @return an List that contains all tags names
    */
-  def getAllTags: Array[String] = new File(PathHelper.TagsDirectory).listFiles.map(_.getName)
+  def getAllTags: List[String] = new File(PathHelper.TagsDirectory).listFiles.map(_.getName).toList
 
   /**
    *
    * @return all the blobs of the index
    */
-  def getIndex: Array[EntryTree] = {
+  def getIndex: List[EntryTree] = {
     val source = Source.fromFile(PathHelper.IndexFile)
-    val index = source.getLines.toArray.map(x => Blob(x))
+    val index = source.getLines.toList.map(x => Blob(x))
     source.close()
     index
   }
@@ -98,10 +98,10 @@ object SgitReaderImpl extends SgitReader {
    * @param hash hash of the object
    * @return all the lines of the content of the object
    */
-  def getContentOfObjectInEntries(hash: String): Array[EntryTree] = {
+  def getContentOfObjectInEntries(hash: String): List[EntryTree] = {
     val pathObject = PathHelper.ObjectDirectory + File.separator + hash.substring(0, 2) + File.separator + hash.substring(2)
     val source = Source.fromFile(pathObject)
-    val content = source.getLines.map(x => EntryTree(x)).toArray
+    val content = source.getLines.map(x => EntryTree(x)).toList
     source.close()
     content
   }

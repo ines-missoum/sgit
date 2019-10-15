@@ -8,15 +8,15 @@ import fr.missoum.utils.helpers.PathHelper
 object WorkspaceReaderImpl extends WorkspaceReader {
   def fileExists(path: String): Boolean = scala.reflect.io.File(path).exists
 
-  def recursiveListFiles(f: File): Array[File] = {
+  def recursiveListFiles(f: File): List[File] = {
     if (!f.isDirectory)
-      Array()
-    val files = f.listFiles.filter(x => x.isFile)
+      List()
+    val files = f.listFiles.filter(x => x.isFile).toList
     val directories = f.listFiles.filter(x => x.isDirectory && !x.getName.startsWith(PathHelper.SgitRepositoryName))
     files ++ directories.flatMap(recursiveListFiles(_))
   }
 
-  def getAllBlobsOfWorkspace(): Array[EntryTree] = {
+  def getAllBlobsOfWorkspace(): List[EntryTree] = {
     val workspaceFiles = recursiveListFiles(new File(PathHelper.SgitPath))
     val result = workspaceFiles.map(x => {
       val content = SgitReaderImpl.getContentOfFile(x.getAbsolutePath)

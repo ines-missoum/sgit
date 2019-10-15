@@ -12,5 +12,5 @@ trait SgitLog{
    *
    * @return the list of all the commits
    */
-  def retrieveAllCommits(): Array[Commit]
+  def retrieveAllCommits(): List[Commit]
 }

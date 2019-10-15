@@ -87,7 +87,7 @@ object SgitWriterImpl extends SgitWriter {
    *
    * @param index list of blobs to put in the index
    */
-  def updateIndex(index: Array[EntryTree]): Unit = writeInFile(PathHelper.IndexFile, index.map(_.toString).mkString("\n"), shouldBeAppend = false)
+  def updateIndex(index: List[EntryTree]): Unit = writeInFile(PathHelper.IndexFile, index.map(_.toString).mkString("\n"), shouldBeAppend = false)
 
   /**
    * Create the commit in memory

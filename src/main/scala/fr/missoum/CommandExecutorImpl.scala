@@ -29,7 +29,7 @@ object CommandExecutorImpl extends CommandExecutor {
     }
   }
 
-  def executeAdd(filesNames: Array[String], linesToAddInIndex: String): Unit = {
+  def executeAdd(filesNames: List[String], linesToAddInIndex: String): Unit = {
     val notExistingFiles = filesNames.filter(addHelper.isNotExistingFile(_))
     //if there's not existing file(s), we inform the user and don't add any files
     if (!notExistingFiles.isEmpty)

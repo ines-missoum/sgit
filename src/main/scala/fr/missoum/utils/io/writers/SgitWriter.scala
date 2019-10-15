@@ -47,7 +47,7 @@ trait SgitWriter {
    * Save the index in parameter
    * @param index list of blobs to put in the index
    */
-  def updateIndex(index: Array[EntryTree])
+  def updateIndex(index: List[EntryTree])
   /**
    * Create the commit in memory
    * @param commitToSave the commit to save
