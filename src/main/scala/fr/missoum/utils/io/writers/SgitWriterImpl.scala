@@ -24,7 +24,8 @@ object SgitWriterImpl extends SgitWriter {
     listFiles.map(new File(_).createNewFile)
 
     //creation of the master branch and checkout
-    createNewBranch("master")
+    new File(PathHelper.BranchesDirectory + File.separator + "master").createNewFile
+    new File(PathHelper.LogsDirectory + File.separator + "master").createNewFile
     setHeadBranch("master")
 
   }
@@ -35,7 +36,7 @@ object SgitWriterImpl extends SgitWriter {
    *
    * @param branch : the branch to checkout
    */
-  def setHeadBranch(branch: String): Unit = writeInFile(PathHelper.HeadFile, "master", shouldBeAppend = false)
+  def setHeadBranch(branch: String): Unit = writeInFile(PathHelper.HeadFile, branch, shouldBeAppend = false)
 
 
   /**
@@ -43,11 +44,13 @@ object SgitWriterImpl extends SgitWriter {
    * Which means creates all the necessary files for this branch (two files named with the branch name in .sgit/refs/heads/ and .sgit/logs/refs/heads/)
    * To use this function be sure that the .sgit repository exists.
    *
-   * @param newBranch : the branch to create
+   * @param newBranch  : the branch to create
+   * @param lastCommit : the last commit
    */
-  def createNewBranch(newBranch: String): Unit = {
+  def createNewBranch(newBranch: String, lastCommit: Commit): Unit = {
     new File(PathHelper.BranchesDirectory + File.separator + newBranch).createNewFile
     new File(PathHelper.LogsDirectory + File.separator + newBranch).createNewFile
+    writeInFile(PathHelper.BranchesDirectory + File.separator + newBranch, lastCommit.hash, shouldBeAppend = false)
   }
 
   /**
@@ -55,9 +58,13 @@ object SgitWriterImpl extends SgitWriter {
    * Which means creates all the necessary files for this branch (one file named with the tag name in .sgit/refs/tags/)
    * To use this function be sure that the .sgit repository exists.
    *
-   * @param newTag : the tag to create
+   * @param newTag     : the tag to create
+   * @param lastCommit : the last commit
    */
-  def createNewTag(newTag: String): Unit = new File(PathHelper.TagsDirectory + File.separator + newTag).createNewFile
+  def createNewTag(newTag: String, lastCommit: Commit): Unit = {
+    new File(PathHelper.TagsDirectory + File.separator + newTag).createNewFile
+    writeInFile(PathHelper.TagsDirectory + File.separator + newTag, lastCommit.hash, shouldBeAppend = false)
+  }
 
 
   /**

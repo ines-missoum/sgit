@@ -23,37 +23,42 @@ trait SgitWriter {
    * Which means creates all the necessary files for this branch (two files named with the branch name in .sgit/refs/heads/ and .sgit/logs/refs/heads/)
    * To use this function be sure that the .sgit repository exists.
    *
-   * @param newBranch : the branch to create
+   * @param newBranch  : the branch to create
+   * @param lastCommit : the last commit
    */
-  def createNewBranch(newBranch: String): Unit
+  def createNewBranch(newBranch: String, lastCommit: Commit): Unit
 
   /**
    * Creates the parameter tag.
    * Which means creates all the necessary files for this branch (one file named with the tag name in .sgit/refs/tags/)
    * To use this function be sure that the .sgit repository exists.
    *
-   * @param newTag : the tag to create
+   * @param newTag     : the tag to create
+   * @param lastCommit : the last commit
    */
-  def createNewTag(newTag: String): Unit
+  def createNewTag(newTag: String, lastCommit: Commit): Unit
 
   /**
    * Creates the blob in the .sgit repository if it doesn't already exists
    *
    * @param contentFile content of the file for which we want to create the blob
    */
-  def createObject(contentFile: String):String
+  def createObject(contentFile: String): String
 
   /**
    * Save the index in parameter
+   *
    * @param index list of blobs to put in the index
    */
   def updateIndex(index: List[EntryTree])
+
   /**
    * Create the commit in memory
-   * @param commitToSave the commit to save
+   *
+   * @param commitToSave  the commit to save
    * @param currentBranch the branch where the commit should be saved
    * @return the commit created
    */
-  def saveCommit(commitToSave:Commit, currentBranch: String): Commit
+  def saveCommit(commitToSave: Commit, currentBranch: String): Commit
 
 }
