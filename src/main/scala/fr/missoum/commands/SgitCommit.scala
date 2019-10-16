@@ -61,4 +61,11 @@ trait SgitCommit extends SgitCommandHelper {
    */
   def createAllTrees(listOfBlobsToCommit: List[EntryTree]): EntryTree
 
+  /**
+   *
+   * @param commit : commit object
+   * @return The list of blobs of the commit
+   */
+  def getBlobsOfCommit(commit: Commit): List[EntryTree]
+
 }

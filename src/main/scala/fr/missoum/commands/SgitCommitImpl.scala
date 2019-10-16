@@ -38,7 +38,6 @@ object SgitCommitImpl extends SgitCommit {
     else parentCommit = sgitReader.getLastCommitHash
 
     //creation of the commit
-    //val commitTree = createAllTrees(blobsToCommit)
     val commitTree = createAllTrees(blobsToCommit)
     Commit(parentCommit, commitTree.hash, message)
 
@@ -53,17 +52,25 @@ object SgitCommitImpl extends SgitCommit {
 
     if (isFirstCommit) List[EntryTree]()
     else {
-      val lastCommit = sgitReader.getLastCommitOfCurrentBranch
-      val treeCommit = Tree()
-      treeCommit.hash = lastCommit.treeHash
-      getBlobsRec(List(treeCommit))
+      getBlobsOfCommit(sgitReader.getLastCommitOfCurrentBranch)
     }
-
   }
 
   /**
    *
-   * @param index the index blobs
+   * @param commit : commit object
+   * @return The list of blobs of the commit
+   */
+  def getBlobsOfCommit(commit: Commit): List[EntryTree] = {
+    val treeCommit = Tree()
+    treeCommit.hash = commit.treeHash
+    getBlobsRec(List(treeCommit))
+  }
+
+
+  /**
+   *
+   * @param index             the index blobs
    * @param blobsOfLastCommit the blobs of the last commit
    * @return the number of changes (creations + modifications)
    */
@@ -148,7 +155,7 @@ object SgitCommitImpl extends SgitCommit {
 
     if (trees.isEmpty) blobs
     else {
-      val entriesOfTree = trees.map(x => sgitReader.getContentOfObjectInEntries(x.hash)).flatten
+      val entriesOfTree = trees.flatMap(x => sgitReader.getContentOfObjectInEntries(x.hash))
       blobs ++ getBlobsRec(entriesOfTree)
     }
   }

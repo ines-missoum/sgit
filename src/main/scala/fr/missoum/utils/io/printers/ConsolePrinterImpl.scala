@@ -80,4 +80,11 @@ object ConsolePrinterImpl extends ConsolePrinter {
   def noLog(branch: String): Unit = println("fatal: your current branch '" + branch + "' does not have any commits yet")
 
   def statusAllGood(): Unit = println("nothing to commit, working tree clean")
+
+  def notExistingSwitch(switchTo: String): Unit = println("error: pathspec '" + switchTo + "' did not match any file(s) known to sgit.")
+
+  def notAllowedCheckout(modifiedFiles: List[String]): Unit = {
+    val printFiles = modifiedFiles.map("\n\t" + _).mkString("\n")
+    println("error: Your local changes to the following files would be overwritten by checkout:" + printFiles + "Please commit your changes or stash them before you switch branches.\nAborting")
+  }
 }

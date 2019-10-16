@@ -3,6 +3,7 @@ package fr.missoum.utils.io.printers
 import fr.missoum.logic.Commit
 
 trait ConsolePrinter {
+  def notAllowedCheckout(modifiedFiles: List[String]) : Unit
 
   def changesNotStagedForCommit(modifiedNotStaged: List[String], deletedNotStaged: List[String]): Unit
 
@@ -44,8 +45,10 @@ trait ConsolePrinter {
 
   def displayAllCommits(commits: List[Commit], branch: String): Unit
 
-  def noLog(branch:String):Unit
+  def noLog(branch: String): Unit
 
   def statusAllGood(): Unit
+
+  def notExistingSwitch(switchTo: String): Unit
 
 }

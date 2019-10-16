@@ -1,7 +1,12 @@
 package fr.missoum
 
 import fr.missoum.commands._
-import fr.missoum.utils.io.{inputs, printers, readers, writers}, inputs._, printers._, readers._, writers._
+import fr.missoum.logic.EntryTree
+import fr.missoum.utils.io.{inputs, printers, readers, writers}
+import inputs._
+import printers._
+import readers._
+import writers._
 
 object CommandExecutorImpl extends CommandExecutor {
 
@@ -32,7 +37,7 @@ object CommandExecutorImpl extends CommandExecutor {
   def executeAdd(filesNames: List[String]): Unit = {
     val notExistingFiles = filesNames.filter(addHelper.isNotExistingFile(_))
     //if there's not existing file(s), we inform the user and don't add any files
-    if (!notExistingFiles.isEmpty)
+    if (notExistingFiles.nonEmpty)
       printer.fileNotExist(notExistingFiles(0))
     //else we add all the existing files
     else
@@ -103,15 +108,15 @@ object CommandExecutorImpl extends CommandExecutor {
     //print
     printer.branch(branch)
 
-    if (!toBeCommitted.isEmpty) {
+    if (toBeCommitted.nonEmpty) {
       printer.changesToBeCommitted(toBeCommitted.get._1, toBeCommitted.get._2, toBeCommitted.get._3)
       printed = true
     }
-    if (!notStaged.isEmpty) {
+    if (notStaged.nonEmpty) {
       printed = true
       printer.changesNotStagedForCommit(notStaged.get._1, notStaged.get._2)
     }
-    if (!untrackedFiles.isEmpty) {
+    if (untrackedFiles.nonEmpty) {
       printed = true
       printer.untrackedFiles(untrackedFiles.get)
     }
@@ -130,14 +135,35 @@ object CommandExecutorImpl extends CommandExecutor {
       printer.displayAllCommits(logs, branch)
   }
 
-  def executeCheckout(switchTo: String): Unit = {
-    var hashCommit: String = ""
-    if (sgitReader.isExistingBranch(switchTo))
-     hashCommit = sgitReader.getLastCommitOfBranch(switchTo)
-    if (sgitReader.isExistingTag(switchTo)) hashCommit = "tag"
-    hashCommit = sgitReader.getCommitTag(switchTo)
-    if (sgitReader.isExistingCommit(switchTo)) hashCommit = switchTo
+  def switch(isCheckoutBranch: Boolean, index: List[EntryTree], commitBlobs: List[EntryTree]): Unit = ???
 
+  def executeCheckout(switchTo: String): Unit = {
+    // We retrieve the hash commit that corresponds to the switch
+    var hashCommit: String = ""
+    val isCheckoutBranch = sgitReader.isExistingBranch(switchTo)
+    if (isCheckoutBranch)
+      hashCommit = sgitReader.getLastCommitOfBranch(switchTo)
+    else {
+      if (sgitReader.isExistingTag(switchTo))
+        hashCommit = sgitReader.getCommitTag(switchTo)
+      else if (sgitReader.isExistingCommit(switchTo))
+        hashCommit = switchTo
+    }
+    //if switch doesn't exist
+    if (hashCommit.isEmpty)
+      printer.notExistingSwitch(switchTo)
+    //else switch exists
+    else {
+      val index = sgitReader.getIndex
+      val commitBlobs = commitHelper.getBlobsOfCommit(sgitReader.getCommit(hashCommit))
+      //if it exists files modified since the switch commit but not committed => switch impossible
+      val changes = statusHelper.getChangesToBeCommitted(index, commitBlobs)
+      if (changes.nonEmpty && changes.get._2.nonEmpty) {
+        printer.notAllowedCheckout(changes.get._2)
+      } else {
+        switch(isCheckoutBranch, index, commitBlobs)
+      }
+    }
 
   }
 
