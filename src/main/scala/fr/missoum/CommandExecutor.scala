@@ -35,6 +35,6 @@ trait CommandExecutor {
 
   def executeLog(): Unit
 
-  def executeCheckout(branch: String): Unit
+  def executeCheckout(switchTo: String): Unit
 
 }

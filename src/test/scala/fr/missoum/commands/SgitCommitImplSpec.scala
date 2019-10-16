@@ -54,7 +54,7 @@ class SgitCommitImplSpec extends FlatSpec with Matchers with IdiomaticMockito {
     //when
     val mockEntries1 = List[EntryTree](Blob("blob hash path"), Blob("blob hash2 path/file.txt"), Tree("hashTree5678", "path"))
     val mockEntries2 = List[EntryTree](Blob("blob hash3 path3"))
-    mockReader.getLastCommit returns Commit("hashParent1234", "hashTree1234", "myMessage")
+    mockReader.getLastCommitOfCurrentBranch returns Commit("hashParent1234", "hashTree1234", "myMessage")
     mockReader.getContentOfObjectInEntries("hashTree1234") returns mockEntries1
     mockReader.getContentOfObjectInEntries("hashTree5678") returns mockEntries2
     val resultExpected = List[EntryTree](Blob("blob hash path"), Blob("blob hash2 path/file.txt"), Blob("blob hash3 path3"))

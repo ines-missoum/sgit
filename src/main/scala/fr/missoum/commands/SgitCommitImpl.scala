@@ -53,7 +53,7 @@ object SgitCommitImpl extends SgitCommit {
 
     if (isFirstCommit) List[EntryTree]()
     else {
-      val lastCommit = sgitReader.getLastCommit
+      val lastCommit = sgitReader.getLastCommitOfCurrentBranch
       val treeCommit = Tree()
       treeCommit.hash = lastCommit.treeHash
       getBlobsRec(List(treeCommit))

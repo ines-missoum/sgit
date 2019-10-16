@@ -52,7 +52,7 @@ object CommandExecutorImpl extends CommandExecutor {
     if (sgitReader.isExistingBranch(newBranch))
       printer.branchAlreadyExists(newBranch)
     else {
-      sgitWriter.createNewBranch(newBranch, sgitReader.getLastCommit)
+      sgitWriter.createNewBranch(newBranch, sgitReader.getLastCommitOfCurrentBranch)
       printer.branchCreated(newBranch)
     }
   }
@@ -61,14 +61,14 @@ object CommandExecutorImpl extends CommandExecutor {
     if (sgitReader.isExistingTag(newTag))
       printer.tagAlreadyExists(newTag)
     else {
-      sgitWriter.createNewTag(newTag, sgitReader.getLastCommit)
+      sgitWriter.createNewTag(newTag, sgitReader.getLastCommitOfCurrentBranch)
       printer.tagCreated(newTag)
     }
   }
 
   def executeCommit(): Unit = {
 
-    val isFirstCommit = !sgitReader.isExistingCommit
+    val isFirstCommit = !sgitReader.isExistingCommitOnCurrentBranch
     val index = sgitReader.getIndex
     val blobsLastCommit = commitHelper.getBlobsLastCommit(isFirstCommit)
     val nbFilesChanged = commitHelper.nbFilesChangedSinceLastCommit(index, blobsLastCommit)
@@ -92,7 +92,7 @@ object CommandExecutorImpl extends CommandExecutor {
     val branch = sgitReader.getCurrentBranch
     val workspace = workspaceReader.getAllBlobsOfWorkspace()
     val index = sgitReader.getIndex
-    val isFirstCommit = !sgitReader.isExistingCommit
+    val isFirstCommit = !sgitReader.isExistingCommitOnCurrentBranch
     val lastCommit = commitHelper.getBlobsLastCommit(isFirstCommit)
 
     //process
@@ -130,7 +130,14 @@ object CommandExecutorImpl extends CommandExecutor {
       printer.displayAllCommits(logs, branch)
   }
 
-  def executeCheckout(branch: String): Unit = {
+  def executeCheckout(switchTo: String): Unit = {
+    var hashCommit: String = ""
+    if (sgitReader.isExistingBranch(switchTo))
+     hashCommit = sgitReader.getLastCommitOfBranch(switchTo)
+    if (sgitReader.isExistingTag(switchTo)) hashCommit = "tag"
+    hashCommit = sgitReader.getCommitTag(switchTo)
+    if (sgitReader.isExistingCommit(switchTo)) hashCommit = switchTo
+
 
   }
 

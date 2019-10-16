@@ -12,6 +12,33 @@ import scala.io.Source
  * ie: this object retrieves information from .sgit.
  */
 object SgitReaderImpl extends SgitReader {
+  /**
+   *
+   * @param tag the tag
+   * @return The commit hash of the tag
+   */
+  def getCommitTag(tag: String): String = readFirstLineFile(PathHelper.TagsDirectory + File.separator + tag)
+
+  /**
+   *
+   * @param branch
+   * @return The hash of the last commit of the branch in parameter
+   */
+  def getLastCommitOfBranch(branch: String): String = readFirstLineFile(PathHelper.BranchesDirectory + File.separator + branch)
+
+  /**
+   *
+   * @param hashCommit hash of the commit searched
+   * @return true if the commit exists otherwise false
+   */
+  def isExistingCommit(hashCommit: String): Boolean = {
+    val path = PathHelper.ObjectDirectory + File.separator + hashCommit.substring(0, 2) + File.separator + hashCommit.substring(2)
+    var commitExists = scala.reflect.io.File(path).exists
+    if (commitExists) {
+      commitExists = Commit.isContentOfCommit(getContentOfFile(path))
+    }
+    commitExists
+  }
 
   /**
    * Checks if a .sgit folder already exists in the current directory.
@@ -74,7 +101,7 @@ object SgitReaderImpl extends SgitReader {
    *
    * @return True if a commit exists, otherwise False.
    */
-  def isExistingCommit: Boolean = {
+  def isExistingCommitOnCurrentBranch: Boolean = {
     val commits = getContentOfFile(PathHelper.BranchesDirectory + File.separator + getCurrentBranch)
     !commits.isEmpty
   }
@@ -111,7 +138,7 @@ object SgitReaderImpl extends SgitReader {
    *
    * @return the last commit done
    */
-  def getLastCommit: Commit = {
+  def getLastCommitOfCurrentBranch: Commit = {
     val hashLastCommit = getLastCommitHash
     getCommit(hashLastCommit)
   }
@@ -132,9 +159,9 @@ object SgitReaderImpl extends SgitReader {
    *
    * @return the logs of the current branch
    */
-  def getLog(): String = {
-    getContentOfFile(PathHelper.HeadLogFile)
-  }
+  def getLog(): String =
+    getContentOfFile(PathHelper.LogsDirectory + File.separator + this.getCurrentBranch)
+
 
   /**
    *

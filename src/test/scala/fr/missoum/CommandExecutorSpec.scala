@@ -84,7 +84,7 @@ class CommandExecutorSpec extends FlatSpec with Matchers with IdiomaticMockito {
     objectTested.workspaceReader = mockWorkspaceHelper
     objectTested.printer = mockPrinter
     //when
-    mockReader.isExistingCommit returns true
+    mockReader.isExistingCommitOnCurrentBranch returns true
     mockReader.getIndex returns List(Blob("blob hash path"))
     mockCommitHelper.getBlobsLastCommit(false) returns List(Blob("blob hash path"))
     mockCommitHelper.nbFilesChangedSinceLastCommit(List(Blob("blob hash path")), List(Blob("blob hash path"))) returns None
@@ -116,7 +116,7 @@ class CommandExecutorSpec extends FlatSpec with Matchers with IdiomaticMockito {
     //when
     val fakeIndex = List(Blob("blob hash path"), Blob("blob hash2 path/file.txt"))
     val fakeCommit = Commit("hash", "treeHash", "my message")
-    mockReader.isExistingCommit returns true
+    mockReader.isExistingCommitOnCurrentBranch returns true
     mockReader.getIndex returns List(Blob("blob hash path"), Blob("blob hash2 path/file.txt"))
     mockCommitHelper.getBlobsLastCommit(false) returns List(Blob("blob hash path"))
     mockCommitHelper.nbFilesChangedSinceLastCommit(fakeIndex, List(Blob("blob hash path"))) returns Some(1)

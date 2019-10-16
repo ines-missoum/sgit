@@ -6,6 +6,28 @@ import fr.missoum.logic.{Commit, EntryTree}
  * This trait gives the role of accessor of files or directories of sgit repository (in reading only).
  */
 trait SgitReader {
+  /**
+   *
+   * @param tag the tag
+   * @return The commit hash of the tag
+   */
+  def getCommitTag(tag: String): String
+
+  /**
+   *
+   * @param branch the branch
+   * @return The hash of the last commit of the branch in parameter
+   */
+  def getLastCommitOfBranch(branch: String): String
+
+  /**
+   * Searches if this commit exists somewhere
+   *
+   * @param hashCommit hash of the commit searched
+   * @return true if the commit exists otherwise false
+   */
+  def isExistingCommit(hashCommit: String): Boolean
+
 
   /**
    * Checks if a .sgit folder already exists in the current directory.
@@ -63,7 +85,7 @@ trait SgitReader {
    *
    * @return True if a commit exists, otherwise False.
    */
-  def isExistingCommit: Boolean
+  def isExistingCommitOnCurrentBranch: Boolean
 
   /**
    * Reads the content of a file
@@ -82,10 +104,10 @@ trait SgitReader {
   def getContentOfObjectInEntries(hash: String): List[EntryTree]
 
   /**
-   * Retrieve the last commit
+   * Retrieve the last commit of the current branch
    * @return the last commit done
    */
-  def getLastCommit: Commit
+  def getLastCommitOfCurrentBranch: Commit
 
   /**
    * Retrieves the commit that corresponds to a hash
