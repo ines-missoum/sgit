@@ -52,7 +52,7 @@ object CommandExecutorImpl extends CommandExecutor {
     if (sgitReader.isExistingBranch(newBranch))
       printer.branchAlreadyExists(newBranch)
     else {
-      sgitWriter.createNewBranch(newBranch,sgitReader.getLastCommit)
+      sgitWriter.createNewBranch(newBranch, sgitReader.getLastCommit)
       printer.branchCreated(newBranch)
     }
   }
@@ -61,7 +61,7 @@ object CommandExecutorImpl extends CommandExecutor {
     if (sgitReader.isExistingTag(newTag))
       printer.tagAlreadyExists(newTag)
     else {
-      sgitWriter.createNewTag(newTag,sgitReader.getLastCommit)
+      sgitWriter.createNewTag(newTag, sgitReader.getLastCommit)
       printer.tagCreated(newTag)
     }
   }
@@ -128,6 +128,10 @@ object CommandExecutorImpl extends CommandExecutor {
       printer.noLog(branch)
     else
       printer.displayAllCommits(logs, branch)
+  }
+
+  def executeCheckout(branch: String): Unit = {
+
   }
 
 }

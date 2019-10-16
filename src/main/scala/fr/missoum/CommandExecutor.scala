@@ -9,12 +9,12 @@ import fr.missoum.utils.io.writers.SgitWriter
 trait CommandExecutor {
 
   var sgitReader: SgitReader
-  var workspaceReader : WorkspaceReader
+  var workspaceReader: WorkspaceReader
   var sgitWriter: SgitWriter
   var printer: ConsolePrinter
   var commitHelper: SgitCommit
   var statusHelper: SgitStatus
-  var inputManager : UserInput
+  var inputManager: UserInput
   var logHelper: SgitLog
 
   def isCommandForbiddenHere(): Boolean
@@ -34,5 +34,7 @@ trait CommandExecutor {
   def executeStatus()
 
   def executeLog(): Unit
+
+  def executeCheckout(branch: String): Unit
 
 }

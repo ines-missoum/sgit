@@ -35,6 +35,9 @@ object Main {
       //log
       case Array("log") => executor.executeLog()
       case Array("log", _*) => printer.notValidArguments("log", "just 'log'")
+      //checkout
+      case Array("checkout", x: String) => executor.executeCheckout(x)
+      case Array("checkout", _*) => printer.notValidArguments("checkout", "'checkout <branch or tag or commit hash>'")
       //default case
       case a: Array[String] => printer.notValidCommand(a(0))
     }

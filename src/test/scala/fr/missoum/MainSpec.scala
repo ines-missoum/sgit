@@ -359,4 +359,36 @@ class MainSpec extends FlatSpec with Matchers with IdiomaticMockito {
     mockExecutor.executeAdd(List("file1","file2","file3")) was  called
   }
 
+  behavior of "Main class with checkout first args"
+
+  it should "execute checkout when arguments are checkout 'branch' and sgit repository exists" in {
+    //given
+    val arg = Array("checkout", "myBranch")
+    val mockExecutor = mock[CommandExecutor]
+    val classTested = Main
+    classTested.executor = mockExecutor
+    mockExecutor.isCommandForbiddenHere() returns false
+    //when
+    Main.main(arg)
+    //then
+    mockExecutor.executeCheckout("myBranch") was called
+  }
+
+  it should "not execute checkout when sgit repository do not exists" in {
+
+    //given
+    val arg = Array("checkout","myBranch")
+    val mockExecutor = mock[CommandExecutor]
+    val mockPrinter = mock[ConsolePrinter]
+    val classTested = Main
+    classTested.executor = mockExecutor
+    classTested.printer = mockPrinter
+    mockExecutor.isCommandForbiddenHere() returns true
+    //when
+    Main.main(arg)
+    //then
+    mockExecutor.executeCheckout("myBranch") wasNever  called
+    mockPrinter.notExistingSgitRepository() was called
+  }
+
 }
