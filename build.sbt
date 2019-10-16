@@ -13,3 +13,14 @@ libraryDependencies ++= Seq(
   "org.mockito" %% "mockito-scala" % "1.5.18" % "test"
 
 )
+
+import sbtsonar.SonarPlugin.autoImport.sonarProperties
+
+sonarProperties ++= Map(
+  "sonar.host.url" -> "http://localhost:9000",
+  "sonar.projectName" -> "Sgit",
+  "sonar.sources" -> "src/main/scala",
+  "sonar.tests" -> "src/test/scala"
+)
+
+
