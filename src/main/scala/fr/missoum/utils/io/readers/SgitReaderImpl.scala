@@ -134,6 +134,16 @@ object SgitReaderImpl extends SgitReader {
   }
 
   /**
+   *
+   * @param hash hash of the object
+   * @return the content of the object
+   */
+  def getContentOfObjectInString(hash: String): String = {
+    val pathObject = PathHelper.ObjectDirectory + File.separator + hash.substring(0, 2) + File.separator + hash.substring(2)
+    getContentOfFile(pathObject)
+  }
+
+  /**
    * Retrieve the last commit
    *
    * @return the last commit done

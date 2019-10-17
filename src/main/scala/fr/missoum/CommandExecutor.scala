@@ -3,13 +3,14 @@ package fr.missoum
 import fr.missoum.commands.{SgitCommit, SgitLog, SgitStatus}
 import fr.missoum.utils.io.inputs.UserInput
 import fr.missoum.utils.io.printers.ConsolePrinter
-import fr.missoum.utils.io.readers.{SgitReader, WorkspaceReader}
+import fr.missoum.utils.io.readers.SgitReader
+import fr.missoum.utils.io.workspace.WorkspaceManager
 import fr.missoum.utils.io.writers.SgitWriter
 
 trait CommandExecutor {
 
   var sgitReader: SgitReader
-  var workspaceReader: WorkspaceReader
+  var workspaceReader: WorkspaceManager
   var sgitWriter: SgitWriter
   var printer: ConsolePrinter
   var commitHelper: SgitCommit

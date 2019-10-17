@@ -4,7 +4,8 @@ import fr.missoum.commands.{SgitCommit, SgitLog, SgitStatus}
 import fr.missoum.logic.{Blob, Commit}
 import fr.missoum.utils.io.inputs.UserInput
 import fr.missoum.utils.io.printers.ConsolePrinter
-import fr.missoum.utils.io.readers.{SgitReader, WorkspaceReader}
+import fr.missoum.utils.io.readers.SgitReader
+import fr.missoum.utils.io.workspace.WorkspaceManager
 import fr.missoum.utils.io.writers.SgitWriter
 import org.mockito.IdiomaticMockito
 import org.scalatest.{FlatSpec, Matchers}
@@ -71,7 +72,7 @@ class CommandExecutorSpec extends FlatSpec with Matchers with IdiomaticMockito {
     val mockCommitHelper = mock[SgitCommit]
     val mockInputManager = mock[UserInput]
     val mockWriter = mock[SgitWriter]
-    val mockWorkspaceHelper = mock[WorkspaceReader]
+    val mockWorkspaceHelper = mock[WorkspaceManager]
     val mockPrinter = mock[ConsolePrinter]
     val mockStatusHelper = mock[SgitStatus]
 
@@ -101,7 +102,7 @@ class CommandExecutorSpec extends FlatSpec with Matchers with IdiomaticMockito {
     val mockCommitHelper = mock[SgitCommit]
     val mockInputManager = mock[UserInput]
     val mockWriter = mock[SgitWriter]
-    val mockWorkspaceHelper = mock[WorkspaceReader]
+    val mockWorkspaceHelper = mock[WorkspaceManager]
     val mockPrinter = mock[ConsolePrinter]
     val mockStatusHelper = mock[SgitStatus]
 

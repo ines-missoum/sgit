@@ -1,11 +1,12 @@
 package fr.missoum.commands
 
-import fr.missoum.utils.io.readers.{SgitReader, WorkspaceReader}
+import fr.missoum.utils.io.readers.SgitReader
+import fr.missoum.utils.io.workspace.WorkspaceManager
 import fr.missoum.utils.io.writers.SgitWriter
 
 trait SgitAdd {
 
-  var workspaceReader: WorkspaceReader
+  var workspaceReader: WorkspaceManager
   var sgitReader: SgitReader
   var sgitWriter: SgitWriter
 

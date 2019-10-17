@@ -2,6 +2,7 @@ package fr.missoum
 
 import fr.missoum.commands._
 import fr.missoum.logic.EntryTree
+import fr.missoum.utils.io.workspace.{WorkspaceManager, WorkspaceManagerImpl}
 import fr.missoum.utils.io.{inputs, printers, readers, writers}
 import inputs._
 import printers._
@@ -12,7 +13,7 @@ object CommandExecutorImpl extends CommandExecutor {
 
   // io managers
   var sgitReader: SgitReader = SgitReaderImpl
-  var workspaceReader: WorkspaceReader = WorkspaceReaderImpl
+  var workspaceReader: WorkspaceManager = WorkspaceManagerImpl
   var sgitWriter: SgitWriter = SgitWriterImpl
   var printer: ConsolePrinter = ConsolePrinterImpl
   var inputManager: UserInput = UserInputImpl
@@ -136,19 +137,23 @@ object CommandExecutorImpl extends CommandExecutor {
       printer.displayAllCommits(logs, branch)
   }
 
-  def switch(isCheckoutBranch: Boolean, index: List[EntryTree], commitBlobs: List[EntryTree]): Unit = ???
 
   def executeCheckout(switchTo: String): Unit = {
     // We retrieve the hash commit that corresponds to the switch
     var hashCommit: String = ""
+    var head: String = switchTo
     val isCheckoutBranch = sgitReader.isExistingBranch(switchTo)
     if (isCheckoutBranch)
       hashCommit = sgitReader.getLastCommitOfBranch(switchTo)
     else {
-      if (sgitReader.isExistingTag(switchTo))
+      if (sgitReader.isExistingTag(switchTo)) {
         hashCommit = sgitReader.getCommitTag(switchTo)
-      else if (sgitReader.isExistingCommit(switchTo))
+        head = hashCommit
+      }
+      else if (sgitReader.isExistingCommit(switchTo)) {
         hashCommit = switchTo
+        head = switchTo
+      }
     }
     //if switch doesn't exist
     if (hashCommit.isEmpty)
@@ -156,20 +161,28 @@ object CommandExecutorImpl extends CommandExecutor {
     //else switch exists
     else {
       val index = sgitReader.getIndex
-      val commitBlobs = commitHelper.getBlobsOfCommit(sgitReader.getCommit(hashCommit))
+      val checkoutBlobs = commitHelper.getBlobsOfCommit(sgitReader.getCommit(hashCommit))
 
       //if it exists files modified since the switch commit but not committed => switch impossible
       val isFirstCommit = !sgitReader.isExistingCommitOnCurrentBranch
       val lastCommit = commitHelper.getBlobsLastCommit(isFirstCommit)
-      val checkoutNotAllowedOn = checkoutHelper.checkoutNotAllowedOn(lastCommit, index, commitBlobs)
+      val checkoutNotAllowedOn = checkoutHelper.checkoutNotAllowedOn(lastCommit, index, checkoutBlobs)
       if (checkoutNotAllowedOn.nonEmpty)
         printer.notAllowedCheckout(checkoutNotAllowedOn)
       else {
-        switch(isCheckoutBranch, index, commitBlobs)
+        switch(head, index, checkoutBlobs)
       }
     }
-
   }
+
+  private def switch(head: String, currentIndex: List[EntryTree], checkoutBlobs: List[EntryTree]): Unit = {
+    sgitWriter.setHeadBranch(head)
+    sgitWriter.updateIndex(checkoutBlobs)
+    val toDelete = checkoutHelper.findFilesToDelete(currentIndex, checkoutBlobs)
+    val toCreate = checkoutHelper.findFilesToCreate(currentIndex, checkoutBlobs)
+    workspaceReader.updateWorkspace(toDelete,toCreate)
+  }
+
 
 }
 

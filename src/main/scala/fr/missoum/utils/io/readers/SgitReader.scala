@@ -8,6 +8,13 @@ import fr.missoum.logic.{Commit, EntryTree}
 trait SgitReader {
   /**
    *
+   * @param hash hash of the object
+   * @return the content of the object
+   */
+  def getContentOfObjectInString(hash: String): String
+
+  /**
+   *
    * @param tag the tag
    * @return The commit hash of the tag
    */
@@ -105,12 +112,14 @@ trait SgitReader {
 
   /**
    * Retrieve the last commit of the current branch
+   *
    * @return the last commit done
    */
   def getLastCommitOfCurrentBranch: Commit
 
   /**
    * Retrieves the commit that corresponds to a hash
+   *
    * @param hashCommit hash of a commit
    * @return the commit that corresponds to the hash in parameter
    */

@@ -5,13 +5,14 @@ import java.io.File
 import fr.missoum.logic.{Blob, EntryTree}
 import fr.missoum.utils.helpers.PathHelper
 import fr.missoum.utils.io.readers._
+import fr.missoum.utils.io.workspace.{WorkspaceManager, WorkspaceManagerImpl}
 import fr.missoum.utils.io.writers._
 
 import scala.annotation.tailrec
 
 object SgitAddImpl extends SgitAdd {
 
-  var workspaceReader: WorkspaceReader = WorkspaceReaderImpl
+  var workspaceReader: WorkspaceManager = WorkspaceManagerImpl
   var sgitReader: SgitReader = SgitReaderImpl
   var sgitWriter: SgitWriter = SgitWriterImpl
 

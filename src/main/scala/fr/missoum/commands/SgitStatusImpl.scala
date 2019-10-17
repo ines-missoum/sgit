@@ -12,9 +12,9 @@ object SgitStatusImpl extends SgitStatus {
    * @return three lists (each one for a category), in the order : new files, modified files and deleted files
    */
   def getChangesToBeCommitted(index: List[EntryTree], lastCommit: List[EntryTree]): Option[(List[String], List[String], List[String])] = {
-    val news = inFirstListButNotInSecond(index, lastCommit).map(_.path)
+    val news = inFirstListButNotInSecondByPath(index, lastCommit).map(_.path)
     val modified = getModifiedElements(index, lastCommit).map(_.path)
-    val deleted = inFirstListButNotInSecond(lastCommit, index).map(_.path)
+    val deleted = inFirstListButNotInSecondByPath(lastCommit, index).map(_.path)
     if (news.isEmpty && modified.isEmpty && deleted.isEmpty)
       None
     else Some((news, modified, deleted))
@@ -29,7 +29,7 @@ object SgitStatusImpl extends SgitStatus {
    */
   def getChangesNotStagedForCommit(index: List[EntryTree], workspace: List[EntryTree]): Option[(List[String], List[String])] = {
     val modified = getModifiedElements(index, workspace).map(_.path)
-    val deleted = inFirstListButNotInSecond(index, workspace).map(_.path)
+    val deleted = inFirstListButNotInSecondByPath(index, workspace).map(_.path)
     if (modified.isEmpty && deleted.isEmpty)
       None
     else Some((modified, deleted))
@@ -44,7 +44,7 @@ object SgitStatusImpl extends SgitStatus {
    * @return the list of blobs untracked
    */
   def getUntrackedFiles(workspace: List[EntryTree], index: List[EntryTree]): Option[List[String]] = {
-    val untrackedFiles = inFirstListButNotInSecond(workspace, index).map(_.path)
+    val untrackedFiles = inFirstListButNotInSecondByPath(workspace, index).map(_.path)
     if (untrackedFiles.isEmpty)
       None
     else
