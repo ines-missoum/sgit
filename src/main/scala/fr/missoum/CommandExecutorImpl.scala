@@ -21,6 +21,7 @@ object CommandExecutorImpl extends CommandExecutor {
   var statusHelper: SgitStatus = SgitStatusImpl
   var addHelper: SgitAdd = SgitAddImpl
   var logHelper: SgitLog = SgitLogImpl
+  var checkoutHelper: SgitCheckout = SgitCheckoutImpl
 
   def isCommandForbiddenHere(): Boolean = !sgitReader.isExistingSgitFolder
 
@@ -156,11 +157,14 @@ object CommandExecutorImpl extends CommandExecutor {
     else {
       val index = sgitReader.getIndex
       val commitBlobs = commitHelper.getBlobsOfCommit(sgitReader.getCommit(hashCommit))
+
       //if it exists files modified since the switch commit but not committed => switch impossible
-      val changes = statusHelper.getChangesToBeCommitted(index, commitBlobs)
-      if (changes.nonEmpty && changes.get._2.nonEmpty) {
-        printer.notAllowedCheckout(changes.get._2)
-      } else {
+      val isFirstCommit = !sgitReader.isExistingCommitOnCurrentBranch
+      val lastCommit = commitHelper.getBlobsLastCommit(isFirstCommit)
+      val checkoutNotAllowedOn = checkoutHelper.checkoutNotAllowedOn(lastCommit, index, commitBlobs)
+      if (checkoutNotAllowedOn.nonEmpty)
+        printer.notAllowedCheckout(checkoutNotAllowedOn)
+      else {
         switch(isCheckoutBranch, index, commitBlobs)
       }
     }
