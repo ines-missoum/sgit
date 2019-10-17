@@ -49,40 +49,42 @@ object SgitAddImpl extends SgitAdd {
       .map(x => Blob.newBlobWithContent(sgitReader.getContentOfFile(x), PathHelper.getSimplePathOfFile(x)))
 
     //we add all files that need to
-    val indexUpdated = recAdd(newFilesBlobs ++ blobsToRemove, sgitReader.getIndex)
+    val (indexUpdated, blobsToCreate) = recAdd(newFilesBlobs ++ blobsToRemove, sgitReader.getIndex, List[EntryTree]())
+    //we create the blob in memory if it doesn't already exists
+    blobsToCreate.map(x => sgitWriter.createObject(x.contentString.get))
     sgitWriter.updateIndex(indexUpdated)
 
   }
 
   /**
    * From the files blobs update the index
-   * @param filesBlobs blobs modified that need to be save in the index
-   * @param index index to update
-   * @return the index updated
+   *
+   * @param filesBlobs    blobs modified that need to be save in the index (empty path for the ones that need to be deleted)
+   * @param index         index to update
+   * @param blobsToCreate list of blobs to create in memory
+   * @return the index updated and the list of blobs to create in memory
    */
   @tailrec
-  def recAdd(filesBlobs: List[EntryTree], index: List[EntryTree]): List[EntryTree] = {
+  def recAdd(filesBlobs: List[EntryTree], index: List[EntryTree], blobsToCreate: List[EntryTree]): (List[EntryTree], List[EntryTree]) = {
     //if no more files to deal with, we save the index
-    if (filesBlobs.length == 0) index
+    if (filesBlobs.length == 0) (index, blobsToCreate)
     //else we update the index and deal with the next blob
     else {
       //if blob to delete
       if (filesBlobs(0).hash.isEmpty)
-        recAdd(filesBlobs.tail, index.filter(!_.path.equals(filesBlobs(0).path)))
+        recAdd(filesBlobs.tail, index.filter(!_.path.equals(filesBlobs(0).path)), blobsToCreate)
       //else blob to add or to update
       else {
-        //we create the blob in memory if it doesn't already exists
-        sgitWriter.createObject(filesBlobs(0).contentString.get)
 
         //new blob
         if (!index.exists(_.path.equals(filesBlobs(0).path)))
-          recAdd(filesBlobs.tail, index :+ filesBlobs(0))
+          recAdd(filesBlobs.tail, index :+ filesBlobs(0), blobsToCreate :+ filesBlobs(0))
         //blob updated
         else {
           val indexUpdated = index
           indexUpdated.map(x =>
             if (x.path.equals(filesBlobs(0).path)) x.hash = filesBlobs(0).hash)
-          recAdd(filesBlobs.tail, indexUpdated)
+          recAdd(filesBlobs.tail, indexUpdated, blobsToCreate :+ filesBlobs(0))
         }
       }
     }
