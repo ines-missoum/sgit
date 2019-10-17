@@ -1,7 +1,7 @@
 package fr.missoum
 
-import fr.missoum.commands.{SgitCommit, SgitLog, SgitStatus}
-import fr.missoum.logic.{Blob, Commit}
+import fr.missoum.commands.{SgitCheckout, SgitCommit, SgitLog, SgitStatus}
+import fr.missoum.logic.{Blob, Commit, EntryTree}
 import fr.missoum.utils.io.inputs.UserInput
 import fr.missoum.utils.io.printers.ConsolePrinter
 import fr.missoum.utils.io.readers.SgitReader
@@ -123,7 +123,7 @@ class CommandExecutorSpec extends FlatSpec with Matchers with IdiomaticMockito {
     mockCommitHelper.nbFilesChangedSinceLastCommit(fakeIndex, List(Blob("blob hash path"))) returns Some(1)
     mockReader.getCurrentBranch returns "master"
     mockInputManager.retrieveUserCommitMessage() returns "my message"
-    mockCommitHelper.commit(false, "master", fakeIndex, "my message") returns fakeCommit
+    mockCommitHelper.commit(isFirstCommit = false, "master", fakeIndex, "my message") returns fakeCommit
     objectTested.executeCommit()
     //then
     mockWriter.saveCommit(fakeCommit, "master")
@@ -198,5 +198,64 @@ class CommandExecutorSpec extends FlatSpec with Matchers with IdiomaticMockito {
     //then
     mockReader.isExistingBranch("myBranch")
   }
+
+  behavior of "The checkout"
+
+  it should "not execute checkout when switch doesn't exist" in {
+    //given
+    val mockReader = mock[SgitReader]
+    val mockWriter = mock[SgitWriter]
+    val mockCommitHelper = mock[SgitCommit]
+    val mockCheckoutHelper = mock[SgitCheckout]
+    val mockPrinter = mock[ConsolePrinter]
+    val objectTested = CommandExecutorImpl
+    objectTested.sgitReader = mockReader
+    objectTested.sgitWriter = mockWriter
+    objectTested.checkoutHelper = mockCheckoutHelper
+    objectTested.commitHelper = mockCommitHelper
+    objectTested.printer = mockPrinter
+    //when
+    objectTested.executeCheckout("switch")
+    mockReader.isExistingBranch("switch") returns false
+    mockReader.isExistingCommit("switch") returns false
+    mockReader.isExistingTag("switch") returns false
+    //then
+    mockPrinter.notExistingSwitch("switch") was called
+  }
+  it should "not execute checkout when modified files are not committed" in {
+    //given
+    val mockReader = mock[SgitReader]
+    val mockWriter = mock[SgitWriter]
+    val mockCommitHelper = mock[SgitCommit]
+    val mockCheckoutHelper = mock[SgitCheckout]
+    val mockPrinter = mock[ConsolePrinter]
+    val objectTested = CommandExecutorImpl
+    objectTested.sgitReader = mockReader
+    objectTested.sgitWriter = mockWriter
+    objectTested.checkoutHelper = mockCheckoutHelper
+    objectTested.commitHelper = mockCommitHelper
+    objectTested.printer = mockPrinter
+    //when
+    mockReader.isExistingBranch("switch") returns true
+    mockReader.isExistingCommit("switch") returns false
+    mockReader.isExistingTag("switch") returns false
+    mockReader.getLastCommitOfBranch("switch") returns "hashCommit"
+    mockReader.getIndex returns List[EntryTree]()
+    mockReader.getCommit("hashCommit") returns Commit("hash","treeHash","message")
+    mockCommitHelper.getBlobsOfCommit(Commit("hash","treeHash","message")) returns List[EntryTree]()
+    mockReader.isExistingCommitOnCurrentBranch returns true
+    mockCommitHelper.getBlobsLastCommit(false) returns List[EntryTree]()
+    mockCheckoutHelper.checkoutNotAllowedOn(List[EntryTree](), List[EntryTree](), List[EntryTree]()) returns List[String]("path/file.txt")
+
+    objectTested.executeCheckout("switch")
+    //then
+    mockPrinter.notAllowedCheckout(List[String]("path/file.txt")) was called
+
+  }
+
+  it should "change the head, the index and the workspace" in {
+
+  }
+
 
 }

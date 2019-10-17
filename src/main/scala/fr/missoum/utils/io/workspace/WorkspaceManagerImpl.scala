@@ -40,6 +40,10 @@ object WorkspaceManagerImpl extends WorkspaceManager {
     createRec(toCreate)
   }
 
+  /**
+   * Deletes all empty directories from the directory in parameter
+   * @param dir directory
+   */
   private def cleanRecEmptyDir(dir: File): Unit = {
     //if not root and empty
     if (!dir.getAbsolutePath.startsWith(PathHelper.SgitPath) && dir.listFiles().isEmpty) {
@@ -49,6 +53,10 @@ object WorkspaceManagerImpl extends WorkspaceManager {
 
   }
 
+  /**
+   * Deletes recursively all the files that corresponds to blobs in parameter
+   * @param toDelete list of blobs
+   */
   private def deleteRec(toDelete: List[EntryTree]): Unit = {
     if (toDelete.nonEmpty) {
       val file = new File(PathHelper.getAbsolutePathOfFile(toDelete(0).path))
@@ -58,15 +66,19 @@ object WorkspaceManagerImpl extends WorkspaceManager {
     }
   }
 
+  /**
+   * Creates recursively all the files that corresponds to blobs in parameter
+   * @param toCreate list of blobs
+   */
   private def createRec(toCreate: List[EntryTree]): Unit = {
     if (toCreate.nonEmpty) {
-      val pathFile = toCreate(0).path
+      val pathFile = PathHelper.getAbsolutePathOfFile(toCreate(0).path)
       val dirPath = pathFile
         .split(File.separator)
         .dropRight(1)
         .mkString(File.separator)
-      val file = new File(PathHelper.getAbsolutePathOfFile(pathFile))
-      val dir = new File(PathHelper.getAbsolutePathOfFile(dirPath))
+      val file = new File(pathFile)
+      val dir = new File(dirPath)
       dir.mkdirs()
       file.createNewFile()
       //we write the content in the file
