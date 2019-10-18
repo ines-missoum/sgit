@@ -55,6 +55,20 @@ class SgitDiffImplSpec extends FlatSpec with Matchers with IdiomaticMockito {
     //then
     val resultExpected = List[String]("a", "+c", "b", "c", "-d", "-a", "f")
     result shouldBe resultExpected
+  }
 
+  it should "returns the correct list of differences when one of the file is empty" in {
+    //given
+    val content1 = List("a", "b", "c", "d", "a", "f")
+    val content2 = List()
+    val objectTested = SgitDiffImpl
+    //when
+    val resultRemoveAll = objectTested.diff(content1, content2)
+    val resultAddAll = objectTested.diff(content2, content1)
+    //then
+    val removeAllExpected = List("-a", "-b", "-c", "-d", "-a", "-f")
+    val addAllExpected = List("+a", "+b", "+c", "+d", "+a", "+f")
+    resultRemoveAll shouldBe removeAllExpected
+    resultAddAll shouldBe resultAddAll
   }
 }
