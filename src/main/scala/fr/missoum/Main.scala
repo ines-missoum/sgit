@@ -38,6 +38,9 @@ object Main {
       //checkout
       case Array("checkout", x: String) => executor.executeCheckout(x)
       case Array("checkout", _*) => printer.notValidArguments("checkout", "'checkout <branch or tag or commit hash>'")
+      //diff
+      case Array("diff") => executor.executeDiff()
+      case Array("diff", _*) => printer.notValidArguments("diff", "just 'diff'")
       //default case
       case a: Array[String] => printer.notValidCommand(a(0))
     }

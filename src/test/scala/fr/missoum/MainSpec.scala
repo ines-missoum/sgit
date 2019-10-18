@@ -391,4 +391,55 @@ class MainSpec extends FlatSpec with Matchers with IdiomaticMockito {
     mockPrinter.notExistingSgitRepository() was called
   }
 
+  behavior of "Main class with diff first args"
+
+  it should "execute diff command when argument is diff and sgit repository exists" in {
+    //given
+    val arg = Array("diff")
+    val mockExecutor = mock[CommandExecutor]
+    val classTested = Main
+    classTested.executor = mockExecutor
+    mockExecutor.isCommandForbiddenHere() returns false
+    //when
+    Main.main(arg)
+    //then
+    mockExecutor.executeDiff() was called
+  }
+
+  it should "not execute diff command when first argument is diff and others arguments are invalid and sgit repository exists" in {
+
+    //given
+    val arg = Array("diff","testCommand")
+    val mockExecutor = mock[CommandExecutor]
+    val mockPrinter = mock[ConsolePrinter]
+    val classTested = Main
+    classTested.executor = mockExecutor
+    classTested.printer = mockPrinter
+    mockExecutor.isCommandForbiddenHere() returns false
+    //when
+    Main.main(arg)
+    //then
+    mockExecutor.executeDiff() wasNever  called
+    mockPrinter.notValidArguments("diff","just 'diff'") was called
+  }
+
+  it should "not execute diff sgit repository do not exists" in {
+
+    //given
+    val arg = Array("diff","testCommand")
+    val mockExecutor = mock[CommandExecutor]
+    val mockPrinter = mock[ConsolePrinter]
+    val classTested = Main
+    classTested.executor = mockExecutor
+    classTested.printer = mockPrinter
+    mockExecutor.isCommandForbiddenHere() returns true
+    //when
+    Main.main(arg)
+    //then
+    mockExecutor.executeDiff() wasNever  called
+    mockPrinter.notExistingSgitRepository() was called
+
+  }
+
+
 }
