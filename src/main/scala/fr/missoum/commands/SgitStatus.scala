@@ -11,7 +11,7 @@ trait SgitStatus extends SgitCommandHelper{
    * @param lastCommit blobs that have been committed in the previous commit in their last version
    * @return three lists (each one for a category), in the order : new files, modified files and deleted files
    */
-  def getChangesToBeCommitted(index: List[EntryTree], lastCommit: List[EntryTree]): Option[(List[String], List[String], List[String])]
+  def getChangesToBeCommitted(index: List[EntryTree], lastCommit: List[EntryTree]): Option[(List[EntryTree], List[EntryTree], List[EntryTree])]
 
   /**
    * By comparing the index and workspace, it returns all the blobs not stage for commit divided in two categories : modified files and deleted files
@@ -19,7 +19,7 @@ trait SgitStatus extends SgitCommandHelper{
    * @param workspace blobs of the workspace
    * @return two lists (each one for a category), in the order : modified files and deleted files
    */
-  def getChangesNotStagedForCommit(index: List[EntryTree], workspace: List[EntryTree]): Option[(List[String], List[String])]
+  def getChangesNotStagedForCommit(index: List[EntryTree], workspace: List[EntryTree]): Option[(List[EntryTree], List[EntryTree])]
 
   /**
    * By comparing the index and workspace, it returns all the blobs not tracked
@@ -27,6 +27,6 @@ trait SgitStatus extends SgitCommandHelper{
    * @param index blobs of the index
    * @return the list of blobs untracked
    */
-  def getUntrackedFiles(workspace: List[EntryTree], index: List[EntryTree]): Option[List[String]]
+  def getUntrackedFiles(workspace: List[EntryTree], index: List[EntryTree]): Option[List[EntryTree]]
 
 }

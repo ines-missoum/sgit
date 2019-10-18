@@ -1,6 +1,6 @@
 package fr.missoum
 
-import fr.missoum.commands.{SgitCommit, SgitLog, SgitStatus}
+import fr.missoum.commands.{SgitCommit, SgitDiff, SgitLog, SgitStatus}
 import fr.missoum.utils.io.inputs.UserInput
 import fr.missoum.utils.io.printers.ConsolePrinter
 import fr.missoum.utils.io.readers.SgitReader
@@ -17,6 +17,7 @@ trait CommandExecutor {
   var statusHelper: SgitStatus
   var inputManager: UserInput
   var logHelper: SgitLog
+  var diffHelper: SgitDiff
 
   def isCommandForbiddenHere(): Boolean
 
@@ -37,5 +38,7 @@ trait CommandExecutor {
   def executeLog(): Unit
 
   def executeCheckout(switchTo: String): Unit
+
+  def executeDiff(): Unit
 
 }

@@ -6,6 +6,8 @@ import fr.missoum.logic.{Blob, EntryTree}
 import fr.missoum.utils.helpers.PathHelper
 import fr.missoum.utils.io.readers.{SgitReader, SgitReaderImpl}
 
+import scala.io.Source
+
 object WorkspaceManagerImpl extends WorkspaceManager {
 
   var reader: SgitReader = SgitReaderImpl
@@ -42,6 +44,7 @@ object WorkspaceManagerImpl extends WorkspaceManager {
 
   /**
    * Deletes all empty directories from the directory in parameter
+   *
    * @param dir directory
    */
   private def cleanRecEmptyDir(dir: File): Unit = {
@@ -55,6 +58,7 @@ object WorkspaceManagerImpl extends WorkspaceManager {
 
   /**
    * Deletes recursively all the files that corresponds to blobs in parameter
+   *
    * @param toDelete list of blobs
    */
   private def deleteRec(toDelete: List[EntryTree]): Unit = {
@@ -68,6 +72,7 @@ object WorkspaceManagerImpl extends WorkspaceManager {
 
   /**
    * Creates recursively all the files that corresponds to blobs in parameter
+   *
    * @param toCreate list of blobs
    */
   private def createRec(toCreate: List[EntryTree]): Unit = {
@@ -88,6 +93,13 @@ object WorkspaceManagerImpl extends WorkspaceManager {
       }
       createRec(toCreate.tail)
     }
+  }
+
+  def getContentOfFile(absPath: String): List[String] = {
+    val source = Source.fromFile(absPath)
+    val content = source.getLines.toList
+    source.close()
+    content
   }
 
 }

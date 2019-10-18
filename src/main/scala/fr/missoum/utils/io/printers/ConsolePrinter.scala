@@ -3,7 +3,9 @@ package fr.missoum.utils.io.printers
 import fr.missoum.logic.Commit
 
 trait ConsolePrinter {
-  def notAllowedCheckout(modifiedFiles: List[String]) : Unit
+  def printSingleDiff(path: String, value: List[String]): Unit
+
+  def notAllowedCheckout(modifiedFiles: List[String]): Unit
 
   def changesNotStagedForCommit(modifiedNotStaged: List[String], deletedNotStaged: List[String]): Unit
 

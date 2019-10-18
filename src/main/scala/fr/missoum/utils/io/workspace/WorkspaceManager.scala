@@ -7,11 +7,14 @@ import fr.missoum.utils.io.readers.SgitReader
  * This trait gives the role of accessor of files or directories of the workspace.
  */
 trait WorkspaceManager {
+  def getContentOfFile(absPath: String): List[String]
+
 
   var reader: SgitReader
 
   /**
    * From the lists of blobs that sould be deleted and created, it's updating the workspace content
+   *
    * @param toDelete blobs to delete from the workspace
    * @param toCreate blobs to create in the workspace
    */

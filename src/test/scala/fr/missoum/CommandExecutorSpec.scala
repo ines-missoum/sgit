@@ -241,8 +241,8 @@ class CommandExecutorSpec extends FlatSpec with Matchers with IdiomaticMockito {
     mockReader.isExistingTag("switch") returns false
     mockReader.getLastCommitOfBranch("switch") returns "hashCommit"
     mockReader.getIndex returns List[EntryTree]()
-    mockReader.getCommit("hashCommit") returns Commit("hash","treeHash","message")
-    mockCommitHelper.getBlobsOfCommit(Commit("hash","treeHash","message")) returns List[EntryTree]()
+    mockReader.getCommit("hashCommit") returns Commit("hash", "treeHash", "message")
+    mockCommitHelper.getBlobsOfCommit(Commit("hash", "treeHash", "message")) returns List[EntryTree]()
     mockReader.isExistingCommitOnCurrentBranch returns true
     mockCommitHelper.getBlobsLastCommit(false) returns List[EntryTree]()
     mockCheckoutHelper.checkoutNotAllowedOn(List[EntryTree](), List[EntryTree](), List[EntryTree]()) returns List[String]("path/file.txt")
@@ -255,6 +255,29 @@ class CommandExecutorSpec extends FlatSpec with Matchers with IdiomaticMockito {
 
   it should "change the head, the index and the workspace" in {
 
+  }
+
+  behavior of "The diff"
+
+  it should "retrieve the right files to update" in {
+    //given
+    val mockReader = mock[SgitReader]
+    val mockWorkspace = mock[WorkspaceManager]
+    val mockStatus = mock[SgitStatus]
+    val objectTested = CommandExecutorImpl
+    objectTested.sgitReader = mockReader
+    objectTested.workspaceReader = mockWorkspace
+    objectTested.statusHelper = mockStatus
+
+    //when
+    val fakeList = List[EntryTree]()
+    mockWorkspace.getAllBlobsOfWorkspace() returns fakeList
+    mockReader.getIndex returns fakeList
+    mockStatus.getChangesNotStagedForCommit(fakeList, fakeList) returns None
+    objectTested.executeDiff()
+
+    //then
+    mockStatus.getChangesNotStagedForCommit(List[EntryTree](), List[EntryTree]()) was called
   }
 
 

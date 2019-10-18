@@ -12,9 +12,9 @@ object SgitDiffImpl extends SgitDiff {
    * @return the old file with the diff lines in the right place
    */
   def diff(contentFile1: List[String], contentFile2: List[String]): List[String] = {
-    if (contentFile1.isEmpty) contentFile2.map("+" + _)
+    if (contentFile1.isEmpty || contentFile1.filter(_.nonEmpty).isEmpty) contentFile2.map("+" + _)
     else {
-      if (contentFile2.isEmpty) contentFile1.map("-" + _)
+      if (contentFile2.isEmpty || contentFile2.filter(_.nonEmpty).isEmpty) contentFile1.map("-" + _)
       else
         buildDiff(buildMatrix(contentFile1, contentFile2), contentFile1, contentFile2)
     }

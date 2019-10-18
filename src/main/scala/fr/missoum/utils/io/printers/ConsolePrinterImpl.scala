@@ -34,7 +34,7 @@ object ConsolePrinterImpl extends ConsolePrinter {
     var result = ""
     branches.map(x => if (x.equals(currentBranch)) result += "* " + x + "\n" else result += x + "\n")
     println("__BRANCHES__ \n" + result)
-    if (tags.length != 0)
+    if (tags.nonEmpty)
       println("__TAGS__ \n" + tags.mkString("\n"))
 
   }
@@ -86,5 +86,14 @@ object ConsolePrinterImpl extends ConsolePrinter {
   def notAllowedCheckout(modifiedFiles: List[String]): Unit = {
     val printFiles = modifiedFiles.map("\n\t" + _).mkString("\n")
     println("error: Your local changes to the following files would be overwritten by checkout:" + printFiles + "Please commit your changes or stash them before you switch branches.\nAborting")
+  }
+
+  def printSingleDiff(path: String, value: List[String]): Unit = {
+    val diff = value.map(x => {
+      if (x.startsWith("-")) Console.RED + x
+      else if (x.startsWith("+")) Console.GREEN + x
+      else Console.WHITE + x
+    }).mkString("\n") + "\n" + Console.WHITE
+    println("______" + path + "______\n" + diff + "\n")
   }
 }

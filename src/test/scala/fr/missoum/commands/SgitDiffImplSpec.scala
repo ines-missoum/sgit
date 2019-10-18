@@ -69,6 +69,6 @@ class SgitDiffImplSpec extends FlatSpec with Matchers with IdiomaticMockito {
     val removeAllExpected = List("-a", "-b", "-c", "-d", "-a", "-f")
     val addAllExpected = List("+a", "+b", "+c", "+d", "+a", "+f")
     resultRemoveAll shouldBe removeAllExpected
-    resultAddAll shouldBe resultAddAll
+    resultAddAll shouldBe addAllExpected
   }
 }

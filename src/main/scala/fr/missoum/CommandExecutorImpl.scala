@@ -2,6 +2,7 @@ package fr.missoum
 
 import fr.missoum.commands._
 import fr.missoum.logic.EntryTree
+import fr.missoum.utils.helpers.PathHelper
 import fr.missoum.utils.io.workspace.{WorkspaceManager, WorkspaceManagerImpl}
 import fr.missoum.utils.io.{inputs, printers, readers, writers}
 import inputs._
@@ -23,6 +24,7 @@ object CommandExecutorImpl extends CommandExecutor {
   var addHelper: SgitAdd = SgitAddImpl
   var logHelper: SgitLog = SgitLogImpl
   var checkoutHelper: SgitCheckout = SgitCheckoutImpl
+  var diffHelper: SgitDiff = SgitDiffImpl
 
   def isCommandForbiddenHere(): Boolean = !sgitReader.isExistingSgitFolder
 
@@ -111,16 +113,16 @@ object CommandExecutorImpl extends CommandExecutor {
     printer.branch(branch)
 
     if (toBeCommitted.nonEmpty) {
-      printer.changesToBeCommitted(toBeCommitted.get._1, toBeCommitted.get._2, toBeCommitted.get._3)
+      printer.changesToBeCommitted(toBeCommitted.get._1.map(_.path), toBeCommitted.get._2.map(_.path), toBeCommitted.get._3.map(_.path))
       printed = true
     }
     if (notStaged.nonEmpty) {
       printed = true
-      printer.changesNotStagedForCommit(notStaged.get._1, notStaged.get._2)
+      printer.changesNotStagedForCommit(notStaged.get._1.map(_.path), notStaged.get._2.map(_.path))
     }
     if (untrackedFiles.nonEmpty) {
       printed = true
-      printer.untrackedFiles(untrackedFiles.get)
+      printer.untrackedFiles(untrackedFiles.get.map(_.path))
     }
     if (!printed)
       printer.statusAllGood()
@@ -180,7 +182,28 @@ object CommandExecutorImpl extends CommandExecutor {
     sgitWriter.updateIndex(checkoutBlobs)
     val toDelete = checkoutHelper.findFilesToDelete(currentIndex, checkoutBlobs)
     val toCreate = checkoutHelper.findFilesToCreate(currentIndex, checkoutBlobs)
-    workspaceReader.updateWorkspace(toDelete,toCreate)
+    workspaceReader.updateWorkspace(toDelete, toCreate)
+  }
+
+  def executeDiff(): Unit = {
+    val workspace = workspaceReader.getAllBlobsOfWorkspace()
+    val index = sgitReader.getIndex
+    val notStaged = statusHelper.getChangesNotStagedForCommit(index, workspace)
+    if (notStaged.nonEmpty) {
+      val (modifiedNotStaged, deletedNotStaged) = notStaged.get
+
+      modifiedNotStaged.map(x => {
+        val absPath = PathHelper.getAbsolutePathOfFile(x.path)
+        val oldContent = sgitReader.getContentOfObjectInString(x.hash).split("\n").toList
+        val newContent = workspaceReader.getContentOfFile(absPath)
+        printer.printSingleDiff(x.path, diffHelper.diff(oldContent, newContent))
+      })
+
+      deletedNotStaged.map(x => {
+        val oldContent = sgitReader.getContentOfObjectInString(x.hash).split("\n").toList
+        printer.printSingleDiff(x.path, diffHelper.diff(oldContent, List[String]()))
+      })
+    }
   }
 
 
