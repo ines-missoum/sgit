@@ -19,14 +19,16 @@ object SgitAddImpl extends SgitAdd {
   /**
    * Checks if the file name exists
    *
-   * @param fileName : Name of the file
+   * @param fileName  : Name of the file
+   * @param index     : Blobs of the index
+   * @param workspace : Blobs of the workspace
+   * @param local     : Where the command is made
    * @return True if the file do not exists either in workspace nor in index, otherwise false
    */
-  def isNotExistingFile(fileName: String): Boolean = {
-    val indexBlobsAbsolutePaths = sgitReader.getIndex.map(x => PathHelper.getAbsolutePathOfFile(x.path))
-    val fileAbsolutePath = System.getProperty("user.dir") + File.separator + fileName
-    val isExistInWorkspace = workspaceReader.fileExists(fileAbsolutePath)
-    val isExistingInIndex = indexBlobsAbsolutePaths.exists(_.equals(fileAbsolutePath))
+  def isNotExistingFile(fileName: String, index: List[EntryTree], workspace: List[EntryTree], local: String): Boolean = {
+    val fileRelativePath = PathHelper.getSimplePathOfFile(local + File.separator + fileName)
+    val isExistInWorkspace = workspace.exists(_.path.equals(fileRelativePath))
+    val isExistingInIndex = index.exists(_.path.equals(fileRelativePath))
     !isExistInWorkspace && !isExistingInIndex
   }
 
@@ -68,7 +70,7 @@ object SgitAddImpl extends SgitAdd {
   @tailrec
   def recAdd(filesBlobs: List[EntryTree], index: List[EntryTree], blobsToCreate: List[EntryTree]): (List[EntryTree], List[EntryTree]) = {
     //if no more files to deal with, we save the index
-    if (filesBlobs.length == 0) (index, blobsToCreate)
+    if (filesBlobs.isEmpty) (index, blobsToCreate)
     //else we update the index and deal with the next blob
     else {
       //if blob to delete

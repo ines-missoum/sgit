@@ -142,8 +142,9 @@ class CommandExecutorSpec extends FlatSpec with Matchers with IdiomaticMockito {
     objectTested.logHelper = mockLogHelper
     objectTested.printer = mockPrinter
     //when
+    mockReader.getLog() returns "log"
     mockReader.getCurrentBranch returns "master"
-    mockLogHelper.retrieveAllCommits() returns List[Commit]()
+    mockLogHelper.retrieveAllCommits("log") returns List[Commit]()
     objectTested.executeLog()
     //then
     mockPrinter.noLog("master")
@@ -159,8 +160,9 @@ class CommandExecutorSpec extends FlatSpec with Matchers with IdiomaticMockito {
     objectTested.logHelper = mockLogHelper
     objectTested.printer = mockPrinter
     //when
+    mockReader.getLog() returns "log"
     mockReader.getCurrentBranch returns "master"
-    mockLogHelper.retrieveAllCommits() returns List(Commit("hash1", "hash2", "message"))
+    mockLogHelper.retrieveAllCommits("log") returns List(Commit("hash1", "hash2", "message"))
     objectTested.executeLog()
     //then
     mockPrinter.displayAllCommits(List(Commit("hash1", "hash2", "message")), "master")

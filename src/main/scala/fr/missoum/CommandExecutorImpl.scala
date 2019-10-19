@@ -39,7 +39,10 @@ object CommandExecutorImpl extends CommandExecutor {
   }
 
   def executeAdd(filesNames: List[String]): Unit = {
-    val notExistingFiles = filesNames.filter(addHelper.isNotExistingFile(_))
+    val index = sgitReader.getIndex
+    val workspace = workspaceReader.getAllBlobsOfWorkspace()
+    val local = System.getProperty("user.dir")
+    val notExistingFiles = filesNames.filter(addHelper.isNotExistingFile(_, index, workspace, local))
     //if there's not existing file(s), we inform the user and don't add any files
     if (notExistingFiles.nonEmpty)
       printer.fileNotExist(notExistingFiles(0))
@@ -131,7 +134,7 @@ object CommandExecutorImpl extends CommandExecutor {
   def executeLog(): Unit = {
 
     val branch = sgitReader.getCurrentBranch
-    val logs = logHelper.retrieveAllCommits()
+    val logs = logHelper.retrieveAllCommits(sgitReader.getLog())
 
     if (logs.isEmpty)
       printer.noLog(branch)
