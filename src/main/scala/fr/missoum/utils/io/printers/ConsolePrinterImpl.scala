@@ -53,7 +53,7 @@ object ConsolePrinterImpl extends ConsolePrinter {
   def changesNotStagedForCommit(modifiedNotStaged: List[String], deletedNotStaged: List[String]): Unit = {
     val deleted = deletedNotStaged.map("\tdeleted:     " + _).mkString("\n")
     val modified = modifiedNotStaged.map("\tmodified:    " + _).mkString("\n")
-    println("Changes not staged for commit:\n  (use \"git add <file>...\" to update what will be committed)\n  (use \"git checkout -- <file>...\" to discard changes in working directory)\n\n"
+    println("Changes not staged for commit:\n  (use \"git add <file>...\" to update what will be committed)\n\n"
       + Console.RED + deleted + "\n" + modified + "\n" + Console.WHITE)
   }
 
@@ -61,7 +61,7 @@ object ConsolePrinterImpl extends ConsolePrinter {
     val newsPrint = news.map("\tnew file:    " + _).mkString("\n")
     val deletedPrint = deleted.map("\tdeleted:     " + _).mkString("\n")
     val modifiedPrint = modified.map("\tmodified:    " + _).mkString("\n")
-    println("Changes to be committed:\n  (use \"git reset HEAD <file>...\" to unstage)\n\n"
+    println("Changes to be committed:\n\n"
       + Console.GREEN + newsPrint + "\n" + deletedPrint + "\n" + modifiedPrint + "\n" + Console.WHITE)
   }
 
@@ -101,7 +101,7 @@ object ConsolePrinterImpl extends ConsolePrinter {
 
   def improperSgitRepository(): Unit = println("fatal: improper sgit repository")
 
-  def notOnBranch(): Unit = println("fatal:you are not on a branch")
+  def notOnBranch(): Unit = println("fatal: you are not on a branch")
 
   def checkoutBranch(head: String): Unit = println("Switched to '"+head+"'")
 
