@@ -43,10 +43,10 @@ trait SgitCommit extends SgitCommandHelper {
 
   /**
    *
-   * @param lastCommitHash None if it's a first commit else the hash of the last commit
+   * @param lastCommit None if it's a first commit else the last commit
    * @return the list of the blobs of the last commit
    */
-  def getBlobsLastCommit(lastCommitHash: Option[String]): List[EntryTree]
+  def getBlobsLastCommit(lastCommit: Option[Commit]): List[EntryTree]
  /* /**
    * Retrieve all the last version of all blobs committed in the previous commits
    * @return The list of blobs committed in the previous commits in their last version

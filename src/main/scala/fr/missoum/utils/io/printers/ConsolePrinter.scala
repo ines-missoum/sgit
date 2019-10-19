@@ -3,6 +3,8 @@ package fr.missoum.utils.io.printers
 import fr.missoum.logic.Commit
 
 trait ConsolePrinter {
+  def improperSgitRepository(): Unit
+
   def noCreationPossible(): Unit
 
   def printSingleDiff(path: String, value: List[String]): Unit

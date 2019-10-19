@@ -43,14 +43,14 @@ object SgitCommitImpl extends SgitCommit {
 
   /**
    *
-   * @param lastCommitHash None if it's a first commit else the hash of the last commit
+   * @param lastCommit None if it's a first commit else the last commit
    * @return the list of the blobs of the last commit
    */
-  def getBlobsLastCommit(lastCommitHash: Option[String]): List[EntryTree] = {
+  def getBlobsLastCommit(lastCommit: Option[Commit]): List[EntryTree] = {
 
-    if (lastCommitHash.isEmpty) List[EntryTree]()
+    if (lastCommit.isEmpty) List[EntryTree]()
     else {
-      getBlobsOfCommit(sgitReader.getCommit(lastCommitHash.get))
+      getBlobsOfCommit(lastCommit.get)
     }
   }
 

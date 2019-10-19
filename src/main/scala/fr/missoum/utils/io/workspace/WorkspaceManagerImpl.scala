@@ -88,7 +88,9 @@ object WorkspaceManagerImpl extends WorkspaceManager {
       file.createNewFile()
       //we write the content in the file
       new PrintWriter(pathFile) {
-        write(reader.getContentOfObjectInString(toCreate(0).hash))
+        val content = reader.getContentOfObjectInString(toCreate(0).hash)
+        if (content.nonEmpty)
+          write(content.get)
         close()
       }
       createRec(toCreate.tail)

@@ -20,7 +20,7 @@ class SgitReaderImplSpec extends FlatSpec with Matchers with IdiomaticMockito {
   } else file.delete
 
 
-  behavior of "commitExists method"
+  behavior of "isExistingCommit method"
 
   it should "returns false when the object exists but is not a commit" in {
     //given

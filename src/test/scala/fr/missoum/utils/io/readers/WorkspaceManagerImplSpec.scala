@@ -69,6 +69,8 @@ class WorkspaceManagerImplSpec extends FlatSpec with Matchers with IdiomaticMock
     val fakeToDelete = List[EntryTree](Blob("11hashBlob1", "dir1/pathBlob1"), Blob("22hashBlob2", "dir2/pathBlob2"))
     val fakeToCreate = List[EntryTree](Blob("12hashBlob1", "dir1/pathBlob1"), Blob("33hashBlob3", "dir3/dir4/pathBlob3"))
     //when
+    mockReader.getContentOfObjectInString("12hashBlob1") returns Some("test")
+    mockReader.getContentOfObjectInString("33hashBlob3") returns Some("test")
     classTested.updateWorkspace(fakeToDelete, fakeToCreate)
 
     //then
@@ -103,6 +105,8 @@ class WorkspaceManagerImplSpec extends FlatSpec with Matchers with IdiomaticMock
     val fakeToDelete = List[EntryTree](Blob("11hashBlob1", "dir1/pathBlob1"), Blob("22hashBlob2", "dir2/pathBlob2"))
     val fakeToCreate = List[EntryTree](Blob("12hashBlob1", "dir1/pathBlob1"), Blob("33hashBlob3", "dir3/dir4/pathBlob3"))
     //when
+    mockReader.getContentOfObjectInString("12hashBlob1") returns Some("test")
+    mockReader.getContentOfObjectInString("33hashBlob3") returns Some("test")
     classTested.updateWorkspace(fakeToDelete, fakeToCreate)
 
     //then
@@ -180,6 +184,8 @@ class WorkspaceManagerImplSpec extends FlatSpec with Matchers with IdiomaticMock
     val fakeToDelete = List[EntryTree](Blob("11hashBlob1", "dir1/pathBlob1"), Blob("22hashBlob2", "dir2/pathBlob2"))
     val fakeToCreate = List[EntryTree](Blob("12hashBlob1", "dir1/pathBlob1"), Blob("33hashBlob3", "dir3/dir4/pathBlob3"))
     //when
+    mockReader.getContentOfObjectInString("12hashBlob1") returns Some("test")
+    mockReader.getContentOfObjectInString("33hashBlob3") returns Some("test")
     classTested.updateWorkspace(fakeToDelete, fakeToCreate)
 
     //then

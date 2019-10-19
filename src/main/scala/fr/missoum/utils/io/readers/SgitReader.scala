@@ -11,7 +11,7 @@ trait SgitReader {
    * @param hash hash of the object
    * @return the content of the object
    */
-  def getContentOfObjectInString(hash: String): String
+  def getContentOfObjectInString(hash: String): Option[String]
 
   /**
    *
@@ -71,7 +71,7 @@ trait SgitReader {
    *
    * @return an List that contains all branches names
    */
-  def getAllBranches: List[String]
+  def getAllBranches: Option[List[String]]
 
 
   /**
@@ -79,13 +79,13 @@ trait SgitReader {
    *
    * @return an List that contains all tags names
    */
-  def getAllTags: List[String]
+  def getAllTags: Option[List[String]]
 
   /**
    *
    * @return all the blobs of the index
    */
-  def getIndex: List[EntryTree]
+  def getIndex: Option[List[EntryTree]]
 
   /**
    * Reads the content of a file
@@ -93,7 +93,7 @@ trait SgitReader {
    * @param path absolute path of the file
    * @return the content of the file
    */
-  def getContentOfFile(path: String): String
+  def getContentOfFile(path: String): Option[String]
 
   /**
    * Reads all the content of an object save in memory
@@ -109,7 +109,7 @@ trait SgitReader {
    * @param hashCommit hash of a commit
    * @return the commit that corresponds to the hash in parameter
    */
-  def getCommit(hashCommit: String): Commit
+  def getCommit(hashCommit: String): Option[Commit]
 
   /**
    *
@@ -122,6 +122,6 @@ trait SgitReader {
    *
    * @return the logs of the current branch
    */
-  def getLog(branch: String): String
+  def getLog(branch: String): Option[String]
 
 }

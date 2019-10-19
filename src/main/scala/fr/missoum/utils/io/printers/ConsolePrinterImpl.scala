@@ -98,4 +98,6 @@ object ConsolePrinterImpl extends ConsolePrinter {
   }
 
   def noCreationPossible(): Unit = println("fatal: you need to do a first commit before creating a branch or a tag")
+
+  def improperSgitRepository(): Unit = println("fatal: improper sgit repository")
 }

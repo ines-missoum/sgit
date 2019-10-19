@@ -21,7 +21,7 @@ object SgitReaderImpl extends SgitReader {
 
   /**
    *
-   * @param branch
+   * @param branch : the branch
    * @return The hash of the last commit of the branch in parameter
    */
   def getLastCommitOfBranch(branch: String): Option[String] = readFirstLineFile(PathHelper.BranchesDirectory + File.separator + branch)
@@ -33,11 +33,10 @@ object SgitReaderImpl extends SgitReader {
    */
   def isExistingCommit(hashCommit: String): Boolean = {
     val path = PathHelper.ObjectDirectory + File.separator + hashCommit.substring(0, 2) + File.separator + hashCommit.substring(2)
-    var commitExists = scala.reflect.io.File(path).exists
-    if (commitExists) {
-      commitExists = Commit.isContentOfCommit(getContentOfFile(path))
-    }
-    commitExists
+    val content = getContentOfFile(path)
+    if (content.nonEmpty) {
+      Commit.isContentOfCommit(content.get)
+    } else false
   }
 
   /**
@@ -70,7 +69,7 @@ object SgitReaderImpl extends SgitReader {
    */
   def getCurrentBranch: Option[String] = {
     val line = readFirstLineFile(PathHelper.HeadFile)
-    if(line.nonEmpty) Some(line.get.split(" ")(1))
+    if (line.nonEmpty) Some(line.get.split(" ")(1))
     else None
   }
 
@@ -86,25 +85,32 @@ object SgitReaderImpl extends SgitReader {
    *
    * @return an List that contains all branches names
    */
-  def getAllBranches: List[String] = new File(PathHelper.BranchesDirectory).listFiles.map(_.getName).toList
+  def getAllBranches: Option[List[String]] = getAllRef(PathHelper.BranchesDirectory)
 
+  private def getAllRef(path: String): Option[List[String]] = {
+    if (scala.reflect.io.File(path).exists)
+      Some(new File(path).listFiles.map(_.getName).toList)
+    else None
+  }
 
   /**
    * Retrieves all tags names
    *
    * @return an List that contains all tags names
    */
-  def getAllTags: List[String] = new File(PathHelper.TagsDirectory).listFiles.map(_.getName).toList
+  def getAllTags: Option[List[String]] = getAllRef(PathHelper.TagsDirectory)
 
   /**
    *
    * @return all the blobs of the index
    */
-  def getIndex: List[EntryTree] = {
-    val source = Source.fromFile(PathHelper.IndexFile)
-    val index = source.getLines.toList.map(x => Blob(x))
-    source.close()
-    index
+  def getIndex: Option[List[EntryTree]] = {
+    if (scala.reflect.io.File(PathHelper.IndexFile).exists) {
+      val source = Source.fromFile(PathHelper.IndexFile)
+      val index = source.getLines.toList.map(x => Blob(x))
+      source.close()
+      Some(index)
+    } else None
   }
 
   /**
@@ -113,11 +119,14 @@ object SgitReaderImpl extends SgitReader {
    * @param path absolute path of the file
    * @return the content of the file
    */
-  def getContentOfFile(path: String): String = {
-    val source = Source.fromFile(path)
-    val content = source.getLines.mkString("\n")
-    source.close()
-    content
+  def getContentOfFile(path: String): Option[String] = {
+    if (scala.reflect.io.File(path).exists) {
+      val source = Source.fromFile(path)
+      val content = source.getLines.mkString("\n")
+      source.close()
+      Some(content)
+    }
+    else None
   }
 
   /**
@@ -139,7 +148,7 @@ object SgitReaderImpl extends SgitReader {
    * @param hash hash of the object
    * @return the content of the object
    */
-  def getContentOfObjectInString(hash: String): String = {
+  def getContentOfObjectInString(hash: String): Option[String] = {
     val pathObject = PathHelper.ObjectDirectory + File.separator + hash.substring(0, 2) + File.separator + hash.substring(2)
     getContentOfFile(pathObject)
   }
@@ -150,9 +159,12 @@ object SgitReaderImpl extends SgitReader {
    * @param hashCommit hash of a commit
    * @return the commit that corresponds to the hash in parameter
    */
-  def getCommit(hashCommit: String): Commit = {
+  def getCommit(hashCommit: String): Option[Commit] = {
     val pathCommit = PathHelper.ObjectDirectory + File.separator + hashCommit.substring(0, 2) + File.separator + hashCommit.substring(2)
-    Commit.getCommitFromContent(getContentOfFile(pathCommit), hashCommit)
+    val content = getContentOfFile(pathCommit)
+    if (content.nonEmpty)
+      Some(Commit.getCommitFromContent(content.get, hashCommit))
+    else None
   }
 
   /**
@@ -160,7 +172,7 @@ object SgitReaderImpl extends SgitReader {
    *
    * @return the logs of the current branch
    */
-  def getLog(branch:String): String =
+  def getLog(branch: String): Option[String] =
     getContentOfFile(PathHelper.LogsDirectory + File.separator + branch)
 
 

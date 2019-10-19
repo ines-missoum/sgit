@@ -40,22 +40,26 @@ object CommandExecutorImpl extends CommandExecutor {
 
   def executeAdd(filesNames: List[String]): Unit = {
     val index = sgitReader.getIndex
-    val workspace = workspaceReader.getAllBlobsOfWorkspace()
-    val local = System.getProperty("user.dir")
-    val notExistingFiles = filesNames.filter(addHelper.isNotExistingFile(_, index, workspace, local))
-    //if there's not existing file(s), we inform the user and don't add any files
-    if (notExistingFiles.nonEmpty)
-      printer.fileNotExist(notExistingFiles(0))
-    //else we add all the existing files
+    if (index.isEmpty)
+      printer.improperSgitRepository()
     else {
-      val result = addHelper.findUpdatesIndex(filesNames, workspace, local)
-      val blobsToRemove = result._1.map(x => Blob("", x))
-      val newFilesBlobs = result._2.map(x => Blob.newBlobWithContent(workspaceReader.getContentOfFile(PathHelper.getAbsolutePathOfFile(x)).mkString("\n"), x))
+      val workspace = workspaceReader.getAllBlobsOfWorkspace()
+      val local = System.getProperty("user.dir")
+      val notExistingFiles = filesNames.filter(addHelper.isNotExistingFile(_, index.get, workspace, local))
+      //if there's not existing file(s), we inform the user and don't add any files
+      if (notExistingFiles.nonEmpty)
+        printer.fileNotExist(notExistingFiles(0))
+      //else we add all the existing files
+      else {
+        val result = addHelper.findUpdatesIndex(filesNames, workspace, local)
+        val blobsToRemove = result._1.map(x => Blob("", x))
+        val newFilesBlobs = result._2.map(x => Blob.newBlobWithContent(workspaceReader.getContentOfFile(PathHelper.getAbsolutePathOfFile(x)).mkString("\n"), x))
 
-      val (indexUpdated, blobsToCreate) = addHelper.addAll(index, blobsToRemove, newFilesBlobs)
-      //we create the blob in memory if it doesn't already exists
-      blobsToCreate.map(x => sgitWriter.createObject(x.contentString.get))
-      sgitWriter.updateIndex(indexUpdated)
+        val (indexUpdated, blobsToCreate) = addHelper.addAll(index.get, blobsToRemove, newFilesBlobs)
+        //we create the blob in memory if it doesn't already exists
+        blobsToCreate.map(x => sgitWriter.createObject(x.contentString.get))
+        sgitWriter.updateIndex(indexUpdated)
+      }
     }
   }
 
@@ -64,7 +68,9 @@ object CommandExecutorImpl extends CommandExecutor {
     val currentBranch = sgitReader.getCurrentBranch.getOrElse("")
     val tags = sgitReader.getAllTags
     val branches = sgitReader.getAllBranches
-    printer.printBranchesAndTags(currentBranch, tags, branches)
+    if (tags.nonEmpty && branches.nonEmpty)
+      printer.printBranchesAndTags(currentBranch, tags.get, branches.get)
+    else printer.improperSgitRepository()
   }
 
 
@@ -95,67 +101,78 @@ object CommandExecutorImpl extends CommandExecutor {
   def executeCommit(): Unit = {
 
     val index = sgitReader.getIndex
-    val lastCommitHash = sgitReader.getLastCommitHash
-    val blobsLastCommit = commitHelper.getBlobsLastCommit(lastCommitHash)
-    val nbFilesChanged = commitHelper.nbFilesChangedSinceLastCommit(index, blobsLastCommit)
-    val branch = sgitReader.getCurrentBranch
-    if (branch.nonEmpty) {
-      //if nothing to commit
-      if (nbFilesChanged.isEmpty)
-        printer.nothingToCommit(branch.get)
-      else {
-        //if commit needed
-        printer.askEnterMessageCommits()
-        val message = inputManager.retrieveUserCommitMessage()
-        val commit = commitHelper.commit(lastCommitHash, branch.get, index, message)
-        sgitWriter.saveCommit(commit, branch.get)
-        printer.commitCreatedMessage(branch.get, message, nbFilesChanged.get)
+    if (index.isEmpty) printer.improperSgitRepository()
+    else {
+      val lastCommitHash = sgitReader.getLastCommitHash
+      val blobsLastCommit = commitHelper.getBlobsLastCommit(sgitReader.getCommit(lastCommitHash.getOrElse("")))
+      val nbFilesChanged = commitHelper.nbFilesChangedSinceLastCommit(index.get, blobsLastCommit)
+      val branch = sgitReader.getCurrentBranch
+      if (branch.nonEmpty) {
+        //if nothing to commit
+        if (nbFilesChanged.isEmpty)
+          printer.nothingToCommit(branch.get)
+        else {
+          //if commit needed
+          printer.askEnterMessageCommits()
+          val message = inputManager.retrieveUserCommitMessage()
+          val commit = commitHelper.commit(lastCommitHash, branch.get, index.get, message)
+          sgitWriter.saveCommit(commit, branch.get)
+          printer.commitCreatedMessage(branch.get, message, nbFilesChanged.get)
+        }
       }
     }
   }
 
   def executeStatus(): Unit = {
-    //retrieve data
-    val branch = sgitReader.getCurrentBranch
-    val workspace = workspaceReader.getAllBlobsOfWorkspace()
     val index = sgitReader.getIndex
-    val lastCommitHash = sgitReader.getLastCommitHash
-    val lastCommit = commitHelper.getBlobsLastCommit(lastCommitHash)
+    if (index.isEmpty) printer.improperSgitRepository()
+    else {
+      //retrieve data
+      val branch = sgitReader.getCurrentBranch
+      val workspace = workspaceReader.getAllBlobsOfWorkspace()
 
-    //process
-    val untrackedFiles = statusHelper.getUntrackedFiles(workspace, index)
-    val notStaged = statusHelper.getChangesNotStagedForCommit(index, workspace)
-    val toBeCommitted = statusHelper.getChangesToBeCommitted(index, lastCommit)
-    var printed = false
-    //print
-    if (branch.nonEmpty)
-      printer.branch(branch.get)
+      val lastCommitHash = sgitReader.getLastCommitHash.getOrElse("")
+      val lastCommit = commitHelper.getBlobsLastCommit(sgitReader.getCommit(lastCommitHash))
 
-    if (toBeCommitted.nonEmpty) {
-      printer.changesToBeCommitted(toBeCommitted.get._1.map(_.path), toBeCommitted.get._2.map(_.path), toBeCommitted.get._3.map(_.path))
-      printed = true
+      //process
+      val untrackedFiles = statusHelper.getUntrackedFiles(workspace, index.get)
+      val notStaged = statusHelper.getChangesNotStagedForCommit(index.get, workspace)
+      val toBeCommitted = statusHelper.getChangesToBeCommitted(index.get, lastCommit)
+      var printed = false
+      //print
+      if (branch.nonEmpty)
+        printer.branch(branch.get)
+
+      if (toBeCommitted.nonEmpty) {
+        printer.changesToBeCommitted(toBeCommitted.get._1.map(_.path), toBeCommitted.get._2.map(_.path), toBeCommitted.get._3.map(_.path))
+        printed = true
+      }
+      if (notStaged.nonEmpty) {
+        printed = true
+        printer.changesNotStagedForCommit(notStaged.get._1.map(_.path), notStaged.get._2.map(_.path))
+      }
+      if (untrackedFiles.nonEmpty) {
+        printed = true
+        printer.untrackedFiles(untrackedFiles.get.map(_.path))
+      }
+      if (!printed)
+        printer.statusAllGood()
     }
-    if (notStaged.nonEmpty) {
-      printed = true
-      printer.changesNotStagedForCommit(notStaged.get._1.map(_.path), notStaged.get._2.map(_.path))
-    }
-    if (untrackedFiles.nonEmpty) {
-      printed = true
-      printer.untrackedFiles(untrackedFiles.get.map(_.path))
-    }
-    if (!printed)
-      printer.statusAllGood()
   }
 
   def executeLog(): Unit = {
 
     val branch = sgitReader.getCurrentBranch
     if (branch.nonEmpty) {
-      val logs = logHelper.retrieveAllCommits(sgitReader.getLog(branch.get))
-      if (logs.isEmpty)
-        printer.noLog(branch.get)
-      else
-        printer.displayAllCommits(logs, branch.get)
+      val logFile = sgitReader.getLog(branch.get)
+      if (logFile.isEmpty) printer.improperSgitRepository()
+      else {
+        val logs = logHelper.retrieveAllCommits(logFile.get)
+        if (logs.isEmpty)
+          printer.noLog(branch.get)
+        else
+          printer.displayAllCommits(logs, branch.get)
+      }
     }
   }
 
@@ -183,16 +200,19 @@ object CommandExecutorImpl extends CommandExecutor {
     //else switch exists
     else {
       val index = sgitReader.getIndex
-      val checkoutBlobs = commitHelper.getBlobsOfCommit(sgitReader.getCommit(hashCommit))
-
-      //if it exists files modified since the switch commit but not committed => switch impossible
-      val lastCommitHash = sgitReader.getLastCommitHash
-      val lastCommit = commitHelper.getBlobsLastCommit(lastCommitHash)
-      val checkoutNotAllowedOn = checkoutHelper.checkoutNotAllowedOn(lastCommit, index, checkoutBlobs)
-      if (checkoutNotAllowedOn.nonEmpty)
-        printer.notAllowedCheckout(checkoutNotAllowedOn)
+      if (index.isEmpty) printer.improperSgitRepository()
       else {
-        switch(head, isCheckoutBranch, index, checkoutBlobs)
+        val checkoutBlobs = commitHelper.getBlobsOfCommit(sgitReader.getCommit(hashCommit).get)
+
+        //if it exists files modified since the switch commit but not committed => switch impossible
+        val lastCommitHash = sgitReader.getLastCommitHash
+        val lastCommit = commitHelper.getBlobsLastCommit(sgitReader.getCommit(lastCommitHash.getOrElse("")))
+        val checkoutNotAllowedOn = checkoutHelper.checkoutNotAllowedOn(lastCommit, index.get, checkoutBlobs)
+        if (checkoutNotAllowedOn.nonEmpty)
+          printer.notAllowedCheckout(checkoutNotAllowedOn)
+        else {
+          switch(head, isCheckoutBranch, index.get, checkoutBlobs)
+        }
       }
     }
   }
@@ -208,21 +228,24 @@ object CommandExecutorImpl extends CommandExecutor {
   def executeDiff(): Unit = {
     val workspace = workspaceReader.getAllBlobsOfWorkspace()
     val index = sgitReader.getIndex
-    val notStaged = statusHelper.getChangesNotStagedForCommit(index, workspace)
-    if (notStaged.nonEmpty) {
-      val (modifiedNotStaged, deletedNotStaged) = notStaged.get
+    if (index.isEmpty) printer.improperSgitRepository()
+    else {
+      val notStaged = statusHelper.getChangesNotStagedForCommit(index.get, workspace)
+      if (notStaged.nonEmpty) {
+        val (modifiedNotStaged, deletedNotStaged) = notStaged.get
 
-      modifiedNotStaged.map(x => {
-        val absPath = PathHelper.getAbsolutePathOfFile(x.path)
-        val oldContent = sgitReader.getContentOfObjectInString(x.hash).split("\n").toList
-        val newContent = workspaceReader.getContentOfFile(absPath)
-        printer.printSingleDiff(x.path, diffHelper.diff(oldContent, newContent))
-      })
+        modifiedNotStaged.map(x => {
+          val absPath = PathHelper.getAbsolutePathOfFile(x.path)
+          val oldContent = sgitReader.getContentOfObjectInString(x.hash).getOrElse("").split("\n").toList
+          val newContent = workspaceReader.getContentOfFile(absPath)
+          printer.printSingleDiff(x.path, diffHelper.diff(oldContent, newContent))
+        })
 
-      deletedNotStaged.map(x => {
-        val oldContent = sgitReader.getContentOfObjectInString(x.hash).split("\n").toList
-        printer.printSingleDiff(x.path, diffHelper.diff(oldContent, List[String]()))
-      })
+        deletedNotStaged.map(x => {
+          val oldContent = sgitReader.getContentOfObjectInString(x.hash).getOrElse("").split("\n").toList
+          printer.printSingleDiff(x.path, diffHelper.diff(oldContent, List[String]()))
+        })
+      }
     }
   }
 
