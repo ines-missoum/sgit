@@ -1,7 +1,7 @@
 package fr.missoum
 
 import fr.missoum.commands._
-import fr.missoum.logic.EntryTree
+import fr.missoum.logic.{Blob, EntryTree}
 import fr.missoum.utils.helpers.PathHelper
 import fr.missoum.utils.io.workspace.{WorkspaceManager, WorkspaceManagerImpl}
 import fr.missoum.utils.io.{inputs, printers, readers, writers}
@@ -47,8 +47,16 @@ object CommandExecutorImpl extends CommandExecutor {
     if (notExistingFiles.nonEmpty)
       printer.fileNotExist(notExistingFiles(0))
     //else we add all the existing files
-    else
-      addHelper.addAll(filesNames)
+    else {
+      val result = addHelper.findUpdatesIndex(filesNames, workspace, local)
+      val blobsToRemove = result._1.map(x => Blob("", x))
+      val newFilesBlobs = result._2.map(x => Blob.newBlobWithContent(workspaceReader.getContentOfFile(PathHelper.getAbsolutePathOfFile(x)).mkString("\n"), x))
+
+      val (indexUpdated, blobsToCreate) = addHelper.addAll(index, blobsToRemove, newFilesBlobs)
+      //we create the blob in memory if it doesn't already exists
+      blobsToCreate.map(x => sgitWriter.createObject(x.contentString.get))
+      sgitWriter.updateIndex(indexUpdated)
+    }
   }
 
 

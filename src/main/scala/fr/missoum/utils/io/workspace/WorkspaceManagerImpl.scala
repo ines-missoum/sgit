@@ -25,7 +25,7 @@ object WorkspaceManagerImpl extends WorkspaceManager {
   def getAllBlobsOfWorkspace(): List[EntryTree] = {
     val workspaceFiles = recursiveListFiles(new File(PathHelper.SgitPath))
     val result = workspaceFiles.map(x => {
-      val content = SgitReaderImpl.getContentOfFile(x.getAbsolutePath)
+      val content = getContentOfFile(x.getAbsolutePath).mkString("\n")
       Blob.newBlobWithContent(content, PathHelper.getSimplePathOfFile(x.getAbsolutePath))
     })
     result
