@@ -81,64 +81,6 @@ object SgitCommitImpl extends SgitCommit {
     }
   }
 
-  /*
-  /**
-   * Gives the list of all the blobs to commit (ie: blobs that have been created or modified since the previous commits)
-   * @param isFirstCommit Indicates if it's the first commit or not
-   * @return The list of all the blobs to commit
-   */
-    //not used
-  def getBlobsToCommit(isFirstCommit: Boolean): List[EntryTree] = {
-
-    val index = sgitReader.getIndex
-    //if first commit we commit all the content of the index
-    if (isFirstCommit) index
-    //else we commit the differences between the index and the last commit
-    else {
-      val previousCommit = getAllBlobsCommitted(isFirstCommit)
-      val blobsToCommit = index.filter(x => !previousCommit.exists(y => x.path.equals(y.path) && x.hash.equals(y.hash)))
-      blobsToCommit
-    }
-  }
-
-  /**
-   * Retrieve all the last version of all blobs committed in the previous commits
-   * @return The list of blobs committed in the previous commits in their last version
-   */
-    //not used
-  def getAllBlobsCommitted(isFirstCommit: Boolean): List[EntryTree] = {
-
-    if (isFirstCommit) List[EntryTree]()
-    else
-      getAllBlobsCommittedRec(sgitReader.getLastCommit, List[EntryTree]())
-  }
-
-  /**
-   * Retrieve all the last version of all blobs committed in the previous commits (since the commit parameter)
-   * @param commit Current commit for whom we want to retrieve the committed blobs
-   * @param result Current result (tail rec)
-   * @return The list of blobs committed in the previous commits in their last version
-   */
-  @tailrec
-  //not used
-  private def getAllBlobsCommittedRec(commit: Commit, result: List[EntryTree]): List[EntryTree] = {
-    // we retrieve the blobs of the commit
-    val treeCommit = Tree()
-    treeCommit.hash = commit.treeHash
-    val blobsOfCommit = getBlobsRec(List(treeCommit))
-    val newResult = result ++ inFirstListButNotInSecond(blobsOfCommit, result)
-
-    // end if it's the first commit
-    if (commit.hashParentCommit.equals(Commit.noParentHash))
-      newResult
-    else {
-      val nexCommit = sgitReader.getCommit(commit.hashParentCommit)
-      //we want only the last version of each blobs
-      getAllBlobsCommittedRec(nexCommit, newResult)
-    }
-
-  }
-*/
   /**
    * Retrieves all the blobs from the entries
    *
