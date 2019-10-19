@@ -20,34 +20,6 @@ class SgitReaderImplSpec extends FlatSpec with Matchers with IdiomaticMockito {
   } else file.delete
 
 
-  behavior of "isExistingCommit method"
-
-  it should "returns true when a commit exists on the current branch" in {
-    //given
-    setUpSgitRepository()
-    new PrintWriter(PathHelper.BranchesDirectory + File.separator + "master") {
-      write("file contents")
-      close()
-    }
-    //when
-    val result = SgitReaderImpl.isExistingCommitOnCurrentBranch
-    //then
-    result shouldBe true
-    //clean
-    cleanSgitRepository()
-  }
-
-  it should "returns false when a commit do not exists on the current branch" in {
-    //given
-    setUpSgitRepository()
-    //when
-    val result = SgitReaderImpl.isExistingCommitOnCurrentBranch
-    //then
-    result shouldBe false
-    //clean
-    cleanSgitRepository()
-  }
-
   behavior of "commitExists method"
 
   it should "returns false when the object exists but is not a commit" in {
@@ -104,10 +76,10 @@ class SgitReaderImplSpec extends FlatSpec with Matchers with IdiomaticMockito {
     setUpSgitRepository()
     val fakeTag = "myTag"
     val path = PathHelper.TagsDirectory + File.separator + fakeTag
-    val hashExpected = "e2kjgks8856qsqfd"
+    val hashExpected = Some("e2kjgks8856qsqfd")
     new File(path).createNewFile
     new PrintWriter(path) {
-      write(hashExpected)
+      write(hashExpected.get)
       close()
     }
     //when
@@ -125,10 +97,10 @@ class SgitReaderImplSpec extends FlatSpec with Matchers with IdiomaticMockito {
     setUpSgitRepository()
     val fakeBranch = "myBranch"
     val path = PathHelper.BranchesDirectory + File.separator + fakeBranch
-    val hashExpected = "e2kjgks8856qsqfd"
+    val hashExpected = Some("e2kjgks8856qsqfd")
     new File(path).createNewFile
     new PrintWriter(path) {
-      write(hashExpected)
+      write(hashExpected.get)
       close()
     }
     //when

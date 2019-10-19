@@ -17,14 +17,14 @@ object SgitReaderImpl extends SgitReader {
    * @param tag the tag
    * @return The commit hash of the tag
    */
-  def getCommitTag(tag: String): String = readFirstLineFile(PathHelper.TagsDirectory + File.separator + tag)
+  def getCommitTag(tag: String): Option[String] = readFirstLineFile(PathHelper.TagsDirectory + File.separator + tag)
 
   /**
    *
    * @param branch
    * @return The hash of the last commit of the branch in parameter
    */
-  def getLastCommitOfBranch(branch: String): String = readFirstLineFile(PathHelper.BranchesDirectory + File.separator + branch)
+  def getLastCommitOfBranch(branch: String): Option[String] = readFirstLineFile(PathHelper.BranchesDirectory + File.separator + branch)
 
   /**
    *
@@ -68,7 +68,18 @@ object SgitReaderImpl extends SgitReader {
    *
    * @return the current branch or None if an error happens
    */
-  def getCurrentBranch: String = readFirstLineFile(PathHelper.HeadFile)
+  def getCurrentBranch: Option[String] = {
+    val line = readFirstLineFile(PathHelper.HeadFile)
+    if(line.nonEmpty) Some(line.get.split(" ")(1))
+    else None
+  }
+
+  /**
+   * Retrieves the current branch
+   *
+   * @return the current branch or None if an error happens
+   */
+  def getCurrentHead: Option[String] = readFirstLineFile(PathHelper.HeadFile)
 
   /**
    * Retrieves all branches names
@@ -94,16 +105,6 @@ object SgitReaderImpl extends SgitReader {
     val index = source.getLines.toList.map(x => Blob(x))
     source.close()
     index
-  }
-
-  /**
-   * Check if the already is a commit for the current branch.
-   *
-   * @return True if a commit exists, otherwise False.
-   */
-  def isExistingCommitOnCurrentBranch: Boolean = {
-    val commits = getContentOfFile(PathHelper.BranchesDirectory + File.separator + getCurrentBranch)
-    !commits.isEmpty
   }
 
   /**
@@ -144,16 +145,6 @@ object SgitReaderImpl extends SgitReader {
   }
 
   /**
-   * Retrieve the last commit
-   *
-   * @return the last commit done
-   */
-  def getLastCommitOfCurrentBranch: Commit = {
-    val hashLastCommit = getLastCommitHash
-    getCommit(hashLastCommit)
-  }
-
-  /**
    * Retrieves the commit that corresponds to a hash
    *
    * @param hashCommit hash of a commit
@@ -169,19 +160,29 @@ object SgitReaderImpl extends SgitReader {
    *
    * @return the logs of the current branch
    */
-  def getLog(): String =
-    getContentOfFile(PathHelper.LogsDirectory + File.separator + this.getCurrentBranch)
+  def getLog(branch:String): String =
+    getContentOfFile(PathHelper.LogsDirectory + File.separator + branch)
 
 
   /**
    *
    * @return the hash of the last commit
    */
-  def getLastCommitHash: String = readFirstLineFile(PathHelper.BranchesDirectory + File.separator + getCurrentBranch)
+  def getLastCommitHash: Option[String] = {
+    val ref = getCurrentHead
+    if (ref.nonEmpty) {
+      //if head is branch
+      if (ref.get.startsWith("ref"))
+        readFirstLineFile(PathHelper.BranchesDirectory + File.separator + ref.get.split(" ")(1))
+      else
+      //head is a commit hash
+        ref
+    } else None
+  }
 
-  private def readFirstLineFile(path: String) = {
+  private def readFirstLineFile(path: String): Option[String] = {
     val src = Source.fromFile(path)
-    val line = src.getLines.toList.head
+    val line = src.getLines.toList.headOption
     src.close
     line
   }

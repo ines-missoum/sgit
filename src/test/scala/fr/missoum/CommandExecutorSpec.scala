@@ -85,11 +85,11 @@ class CommandExecutorSpec extends FlatSpec with Matchers with IdiomaticMockito {
     objectTested.workspaceReader = mockWorkspaceHelper
     objectTested.printer = mockPrinter
     //when
-    mockReader.isExistingCommitOnCurrentBranch returns true
+    mockReader.getLastCommitHash returns Some("hash")
     mockReader.getIndex returns List(Blob("blob hash path"))
-    mockCommitHelper.getBlobsLastCommit(false) returns List(Blob("blob hash path"))
+    mockCommitHelper.getBlobsLastCommit(Some("hash")) returns List(Blob("blob hash path"))
     mockCommitHelper.nbFilesChangedSinceLastCommit(List(Blob("blob hash path")), List(Blob("blob hash path"))) returns None
-    mockReader.getCurrentBranch returns "master"
+    mockReader.getCurrentBranch returns Some("master")
     objectTested.executeCommit()
     //then
     mockPrinter.nothingToCommit("master") was called
@@ -115,15 +115,15 @@ class CommandExecutorSpec extends FlatSpec with Matchers with IdiomaticMockito {
     objectTested.workspaceReader = mockWorkspaceHelper
     objectTested.printer = mockPrinter
     //when
+    mockReader.getLastCommitHash returns Some("hash")
     val fakeIndex = List(Blob("blob hash path"), Blob("blob hash2 path/file.txt"))
     val fakeCommit = Commit("hash", "treeHash", "my message")
-    mockReader.isExistingCommitOnCurrentBranch returns true
     mockReader.getIndex returns List(Blob("blob hash path"), Blob("blob hash2 path/file.txt"))
-    mockCommitHelper.getBlobsLastCommit(false) returns List(Blob("blob hash path"))
+    mockCommitHelper.getBlobsLastCommit(Some("hash")) returns List(Blob("blob hash path"))
     mockCommitHelper.nbFilesChangedSinceLastCommit(fakeIndex, List(Blob("blob hash path"))) returns Some(1)
-    mockReader.getCurrentBranch returns "master"
+    mockReader.getCurrentBranch returns Some("master")
     mockInputManager.retrieveUserCommitMessage() returns "my message"
-    mockCommitHelper.commit(isFirstCommit = false, "master", fakeIndex, "my message") returns fakeCommit
+    mockCommitHelper.commit(Some("hash"), "master", fakeIndex, "my message") returns fakeCommit
     objectTested.executeCommit()
     //then
     mockWriter.saveCommit(fakeCommit, "master")
@@ -142,8 +142,8 @@ class CommandExecutorSpec extends FlatSpec with Matchers with IdiomaticMockito {
     objectTested.logHelper = mockLogHelper
     objectTested.printer = mockPrinter
     //when
-    mockReader.getLog() returns "log"
-    mockReader.getCurrentBranch returns "master"
+    mockReader.getLog("master") returns "log"
+    mockReader.getCurrentBranch returns Some("master")
     mockLogHelper.retrieveAllCommits("log") returns List[Commit]()
     objectTested.executeLog()
     //then
@@ -160,8 +160,8 @@ class CommandExecutorSpec extends FlatSpec with Matchers with IdiomaticMockito {
     objectTested.logHelper = mockLogHelper
     objectTested.printer = mockPrinter
     //when
-    mockReader.getLog() returns "log"
-    mockReader.getCurrentBranch returns "master"
+    mockReader.getLog("master") returns "log"
+    mockReader.getCurrentBranch returns Some("master")
     mockLogHelper.retrieveAllCommits("log") returns List(Commit("hash1", "hash2", "message"))
     objectTested.executeLog()
     //then
@@ -178,6 +178,7 @@ class CommandExecutorSpec extends FlatSpec with Matchers with IdiomaticMockito {
     objectTested.sgitReader = mockReader
     objectTested.sgitWriter = mockWriter
     //when
+    mockReader.getLastCommitHash returns Some("hash")
     objectTested.executeCreateNewTag("myTag")
     //then
     mockReader.isExistingTag("myTag")
@@ -196,6 +197,7 @@ class CommandExecutorSpec extends FlatSpec with Matchers with IdiomaticMockito {
     objectTested.sgitReader = mockReader
     objectTested.sgitWriter = mockWriter
     //when
+    mockReader.getLastCommitHash returns Some("hash")
     objectTested.executeCreateNewBranch("myBranch")
     //then
     mockReader.isExistingBranch("myBranch")
@@ -238,15 +240,15 @@ class CommandExecutorSpec extends FlatSpec with Matchers with IdiomaticMockito {
     objectTested.commitHelper = mockCommitHelper
     objectTested.printer = mockPrinter
     //when
+    mockReader.getLastCommitHash returns Some("hash")
     mockReader.isExistingBranch("switch") returns true
     mockReader.isExistingCommit("switch") returns false
     mockReader.isExistingTag("switch") returns false
-    mockReader.getLastCommitOfBranch("switch") returns "hashCommit"
+    mockReader.getLastCommitOfBranch("switch") returns Some("hashCommit")
     mockReader.getIndex returns List[EntryTree]()
     mockReader.getCommit("hashCommit") returns Commit("hash", "treeHash", "message")
     mockCommitHelper.getBlobsOfCommit(Commit("hash", "treeHash", "message")) returns List[EntryTree]()
-    mockReader.isExistingCommitOnCurrentBranch returns true
-    mockCommitHelper.getBlobsLastCommit(false) returns List[EntryTree]()
+    mockCommitHelper.getBlobsLastCommit(Some("hash")) returns List[EntryTree]()
     mockCheckoutHelper.checkoutNotAllowedOn(List[EntryTree](), List[EntryTree](), List[EntryTree]()) returns List[String]("path/file.txt")
 
     objectTested.executeCheckout("switch")

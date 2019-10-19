@@ -61,7 +61,7 @@ object CommandExecutorImpl extends CommandExecutor {
 
 
   def executeGetAllBranchesAndTags(): Unit = {
-    val currentBranch = sgitReader.getCurrentBranch
+    val currentBranch = sgitReader.getCurrentBranch.getOrElse("")
     val tags = sgitReader.getAllTags
     val branches = sgitReader.getAllBranches
     printer.printBranchesAndTags(currentBranch, tags, branches)
@@ -69,41 +69,48 @@ object CommandExecutorImpl extends CommandExecutor {
 
 
   def executeCreateNewBranch(newBranch: String): Unit = {
-    if (sgitReader.isExistingBranch(newBranch))
+    val lastCommitHash = sgitReader.getLastCommitHash
+    if (lastCommitHash.isEmpty)
+      printer.noCreationPossible()
+    else if (sgitReader.isExistingBranch(newBranch))
       printer.branchAlreadyExists(newBranch)
     else {
-      sgitWriter.createNewBranch(newBranch, sgitReader.getLastCommitOfCurrentBranch)
+      sgitWriter.createNewBranch(newBranch, lastCommitHash.get)
       printer.branchCreated(newBranch)
     }
   }
 
   def executeCreateNewTag(newTag: String): Unit = {
-    if (sgitReader.isExistingTag(newTag))
+    val lastCommitHash = sgitReader.getLastCommitHash
+    if (lastCommitHash.isEmpty)
+      printer.noCreationPossible()
+    else if (sgitReader.isExistingTag(newTag))
       printer.tagAlreadyExists(newTag)
     else {
-      sgitWriter.createNewTag(newTag, sgitReader.getLastCommitOfCurrentBranch)
+      sgitWriter.createNewTag(newTag, sgitReader.getLastCommitHash.get)
       printer.tagCreated(newTag)
     }
   }
 
   def executeCommit(): Unit = {
 
-    val isFirstCommit = !sgitReader.isExistingCommitOnCurrentBranch
     val index = sgitReader.getIndex
-    val blobsLastCommit = commitHelper.getBlobsLastCommit(isFirstCommit)
+    val lastCommitHash = sgitReader.getLastCommitHash
+    val blobsLastCommit = commitHelper.getBlobsLastCommit(lastCommitHash)
     val nbFilesChanged = commitHelper.nbFilesChangedSinceLastCommit(index, blobsLastCommit)
     val branch = sgitReader.getCurrentBranch
-
-    //if nothing to commit
-    if (nbFilesChanged.isEmpty)
-      printer.nothingToCommit(branch)
-    else {
-      //if commit needed
-      printer.askEnterMessageCommits()
-      val message = inputManager.retrieveUserCommitMessage()
-      val commit = commitHelper.commit(isFirstCommit, branch, index, message)
-      sgitWriter.saveCommit(commit, branch)
-      printer.commitCreatedMessage(branch, message, nbFilesChanged.get)
+    if (branch.nonEmpty) {
+      //if nothing to commit
+      if (nbFilesChanged.isEmpty)
+        printer.nothingToCommit(branch.get)
+      else {
+        //if commit needed
+        printer.askEnterMessageCommits()
+        val message = inputManager.retrieveUserCommitMessage()
+        val commit = commitHelper.commit(lastCommitHash, branch.get, index, message)
+        sgitWriter.saveCommit(commit, branch.get)
+        printer.commitCreatedMessage(branch.get, message, nbFilesChanged.get)
+      }
     }
   }
 
@@ -112,8 +119,8 @@ object CommandExecutorImpl extends CommandExecutor {
     val branch = sgitReader.getCurrentBranch
     val workspace = workspaceReader.getAllBlobsOfWorkspace()
     val index = sgitReader.getIndex
-    val isFirstCommit = !sgitReader.isExistingCommitOnCurrentBranch
-    val lastCommit = commitHelper.getBlobsLastCommit(isFirstCommit)
+    val lastCommitHash = sgitReader.getLastCommitHash
+    val lastCommit = commitHelper.getBlobsLastCommit(lastCommitHash)
 
     //process
     val untrackedFiles = statusHelper.getUntrackedFiles(workspace, index)
@@ -121,7 +128,8 @@ object CommandExecutorImpl extends CommandExecutor {
     val toBeCommitted = statusHelper.getChangesToBeCommitted(index, lastCommit)
     var printed = false
     //print
-    printer.branch(branch)
+    if (branch.nonEmpty)
+      printer.branch(branch.get)
 
     if (toBeCommitted.nonEmpty) {
       printer.changesToBeCommitted(toBeCommitted.get._1.map(_.path), toBeCommitted.get._2.map(_.path), toBeCommitted.get._3.map(_.path))
@@ -142,12 +150,13 @@ object CommandExecutorImpl extends CommandExecutor {
   def executeLog(): Unit = {
 
     val branch = sgitReader.getCurrentBranch
-    val logs = logHelper.retrieveAllCommits(sgitReader.getLog())
-
-    if (logs.isEmpty)
-      printer.noLog(branch)
-    else
-      printer.displayAllCommits(logs, branch)
+    if (branch.nonEmpty) {
+      val logs = logHelper.retrieveAllCommits(sgitReader.getLog(branch.get))
+      if (logs.isEmpty)
+        printer.noLog(branch.get)
+      else
+        printer.displayAllCommits(logs, branch.get)
+    }
   }
 
 
@@ -157,10 +166,10 @@ object CommandExecutorImpl extends CommandExecutor {
     var head: String = switchTo
     val isCheckoutBranch = sgitReader.isExistingBranch(switchTo)
     if (isCheckoutBranch)
-      hashCommit = sgitReader.getLastCommitOfBranch(switchTo)
+      hashCommit = sgitReader.getLastCommitOfBranch(switchTo).getOrElse("")
     else {
       if (sgitReader.isExistingTag(switchTo)) {
-        hashCommit = sgitReader.getCommitTag(switchTo)
+        hashCommit = sgitReader.getCommitTag(switchTo).getOrElse("")
         head = hashCommit
       }
       else if (sgitReader.isExistingCommit(switchTo)) {
@@ -177,19 +186,19 @@ object CommandExecutorImpl extends CommandExecutor {
       val checkoutBlobs = commitHelper.getBlobsOfCommit(sgitReader.getCommit(hashCommit))
 
       //if it exists files modified since the switch commit but not committed => switch impossible
-      val isFirstCommit = !sgitReader.isExistingCommitOnCurrentBranch
-      val lastCommit = commitHelper.getBlobsLastCommit(isFirstCommit)
+      val lastCommitHash = sgitReader.getLastCommitHash
+      val lastCommit = commitHelper.getBlobsLastCommit(lastCommitHash)
       val checkoutNotAllowedOn = checkoutHelper.checkoutNotAllowedOn(lastCommit, index, checkoutBlobs)
       if (checkoutNotAllowedOn.nonEmpty)
         printer.notAllowedCheckout(checkoutNotAllowedOn)
       else {
-        switch(head, index, checkoutBlobs)
+        switch(head, isCheckoutBranch, index, checkoutBlobs)
       }
     }
   }
 
-  private def switch(head: String, currentIndex: List[EntryTree], checkoutBlobs: List[EntryTree]): Unit = {
-    sgitWriter.setHeadBranch(head)
+  private def switch(head: String, isCheckoutBranch: Boolean, currentIndex: List[EntryTree], checkoutBlobs: List[EntryTree]): Unit = {
+    sgitWriter.setHead(head, isCheckoutBranch)
     sgitWriter.updateIndex(checkoutBlobs)
     val toDelete = checkoutHelper.findFilesToDelete(currentIndex, checkoutBlobs)
     val toCreate = checkoutHelper.findFilesToCreate(currentIndex, checkoutBlobs)

@@ -41,7 +41,7 @@ class SgitCommitImplSpec extends FlatSpec with Matchers with IdiomaticMockito {
     val objectTested = SgitCommitImpl
     objectTested.sgitReader = mockReader
     //when
-    val result = objectTested.getBlobsLastCommit(true)
+    val result = objectTested.getBlobsLastCommit(None)
     //then
     result shouldBe List[EntryTree]()
   }
@@ -54,18 +54,18 @@ class SgitCommitImplSpec extends FlatSpec with Matchers with IdiomaticMockito {
     //when
     val mockEntries1 = List[EntryTree](Blob("blob hash path"), Blob("blob hash2 path/file.txt"), Tree("hashTree5678", "path"))
     val mockEntries2 = List[EntryTree](Blob("blob hash3 path3"))
-    mockReader.getLastCommitOfCurrentBranch returns Commit("hashParent1234", "hashTree1234", "myMessage")
+    mockReader.getCommit("hash") returns Commit("hashParent1234", "hashTree1234", "myMessage")
     mockReader.getContentOfObjectInEntries("hashTree1234") returns mockEntries1
     mockReader.getContentOfObjectInEntries("hashTree5678") returns mockEntries2
     val resultExpected = List[EntryTree](Blob("blob hash path"), Blob("blob hash2 path/file.txt"), Blob("blob hash3 path3"))
-    val result = objectTested.getBlobsLastCommit(false)
+    val result = objectTested.getBlobsLastCommit(Some("hash"))
     //then
     result shouldBe resultExpected
   }
 
   behavior of "commit function"
 
-  it should "creates the commit instance correctly" in {
+  it should "creates the commit instance correctly when first commit" in {
 
     //given
     val mockReader = mock[SgitReader]
@@ -77,7 +77,7 @@ class SgitCommitImplSpec extends FlatSpec with Matchers with IdiomaticMockito {
     val fakeIndex = List(Blob("blob hash path"), Blob("blob hash2 path/file.txt"))
     val expectedHash = HashHelper.hashFile("blob hash path\nblob hash2 path/file.txt")
     mockWriter.createObject("blob hash path\nblob hash2 path/file.txt")
-    val result = objectTested.commit(true, "master", fakeIndex: List[EntryTree], "MyMessage")
+    val result = objectTested.commit(None, "master", fakeIndex: List[EntryTree], "MyMessage")
 
     val resultExpected = Commit("0000000000000000000000000000000000000000", expectedHash, "MyMessage")
     //then

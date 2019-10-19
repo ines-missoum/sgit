@@ -10,12 +10,12 @@ trait SgitWriter {
   def createSgitRepository()
 
   /**
-   * Deletes everything in the HEAD file located on top of the .sgit repository and add a line with the name of the branch in parameter.
+   * Deletes everything in the HEAD file located on top of the .sgit repository and add a line with the name of the branch in parameter or the commit hash.
    * To use this function be sure that the .sgit repository and the parameter branch exist.
    *
-   * @param branch : the branch to checkout
+   * @param element : the branch to checkout or a commit hash
    */
-  def setHeadBranch(branch: String): Unit
+  def setHead(element: String, isBranch: Boolean): Unit
 
 
   /**
@@ -24,9 +24,9 @@ trait SgitWriter {
    * To use this function be sure that the .sgit repository exists.
    *
    * @param newBranch  : the branch to create
-   * @param lastCommit : the last commit
+   * @param hashLastCommit : the last commit hash
    */
-  def createNewBranch(newBranch: String, lastCommit: Commit): Unit
+  def createNewBranch(newBranch: String, hashLastCommit: String): Unit
 
   /**
    * Creates the parameter tag.
@@ -34,9 +34,9 @@ trait SgitWriter {
    * To use this function be sure that the .sgit repository exists.
    *
    * @param newTag     : the tag to create
-   * @param lastCommit : the last commit
+   * @param hashLastCommit : the last commit hash
    */
-  def createNewTag(newTag: String, lastCommit: Commit): Unit
+  def createNewTag(newTag: String, hashLastCommit: String): Unit
 
   /**
    * Creates the blob in the .sgit repository if it doesn't already exists

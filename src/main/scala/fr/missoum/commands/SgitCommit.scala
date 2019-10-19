@@ -33,20 +33,20 @@ trait SgitCommit extends SgitCommandHelper {
   /**
    * Creates the commit object and creates the trees in memory
    *
-   * @param isFirstCommit Indicates if it's the first commit or not
+   * @param lastCommitHash None if it's a first commit else the hash of the last commit
    * @param currentBranch Branch where the commit needs to be recorded
    * @param blobsToCommit List of blobs to add to the commit
    * @param message       Message of the commit
    * @return
    */
-  def commit(isFirstCommit: Boolean, currentBranch: String, blobsToCommit: List[EntryTree], message: String): Commit
+  def commit(lastCommitHash: Option[String], currentBranch: String, blobsToCommit: List[EntryTree], message: String): Commit
 
   /**
    *
-   * @param isFirstCommit indicates if it's a first commit or not
+   * @param lastCommitHash None if it's a first commit else the hash of the last commit
    * @return the list of the blobs of the last commit
    */
-  def getBlobsLastCommit(isFirstCommit: Boolean): List[EntryTree]
+  def getBlobsLastCommit(lastCommitHash: Option[String]): List[EntryTree]
  /* /**
    * Retrieve all the last version of all blobs committed in the previous commits
    * @return The list of blobs committed in the previous commits in their last version

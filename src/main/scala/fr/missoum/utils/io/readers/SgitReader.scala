@@ -18,14 +18,14 @@ trait SgitReader {
    * @param tag the tag
    * @return The commit hash of the tag
    */
-  def getCommitTag(tag: String): String
+  def getCommitTag(tag: String): Option[String]
 
   /**
    *
    * @param branch the branch
    * @return The hash of the last commit of the branch in parameter
    */
-  def getLastCommitOfBranch(branch: String): String
+  def getLastCommitOfBranch(branch: String): Option[String]
 
   /**
    * Searches if this commit exists somewhere
@@ -64,7 +64,7 @@ trait SgitReader {
    *
    * @return the current branch or None if an error happens
    */
-  def getCurrentBranch: String
+  def getCurrentBranch: Option[String]
 
   /**
    * Retrieves all branches names
@@ -88,13 +88,6 @@ trait SgitReader {
   def getIndex: List[EntryTree]
 
   /**
-   * Check if the already is a commit for the current branch.
-   *
-   * @return True if a commit exists, otherwise False.
-   */
-  def isExistingCommitOnCurrentBranch: Boolean
-
-  /**
    * Reads the content of a file
    *
    * @param path absolute path of the file
@@ -111,13 +104,6 @@ trait SgitReader {
   def getContentOfObjectInEntries(hash: String): List[EntryTree]
 
   /**
-   * Retrieve the last commit of the current branch
-   *
-   * @return the last commit done
-   */
-  def getLastCommitOfCurrentBranch: Commit
-
-  /**
    * Retrieves the commit that corresponds to a hash
    *
    * @param hashCommit hash of a commit
@@ -129,13 +115,13 @@ trait SgitReader {
    *
    * @return the hash of the last commit
    */
-  def getLastCommitHash: String
+  def getLastCommitHash: Option[String]
 
   /**
    * Retrieve the logs of the current branch
    *
    * @return the logs of the current branch
    */
-  def getLog(): String
+  def getLog(branch: String): String
 
 }

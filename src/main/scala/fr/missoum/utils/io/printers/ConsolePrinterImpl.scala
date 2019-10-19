@@ -96,4 +96,6 @@ object ConsolePrinterImpl extends ConsolePrinter {
     }).mkString("\n") + "\n" + Console.WHITE
     println("______" + path + "______\n" + diff + "\n")
   }
+
+  def noCreationPossible(): Unit = println("fatal: you need to do a first commit before creating a branch or a tag")
 }

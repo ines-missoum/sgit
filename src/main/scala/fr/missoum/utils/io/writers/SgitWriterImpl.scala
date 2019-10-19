@@ -26,17 +26,22 @@ object SgitWriterImpl extends SgitWriter {
     //creation of the master branch and checkout
     new File(PathHelper.BranchesDirectory + File.separator + "master").createNewFile
     new File(PathHelper.LogsDirectory + File.separator + "master").createNewFile
-    setHeadBranch("master")
+    setHead("master",true)
 
   }
 
   /**
-   * Deletes everything in the HEAD file located on top of the .sgit repository and add a line with the name of the branch in parameter.
+   * Deletes everything in the HEAD file located on top of the .sgit repository and add a line with the name of the branch in parameter or the commit hash.
    * To use this function be sure that the .sgit repository and the parameter branch exist.
    *
-   * @param branch : the branch to checkout
+   * @param element : the branch to checkout or a commit hash
    */
-  def setHeadBranch(branch: String): Unit = writeInFile(PathHelper.HeadFile, branch, shouldBeAppend = false)
+  def setHead(element: String, isBranch: Boolean): Unit = {
+    if (isBranch)
+      writeInFile(PathHelper.HeadFile, "ref " + element, shouldBeAppend = false)
+    else
+      writeInFile(PathHelper.HeadFile, element, shouldBeAppend = false)
+  }
 
 
   /**
@@ -45,12 +50,12 @@ object SgitWriterImpl extends SgitWriter {
    * To use this function be sure that the .sgit repository exists.
    *
    * @param newBranch  : the branch to create
-   * @param lastCommit : the last commit
+   * @param hashLastCommit : the last commit hash
    */
-  def createNewBranch(newBranch: String, lastCommit: Commit): Unit = {
+  def createNewBranch(newBranch: String, hashLastCommit: String): Unit = {
     new File(PathHelper.BranchesDirectory + File.separator + newBranch).createNewFile
     new File(PathHelper.LogsDirectory + File.separator + newBranch).createNewFile
-    writeInFile(PathHelper.BranchesDirectory + File.separator + newBranch, lastCommit.hash, shouldBeAppend = false)
+    writeInFile(PathHelper.BranchesDirectory + File.separator + newBranch, hashLastCommit, shouldBeAppend = false)
   }
 
   /**
@@ -59,11 +64,11 @@ object SgitWriterImpl extends SgitWriter {
    * To use this function be sure that the .sgit repository exists.
    *
    * @param newTag     : the tag to create
-   * @param lastCommit : the last commit
+   * @param hashLastCommit : the last commit hash
    */
-  def createNewTag(newTag: String, lastCommit: Commit): Unit = {
+  def createNewTag(newTag: String, hashLastCommit: String): Unit = {
     new File(PathHelper.TagsDirectory + File.separator + newTag).createNewFile
-    writeInFile(PathHelper.TagsDirectory + File.separator + newTag, lastCommit.hash, shouldBeAppend = false)
+    writeInFile(PathHelper.TagsDirectory + File.separator + newTag, hashLastCommit, shouldBeAppend = false)
   }
 
 

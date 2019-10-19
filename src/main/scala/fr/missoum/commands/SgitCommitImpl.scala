@@ -6,8 +6,6 @@ import fr.missoum.logic.{Commit, EntryTree, Tree}
 import fr.missoum.utils.io.readers.{SgitReader, SgitReaderImpl}
 import fr.missoum.utils.io.writers.{SgitWriter, SgitWriterImpl}
 
-import scala.annotation.tailrec
-
 object SgitCommitImpl extends SgitCommit {
 
   /**
@@ -24,18 +22,18 @@ object SgitCommitImpl extends SgitCommit {
   /**
    * Creates the commit object and creates the trees in memory
    *
-   * @param isFirstCommit Indicates if it's the first commit or not
+   * @param lastCommitHash None if it's a first commit else the hash of the last commit
    * @param currentBranch Branch where the commit needs to be recorded
    * @param blobsToCommit List of blobs to add to the commit
    * @param message       Message of the commit
    * @return
    */
-  def commit(isFirstCommit: Boolean, currentBranch: String, blobsToCommit: List[EntryTree], message: String): Commit = {
+  def commit(lastCommitHash: Option[String], currentBranch: String, blobsToCommit: List[EntryTree], message: String): Commit = {
 
     // we  retrieve the parent commit
     var parentCommit = ""
-    if (isFirstCommit) parentCommit = Commit.noParentHash
-    else parentCommit = sgitReader.getLastCommitHash
+    if (lastCommitHash.isEmpty) parentCommit = Commit.noParentHash
+    else parentCommit = lastCommitHash.get
 
     //creation of the commit
     val commitTree = createAllTrees(blobsToCommit)
@@ -45,14 +43,14 @@ object SgitCommitImpl extends SgitCommit {
 
   /**
    *
-   * @param isFirstCommit indicates if it's a first commit or not
+   * @param lastCommitHash None if it's a first commit else the hash of the last commit
    * @return the list of the blobs of the last commit
    */
-  def getBlobsLastCommit(isFirstCommit: Boolean): List[EntryTree] = {
+  def getBlobsLastCommit(lastCommitHash: Option[String]): List[EntryTree] = {
 
-    if (isFirstCommit) List[EntryTree]()
+    if (lastCommitHash.isEmpty) List[EntryTree]()
     else {
-      getBlobsOfCommit(sgitReader.getLastCommitOfCurrentBranch)
+      getBlobsOfCommit(sgitReader.getCommit(lastCommitHash.get))
     }
   }
 
@@ -81,8 +79,6 @@ object SgitCommitImpl extends SgitCommit {
     } else {
       Some(statusCommit.get._1.length + statusCommit.get._2.length)
     }
-    //val changedBlobs = index.filter(x => !blobsOfLastCommit.exists(y => x.path.equals(y.path) && x.hash.equals(y.hash)))
-
   }
 
   /*
