@@ -3,6 +3,12 @@ package fr.missoum.utils.io.printers
 import fr.missoum.logic.Commit
 
 trait ConsolePrinter {
+  def detachedHead(): Unit
+
+  def checkoutBranch(head: String): Unit
+
+  def notOnBranch(): Unit
+
   def improperSgitRepository(): Unit
 
   def noCreationPossible(): Unit
@@ -13,9 +19,9 @@ trait ConsolePrinter {
 
   def changesNotStagedForCommit(modifiedNotStaged: List[String], deletedNotStaged: List[String]): Unit
 
-  def nothingToCommit(branch: String): Unit
+  def nothingToCommit(branch: Option[String]): Unit
 
-  def commitCreatedMessage(branch: String, message: String, nbFilesChanged: Int): Unit
+  def commitCreatedMessage(branch: Option[String], message: String, nbFilesChanged: Int): Unit
 
   def fileNotExist(fileName: String): Unit
 

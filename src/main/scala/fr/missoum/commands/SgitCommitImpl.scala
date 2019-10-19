@@ -23,12 +23,11 @@ object SgitCommitImpl extends SgitCommit {
    * Creates the commit object and creates the trees in memory
    *
    * @param lastCommitHash None if it's a first commit else the hash of the last commit
-   * @param currentBranch Branch where the commit needs to be recorded
    * @param blobsToCommit List of blobs to add to the commit
    * @param message       Message of the commit
    * @return
    */
-  def commit(lastCommitHash: Option[String], currentBranch: String, blobsToCommit: List[EntryTree], message: String): Commit = {
+  def commit(lastCommitHash: Option[String], blobsToCommit: List[EntryTree], message: String): Commit = {
 
     // we  retrieve the parent commit
     var parentCommit = ""

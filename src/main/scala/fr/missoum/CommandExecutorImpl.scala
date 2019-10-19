@@ -107,18 +107,16 @@ object CommandExecutorImpl extends CommandExecutor {
       val blobsLastCommit = commitHelper.getBlobsLastCommit(sgitReader.getCommit(lastCommitHash.getOrElse("")))
       val nbFilesChanged = commitHelper.nbFilesChangedSinceLastCommit(index.get, blobsLastCommit)
       val branch = sgitReader.getCurrentBranch
-      if (branch.nonEmpty) {
-        //if nothing to commit
-        if (nbFilesChanged.isEmpty)
-          printer.nothingToCommit(branch.get)
-        else {
-          //if commit needed
-          printer.askEnterMessageCommits()
-          val message = inputManager.retrieveUserCommitMessage()
-          val commit = commitHelper.commit(lastCommitHash, branch.get, index.get, message)
-          sgitWriter.saveCommit(commit, branch.get)
-          printer.commitCreatedMessage(branch.get, message, nbFilesChanged.get)
-        }
+      //if nothing to commit
+      if (nbFilesChanged.isEmpty)
+        printer.nothingToCommit(branch)
+      else {
+        //if commit needed
+        printer.askEnterMessageCommits()
+        val message = inputManager.retrieveUserCommitMessage()
+        val commit = commitHelper.commit(lastCommitHash, index.get, message)
+        sgitWriter.saveCommit(commit,branch)
+        printer.commitCreatedMessage(branch, message, nbFilesChanged.get)
       }
     }
   }
@@ -161,7 +159,7 @@ object CommandExecutorImpl extends CommandExecutor {
   }
 
   def executeLog(): Unit = {
-
+    //the log are available only on the current branch
     val branch = sgitReader.getCurrentBranch
     if (branch.nonEmpty) {
       val logFile = sgitReader.getLog(branch.get)
@@ -173,7 +171,7 @@ object CommandExecutorImpl extends CommandExecutor {
         else
           printer.displayAllCommits(logs, branch.get)
       }
-    }
+    } else printer.notOnBranch()
   }
 
 
@@ -212,6 +210,10 @@ object CommandExecutorImpl extends CommandExecutor {
           printer.notAllowedCheckout(checkoutNotAllowedOn)
         else {
           switch(head, isCheckoutBranch, index.get, checkoutBlobs)
+          if(isCheckoutBranch)
+            printer.checkoutBranch(head)
+          else
+            printer.detachedHead()
         }
       }
     }

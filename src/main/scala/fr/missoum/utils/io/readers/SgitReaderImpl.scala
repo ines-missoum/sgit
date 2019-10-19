@@ -69,7 +69,7 @@ object SgitReaderImpl extends SgitReader {
    */
   def getCurrentBranch: Option[String] = {
     val line = readFirstLineFile(PathHelper.HeadFile)
-    if (line.nonEmpty) Some(line.get.split(" ")(1))
+    if (line.nonEmpty && line.get.startsWith("ref")) Some(line.get.split(" ")(1))
     else None
   }
 

@@ -41,9 +41,9 @@ object ConsolePrinterImpl extends ConsolePrinter {
 
   def askEnterMessageCommits(): Unit = println("Please enter the commit message for your changes : ")
 
-  def commitCreatedMessage(branch: String, message: String, nbFilesChanged: Int): Unit = println("\n[" + branch + "] " + message + " \n" + nbFilesChanged + " file(s) changed")
+  def commitCreatedMessage(branch: Option[String], message: String, nbFilesChanged: Int): Unit = println("\n[" + branch.getOrElse("detached head") + "] " + message + " \n" + nbFilesChanged + " file(s) changed")
 
-  def nothingToCommit(branch: String): Unit = println("On branch " + branch + "\nnothing to commit, working tree clean")
+  def nothingToCommit(branch: Option[String]): Unit = println("On branch " + branch.getOrElse("[detached head]") + "\nnothing to commit, working tree clean")
 
   def untrackedFiles(untrackedFiles: List[String]): Unit = {
     val files = untrackedFiles.map("\t" + _).mkString("\n")
@@ -100,4 +100,10 @@ object ConsolePrinterImpl extends ConsolePrinter {
   def noCreationPossible(): Unit = println("fatal: you need to do a first commit before creating a branch or a tag")
 
   def improperSgitRepository(): Unit = println("fatal: improper sgit repository")
+
+  def notOnBranch(): Unit = println("fatal:you are not on a branch")
+
+  def checkoutBranch(head: String): Unit = println("Switched to '"+head+"'")
+
+  def detachedHead(): Unit = println("You are in 'detached HEAD' state. You can look around, make experimental\nchanges and commit them, and you can discard any commits you make in this\nstate without impacting any branches by performing another checkout.\n\nIf you want to create a new branch to retain commits you can do so.")
 }

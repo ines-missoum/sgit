@@ -93,7 +93,7 @@ class CommandExecutorSpec extends FlatSpec with Matchers with IdiomaticMockito {
     mockReader.getCurrentBranch returns Some("master")
     objectTested.executeCommit()
     //then
-    mockPrinter.nothingToCommit("master") was called
+    mockPrinter.nothingToCommit(Some("master")) was called
 
   }
 
@@ -125,11 +125,11 @@ class CommandExecutorSpec extends FlatSpec with Matchers with IdiomaticMockito {
     mockCommitHelper.nbFilesChangedSinceLastCommit(fakeIndex, List(Blob("blob hash path"))) returns Some(1)
     mockReader.getCurrentBranch returns Some("master")
     mockInputManager.retrieveUserCommitMessage() returns "my message"
-    mockCommitHelper.commit(Some("hash"), "master", fakeIndex, "my message") returns fakeCommit
+    mockCommitHelper.commit(Some("hash"), fakeIndex, "my message") returns fakeCommit
     objectTested.executeCommit()
     //then
-    mockWriter.saveCommit(fakeCommit, "master")
-    mockPrinter.commitCreatedMessage("master", "my message", 1)
+    mockWriter.saveCommit(fakeCommit, Some("master"))
+    mockPrinter.commitCreatedMessage(Some("master"), "my message", 1)
   }
 
   behavior of "The execution of log"

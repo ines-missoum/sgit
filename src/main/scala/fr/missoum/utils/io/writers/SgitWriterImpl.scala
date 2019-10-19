@@ -34,7 +34,8 @@ object SgitWriterImpl extends SgitWriter {
    * Deletes everything in the HEAD file located on top of the .sgit repository and add a line with the name of the branch in parameter or the commit hash.
    * To use this function be sure that the .sgit repository and the parameter branch exist.
    *
-   * @param element : the branch to checkout or a commit hash
+   * @param isBranch : indicates if it's a branch
+   * @param element  : the branch to checkout or a commit hash
    */
   def setHead(element: String, isBranch: Boolean): Unit = {
     if (isBranch)
@@ -104,21 +105,24 @@ object SgitWriterImpl extends SgitWriter {
   /**
    * Create the commit in memory
    *
-   * @param commitToSave  the commit to save
-   * @param currentBranch the branch where the commit should be saved
+   * @param commitToSave the commit to save
+   * @param branch       the branch or none
    * @return the commit created
    */
-  def saveCommit(commitToSave: Commit, currentBranch: String): Commit = {
+  def saveCommit(commitToSave: Commit, branch: Option[String]): Commit = {
 
     //creation commit
     val commitCreated: Commit = commitToSave.copy()
     commitCreated.hash = createObject(commitCreated.buildContent)
     commitCreated.date = Calendar.getInstance().getTime().toString.replace(" ", "-")
-    //commit added to the logs
-    writeInFile(PathHelper.HeadLogFile, commitCreated.toString, shouldBeAppend = true)
-    writeInFile(PathHelper.LogsDirectory + File.separator + currentBranch, commitCreated.toString, shouldBeAppend = true)
-    //change the pointer commit of the branch
-    writeInFile(PathHelper.BranchesDirectory + File.separator + currentBranch, commitCreated.hash, shouldBeAppend = false)
+
+    if (branch.nonEmpty) {
+      //commit added to the logs
+      writeInFile(PathHelper.HeadLogFile, commitCreated.toString, shouldBeAppend = true)
+      writeInFile(PathHelper.LogsDirectory + File.separator + branch.get, commitCreated.toString, shouldBeAppend = true)
+      //change the pointer commit of the branch
+      writeInFile(PathHelper.BranchesDirectory + File.separator + branch.get, commitCreated.hash, shouldBeAppend = false)
+    } else setHead(commitCreated.hash, false)
 
     commitCreated
   }

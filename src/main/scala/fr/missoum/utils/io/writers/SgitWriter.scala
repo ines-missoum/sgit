@@ -16,7 +16,7 @@ trait SgitWriter {
   /**
    * Deletes everything in the HEAD file located on top of the .sgit repository and add a line with the name of the branch in parameter or the commit hash.
    * To use this function be sure that the .sgit repository and the parameter branch exist.
-   *
+   * @param isBranch     indicates if it's a branch
    * @param element : the branch to checkout or a commit hash
    */
   def setHead(element: String, isBranch: Boolean): Unit
@@ -27,7 +27,7 @@ trait SgitWriter {
    * Which means creates all the necessary files for this branch (two files named with the branch name in .sgit/refs/heads/ and .sgit/logs/refs/heads/)
    * To use this function be sure that the .sgit repository exists.
    *
-   * @param newBranch  : the branch to create
+   * @param newBranch      : the branch to create
    * @param hashLastCommit : the last commit hash
    */
   def createNewBranch(newBranch: String, hashLastCommit: String): Unit
@@ -37,7 +37,7 @@ trait SgitWriter {
    * Which means creates all the necessary files for this branch (one file named with the tag name in .sgit/refs/tags/)
    * To use this function be sure that the .sgit repository exists.
    *
-   * @param newTag     : the tag to create
+   * @param newTag         : the tag to create
    * @param hashLastCommit : the last commit hash
    */
   def createNewTag(newTag: String, hashLastCommit: String): Unit
@@ -59,10 +59,10 @@ trait SgitWriter {
   /**
    * Create the commit in memory
    *
-   * @param commitToSave  the commit to save
-   * @param currentBranch the branch where the commit should be saved
+   * @param commitToSave the commit to save
+   * @param branch       the branch or none
    * @return the commit created
    */
-  def saveCommit(commitToSave: Commit, currentBranch: String): Commit
+  def saveCommit(commitToSave: Commit, branch: Option[String]): Commit
 
 }

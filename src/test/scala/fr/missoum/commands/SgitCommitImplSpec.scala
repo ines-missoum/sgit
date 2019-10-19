@@ -76,7 +76,7 @@ class SgitCommitImplSpec extends FlatSpec with Matchers with IdiomaticMockito {
     val fakeIndex = List(Blob("blob hash path"), Blob("blob hash2 path/file.txt"))
     val expectedHash = HashHelper.hashFile("blob hash path\nblob hash2 path/file.txt")
     mockWriter.createObject("blob hash path\nblob hash2 path/file.txt")
-    val result = objectTested.commit(None, "master", fakeIndex: List[EntryTree], "MyMessage")
+    val result = objectTested.commit(None, fakeIndex: List[EntryTree], "MyMessage")
 
     val resultExpected = Commit("0000000000000000000000000000000000000000", expectedHash, "MyMessage")
     //then
