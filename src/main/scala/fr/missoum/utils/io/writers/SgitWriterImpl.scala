@@ -26,7 +26,7 @@ object SgitWriterImpl extends SgitWriter {
     //creation of the master branch and checkout
     new File(PathHelper.BranchesDirectory + File.separator + "master").createNewFile
     new File(PathHelper.LogsDirectory + File.separator + "master").createNewFile
-    setHead("master",true)
+    setHead("master", true)
 
   }
 
@@ -49,7 +49,7 @@ object SgitWriterImpl extends SgitWriter {
    * Which means creates all the necessary files for this branch (two files named with the branch name in .sgit/refs/heads/ and .sgit/logs/refs/heads/)
    * To use this function be sure that the .sgit repository exists.
    *
-   * @param newBranch  : the branch to create
+   * @param newBranch      : the branch to create
    * @param hashLastCommit : the last commit hash
    */
   def createNewBranch(newBranch: String, hashLastCommit: String): Unit = {
@@ -63,7 +63,7 @@ object SgitWriterImpl extends SgitWriter {
    * Which means creates all the necessary files for this branch (one file named with the tag name in .sgit/refs/tags/)
    * To use this function be sure that the .sgit repository exists.
    *
-   * @param newTag     : the tag to create
+   * @param newTag         : the tag to create
    * @param hashLastCommit : the last commit hash
    */
   def createNewTag(newTag: String, hashLastCommit: String): Unit = {
@@ -131,9 +131,11 @@ object SgitWriterImpl extends SgitWriter {
    */
   private def writeInFile(path: String, content: String, shouldBeAppend: Boolean): Unit = {
     val file = new File(path)
-    val bw = new BufferedWriter(new FileWriter(file, shouldBeAppend))
-    bw.write(content)
-    bw.close()
+    if (file.exists()) {
+      val bw = new BufferedWriter(new FileWriter(file, shouldBeAppend))
+      bw.write(content)
+      bw.close()
+    }
   }
 
 }

@@ -7,6 +7,10 @@ import fr.missoum.logic.{Commit, EntryTree}
  */
 trait SgitWriter {
 
+  /**
+   * Creates the sgit directory where the command has been executed. It contains all the folders and files necessary.
+   * It also creates the master branch and checkout on the master branch.
+   */
   def createSgitRepository()
 
   /**
