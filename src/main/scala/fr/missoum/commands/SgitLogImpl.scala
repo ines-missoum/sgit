@@ -5,19 +5,18 @@ import fr.missoum.utils.io.readers.{SgitReader, SgitReaderImpl}
 
 object SgitLogImpl extends SgitLog {
 
-  var sgitReader: SgitReader = SgitReaderImpl
-
   /**
    * Retrieves all the commit of the current branch
    *
+   * @param logsContent the content of the logfile
    * @return the list of all the commits
    */
-  def retrieveAllCommits(): List[Commit] = {
+  def retrieveAllCommits(logsContent: String): List[Commit] = {
 
-    if (sgitReader.getLog().isEmpty)
+    if (logsContent.isEmpty)
       List[Commit]()
     else {
-      val logs = sgitReader.getLog().split("\n").toList
+      val logs = logsContent.split("\n").toList
       retrieveAllCommitRec(logs)
     }
 
