@@ -1,7 +1,5 @@
 package fr.missoum.utils.helpers
 
-//import scala.reflect.io.File
-
 import java.io.File
 
 object PathHelper {
