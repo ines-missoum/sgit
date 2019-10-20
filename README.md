@@ -1,5 +1,5 @@
 
-# <span style="color:blue"> Sgit</span> 
+#Sgit
 
 This school project is a git like in scala implemented in order to have a first approach with functional programing and deal with I/O in this context.
 Only some of the features are implemented.
