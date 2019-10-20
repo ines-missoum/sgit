@@ -1,5 +1,5 @@
 
-# Sgit
+# <span style="color:blue"> Sgit</span> 
 
 This school project is a git like in scala implemented in order to have a first approach with functional programing and deal with I/O in this context.
 Only some of the features are implemented.
@@ -17,7 +17,6 @@ We assume that you have sbt (using to build the project) installed on your machi
 
 To install the program, open a terminal and follow the next steps :
 
-Say what the step will be
 
 ```
 git clone https://github.com/ines-missoum/sgit.git
