@@ -122,13 +122,13 @@ object CommandExecutorImpl extends CommandExecutor {
   }
 
   def executeStatus(): Unit = {
+
     val index = sgitReader.getIndex
     if (index.isEmpty) printer.improperSgitRepository()
     else {
       //retrieve data
       val branch = sgitReader.getCurrentBranch
       val workspace = workspaceReader.getAllBlobsOfWorkspace()
-
       val lastCommitHash = sgitReader.getLastCommitHash.getOrElse("")
       val lastCommit = commitHelper.getBlobsLastCommit(sgitReader.getCommit(lastCommitHash))
 

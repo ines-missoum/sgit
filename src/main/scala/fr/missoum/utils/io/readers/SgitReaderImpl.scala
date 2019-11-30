@@ -160,11 +160,15 @@ object SgitReaderImpl extends SgitReader {
    * @return the commit that corresponds to the hash in parameter
    */
   def getCommit(hashCommit: String): Option[Commit] = {
-    val pathCommit = PathHelper.ObjectDirectory + File.separator + hashCommit.substring(0, 2) + File.separator + hashCommit.substring(2)
-    val content = getContentOfFile(pathCommit)
-    if (content.nonEmpty)
-      Some(Commit.getCommitFromContent(content.get, hashCommit))
-    else None
+    if (hashCommit.equals(""))
+      None
+    else {
+      val pathCommit = PathHelper.ObjectDirectory + File.separator + hashCommit.substring(0, 2) + File.separator + hashCommit.substring(2)
+      val content = getContentOfFile(pathCommit)
+      if (content.nonEmpty)
+        Some(Commit.getCommitFromContent(content.get, hashCommit))
+      else None
+    }
   }
 
   /**
