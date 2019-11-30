@@ -183,9 +183,11 @@ object CommandExecutorImpl extends CommandExecutor {
         if (logs.isEmpty)
           printer.noLog(branch.get)
         else {
-          printer.displaySingleCommit(logs(0), branch.get)
-          if (logs.length == 1)
+
+          if (logs.length == 1) {
+            printer.displaySingleCommit(logs(0), branch.get)
             printer.noLogP(branch.get)
+          }
           else
             displayLogDiff(logs, branch.get)
         }
@@ -197,11 +199,11 @@ object CommandExecutorImpl extends CommandExecutor {
 
     if (logs.length > 1) {
 
-      val childBlobs = commitHelper.getBlobsOfCommit(sgitReader.getCommit(logs(1).hash).get)
-      val parentBlobs = commitHelper.getBlobsOfCommit(sgitReader.getCommit(logs(0).hash).get)
+      val childBlobs = commitHelper.getBlobsOfCommit(sgitReader.getCommit(logs(0).hash).get)
+      val parentBlobs = commitHelper.getBlobsOfCommit(sgitReader.getCommit(logs(1).hash).get)
       val news = childBlobs.filter(x => !parentBlobs.exists(y => x.path.equals(y.path)))
       val modified = childBlobs.filter(x => parentBlobs.exists(y => x.path.equals(y.path) && !x.hash.equals(y.hash)))
-      printer.displaySingleCommit(logs(1), branch)
+      printer.displaySingleCommit(logs(0), branch)
 
       modified.map(childBlob => {
         val absPath = PathHelper.getAbsolutePathOfFile(childBlob.path)
@@ -216,6 +218,8 @@ object CommandExecutorImpl extends CommandExecutor {
         printer.printSingleDiff(x.path, diffHelper.diff(List[String](), newContent))
       })
       displayLogDiff(logs.tail, branch)
+    }else{
+      printer.displaySingleCommit(logs(0), branch)
     }
   }
 

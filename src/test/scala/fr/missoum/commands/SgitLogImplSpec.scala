@@ -16,8 +16,8 @@ class SgitLogImplSpec extends FlatSpec with Matchers with IdiomaticMockito {
       "\nSat-Oct-19-13:54:55 commit2"
     //when
     val result = SgitLogImpl.retrieveAllCommits(content)
-    val resultExpected1 = new Commit("000000000000000", "e6964fb56b19ccc", "", "Sat Oct 19 13:53:33", "user1", "first commit")
-    val resultExpected2 = new Commit("e6964fb56b19ccc", "4a90e8b3e683dd7545a949", "", "Sat Oct 19 13:54:55", "user2", "commit2")
+    val resultExpected2 = new Commit("000000000000000", "e6964fb56b19ccc", "", "Sat Oct 19 13:53:33", "user1", "first commit")
+    val resultExpected1 = new Commit("e6964fb56b19ccc", "4a90e8b3e683dd7545a949", "", "Sat Oct 19 13:54:55", "user2", "commit2")
     //then
     result should have length 2
     result(0).hashParentCommit shouldBe resultExpected1.hashParentCommit

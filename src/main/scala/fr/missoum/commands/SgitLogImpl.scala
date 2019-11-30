@@ -17,7 +17,7 @@ object SgitLogImpl extends SgitLog {
       List[Commit]()
     else {
       val logs = logsContent.split("\n").toList
-      retrieveAllCommitRec(logs)
+      retrieveAllCommitRec(logs).reverse
     }
 
   }
