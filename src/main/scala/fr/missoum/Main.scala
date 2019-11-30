@@ -34,6 +34,7 @@ object Main {
       case Array("status", _*) => printer.notValidArguments("status", "just 'status'")
       //log
       case Array("log") => executor.executeLog()
+      case Array("log", "-p") => executor.executeLogP()
       case Array("log", _*) => printer.notValidArguments("log", "just 'log'")
       //checkout
       case Array("checkout", x: String) => executor.executeCheckout(x)

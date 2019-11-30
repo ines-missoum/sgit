@@ -37,6 +37,8 @@ trait CommandExecutor {
 
   def executeLog(): Unit
 
+  def executeLogP(): Unit
+
   def executeCheckout(switchTo: String): Unit
 
   def executeDiff(): Unit

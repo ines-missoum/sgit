@@ -3,6 +3,8 @@ package fr.missoum.utils.io.printers
 import fr.missoum.logic.Commit
 
 trait ConsolePrinter {
+  def noLogP(branch: String): Unit
+
   def detachedHead(): Unit
 
   def checkoutBranch(head: String): Unit
@@ -56,6 +58,8 @@ trait ConsolePrinter {
   def branch(branch: String)
 
   def displayAllCommits(commits: List[Commit], branch: String): Unit
+
+  def displaySingleCommit(c: Commit, branch: String): Unit
 
   def noLog(branch: String): Unit
 

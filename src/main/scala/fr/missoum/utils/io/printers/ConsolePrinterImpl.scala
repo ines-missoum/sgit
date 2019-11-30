@@ -77,6 +77,11 @@ object ConsolePrinterImpl extends ConsolePrinter {
     println(allCommits)
   }
 
+  def displaySingleCommit(c: Commit, branch: String): Unit = {
+    println(Console.YELLOW + "commit " + c.hash + "(" + Console.CYAN + "HEAD -> " + Console.GREEN + branch + Console.YELLOW + ")" +
+      Console.WHITE + "\nAuthor: " + c.author + "\nDate: " + c.date + "\n\n\t" + c.message + "\n")
+  }
+
   def noLog(branch: String): Unit = println("fatal: your current branch '" + branch + "' does not have any commits yet")
 
   def statusAllGood(): Unit = println("nothing to commit, working tree clean")
@@ -103,7 +108,9 @@ object ConsolePrinterImpl extends ConsolePrinter {
 
   def notOnBranch(): Unit = println("fatal: you are not on a branch")
 
-  def checkoutBranch(head: String): Unit = println("Switched to '"+head+"'")
+  def checkoutBranch(head: String): Unit = println("Switched to '" + head + "'")
 
   def detachedHead(): Unit = println("You are in 'detached HEAD' state. You can look around, make experimental\nchanges and commit them, and you can discard any commits you make in this\nstate without impacting any branches by performing another checkout.\n\nIf you want to create a new branch to retain commits you can do so.")
+
+  def noLogP(branch: String): Unit = println("failure : You only have one commit on "+branch+", no diff to display.")
 }

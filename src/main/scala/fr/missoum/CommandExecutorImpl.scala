@@ -1,7 +1,7 @@
 package fr.missoum
 
 import fr.missoum.commands._
-import fr.missoum.logic.{Blob, EntryTree}
+import fr.missoum.logic.{Blob, Commit, EntryTree}
 import fr.missoum.utils.helpers.PathHelper
 import fr.missoum.utils.io.workspace.{WorkspaceManager, WorkspaceManagerImpl}
 import fr.missoum.utils.io.{inputs, printers, readers, writers}
@@ -172,6 +172,52 @@ object CommandExecutorImpl extends CommandExecutor {
     } else printer.notOnBranch()
   }
 
+  def executeLogP(): Unit = {
+    //the log are available only on the current branch
+    val branch = sgitReader.getCurrentBranch
+    if (branch.nonEmpty) {
+      val logFile = sgitReader.getLog(branch.get)
+      if (logFile.isEmpty) printer.improperSgitRepository()
+      else {
+        val logs = logHelper.retrieveAllCommits(logFile.get)
+        if (logs.isEmpty)
+          printer.noLog(branch.get)
+        else {
+          if (logs.length == 1)
+            printer.noLogP(branch.get)
+          else
+            printer.displaySingleCommit(logs(0), branch.get)
+            displayLogDiff(logs, branch.get)
+        }
+      }
+    } else printer.notOnBranch()
+  }
+
+  private def displayLogDiff(logs: List[Commit], branch: String): Unit = {
+
+    if (logs.length > 1) {
+
+      val childBlobs = commitHelper.getBlobsOfCommit(sgitReader.getCommit(logs(1).hash).get)
+      val parentBlobs = commitHelper.getBlobsOfCommit(sgitReader.getCommit(logs(0).hash).get)
+      val news = childBlobs.filter(x => !parentBlobs.exists(y => x.path.equals(y.path)))
+      val modified = childBlobs.filter(x => parentBlobs.exists(y => x.path.equals(y.path) && !x.hash.equals(y.hash)))
+      printer.displaySingleCommit(logs(1), branch)
+
+      modified.map(childBlob => {
+        val absPath = PathHelper.getAbsolutePathOfFile(childBlob.path)
+        val parentBlob = parentBlobs.filter(x => x.path.equals(childBlob.path)).head
+        val oldContent = sgitReader.getContentOfObjectInString(parentBlob.hash).getOrElse("").split("\n").toList
+        val newContent = sgitReader.getContentOfObjectInString(childBlob.hash).getOrElse("").split("\n").toList
+        printer.printSingleDiff(childBlob.path, diffHelper.diff(oldContent, newContent))
+      })
+
+      news.map(x => {
+        val newContent = sgitReader.getContentOfObjectInString(x.hash).getOrElse("").split("\n").toList
+        printer.printSingleDiff(x.path, diffHelper.diff(List[String](), newContent))
+      })
+      displayLogDiff(logs.tail, branch)
+    }
+  }
 
   def executeCheckout(switchTo: String): Unit = {
     // We retrieve the hash commit that corresponds to the switch

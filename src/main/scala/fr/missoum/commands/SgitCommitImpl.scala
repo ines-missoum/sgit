@@ -62,6 +62,7 @@ object SgitCommitImpl extends SgitCommit {
     val treeCommit = Tree()
     treeCommit.hash = commit.treeHash
     getBlobsRec(List(treeCommit))
+
   }
 
 
