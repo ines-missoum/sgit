@@ -25,8 +25,12 @@ object WorkspaceManagerImpl extends WorkspaceManager {
   def getAllBlobsOfWorkspace(): List[EntryTree] = {
     val workspaceFiles = recursiveListFiles(new File(PathHelper.SgitPath))
     val result = workspaceFiles.map(x => {
-      val content = getContentOfFile(x.getAbsolutePath).mkString("\n")
-      Blob.newBlobWithContent(content, PathHelper.getSimplePathOfFile(x.getAbsolutePath))
+      try {
+        val content = getContentOfFile(x.getAbsolutePath).mkString("\n")
+        Blob.newBlobWithContent(content, PathHelper.getSimplePathOfFile(x.getAbsolutePath))
+      }catch {
+        case _ : Throwable => Blob.newBlobWithContent("invalid content", PathHelper.getSimplePathOfFile(x.getAbsolutePath))
+      }
     })
     result
   }

@@ -27,8 +27,8 @@ object Main {
       case a: Array[String] if a.length > 1 && a(0).equals("add") => executor.executeAdd(a.tail.toList)
       case Array("add") => printer.notValidArguments("add", "'add <file>' or 'add <file>*' ")
       //commit
-      case Array("commit") => executor.executeCommit()
-      case Array("commit", _*) => printer.notValidArguments("commit", "just 'commit'")
+      case Array("commit", "-m", x: String)  => executor.executeCommit(x)
+      case Array("commit", _*) => printer.notValidArguments("commit", "'commit' -m <message>")
       //status
       case Array("status") => executor.executeStatus()
       case Array("status", _*) => printer.notValidArguments("status", "just 'status'")

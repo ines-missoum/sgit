@@ -31,7 +31,7 @@ trait CommandExecutor {
 
   def executeCreateNewTag(newTag: String)
 
-  def executeCommit()
+  def executeCommit(message: String)
 
   def executeStatus()
 

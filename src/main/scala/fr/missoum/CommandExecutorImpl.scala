@@ -98,7 +98,7 @@ object CommandExecutorImpl extends CommandExecutor {
     }
   }
 
-  def executeCommit(): Unit = {
+  def executeCommit(message: String): Unit = {
 
     val index = sgitReader.getIndex
     if (index.isEmpty) printer.improperSgitRepository()
@@ -112,10 +112,8 @@ object CommandExecutorImpl extends CommandExecutor {
         printer.nothingToCommit(branch)
       else {
         //if commit needed
-        printer.askEnterMessageCommits()
-        val message = inputManager.retrieveUserCommitMessage()
         val commit = commitHelper.commit(lastCommitHash, index.get, message)
-        sgitWriter.saveCommit(commit,branch)
+        sgitWriter.saveCommit(commit, branch)
         printer.commitCreatedMessage(branch, message, nbFilesChanged.get)
       }
     }
@@ -210,7 +208,7 @@ object CommandExecutorImpl extends CommandExecutor {
           printer.notAllowedCheckout(checkoutNotAllowedOn)
         else {
           switch(head, isCheckoutBranch, index.get, checkoutBlobs)
-          if(isCheckoutBranch)
+          if (isCheckoutBranch)
             printer.checkoutBranch(head)
           else
             printer.detachedHead()

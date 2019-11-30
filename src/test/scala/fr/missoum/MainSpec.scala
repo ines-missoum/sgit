@@ -60,7 +60,7 @@ class MainSpec extends FlatSpec with Matchers with IdiomaticMockito {
 
   it should "execute commit command when argument is commit and sgit repository exists" in {
     //given
-    val arg = Array("commit")
+    val arg = Array("commit", "-m", "message")
     val mockExecutor = mock[CommandExecutor]
     val classTested = Main
     classTested.executor = mockExecutor
@@ -68,7 +68,7 @@ class MainSpec extends FlatSpec with Matchers with IdiomaticMockito {
     //when
     Main.main(arg)
     //then
-    mockExecutor.executeCommit() was called
+    mockExecutor.executeCommit("message") was called
   }
 
   it should "not execute commit command when first argument is commit and others arguments are invalid and sgit repository exists" in {
@@ -84,8 +84,7 @@ class MainSpec extends FlatSpec with Matchers with IdiomaticMockito {
     //when
     Main.main(arg)
     //then
-    mockExecutor.executeCommit wasNever  called
-    mockPrinter.notValidArguments("commit","just 'commit'") was called
+    mockPrinter.notValidArguments("commit","'commit' -m <message>") was called
 
 
   }
@@ -103,7 +102,6 @@ class MainSpec extends FlatSpec with Matchers with IdiomaticMockito {
     //when
     Main.main(arg)
     //then
-    mockExecutor.executeCommit() wasNever  called
     mockPrinter.notExistingSgitRepository() was called
 
 

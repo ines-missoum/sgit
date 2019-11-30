@@ -91,7 +91,7 @@ class CommandExecutorSpec extends FlatSpec with Matchers with IdiomaticMockito {
     mockCommitHelper.getBlobsLastCommit(Some(Commit("hashP","hashT","message"))) returns List(Blob("blob hash path"))
     mockCommitHelper.nbFilesChangedSinceLastCommit(List(Blob("blob hash path")), List(Blob("blob hash path"))) returns None
     mockReader.getCurrentBranch returns Some("master")
-    objectTested.executeCommit()
+    objectTested.executeCommit("message")
     //then
     mockPrinter.nothingToCommit(Some("master")) was called
 
@@ -126,7 +126,7 @@ class CommandExecutorSpec extends FlatSpec with Matchers with IdiomaticMockito {
     mockReader.getCurrentBranch returns Some("master")
     mockInputManager.retrieveUserCommitMessage() returns "my message"
     mockCommitHelper.commit(Some("hash"), fakeIndex, "my message") returns fakeCommit
-    objectTested.executeCommit()
+    objectTested.executeCommit("message")
     //then
     mockWriter.saveCommit(fakeCommit, Some("master"))
     mockPrinter.commitCreatedMessage(Some("master"), "my message", 1)
