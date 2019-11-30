@@ -183,10 +183,10 @@ object CommandExecutorImpl extends CommandExecutor {
         if (logs.isEmpty)
           printer.noLog(branch.get)
         else {
+          printer.displaySingleCommit(logs(0), branch.get)
           if (logs.length == 1)
             printer.noLogP(branch.get)
           else
-            printer.displaySingleCommit(logs(0), branch.get)
             displayLogDiff(logs, branch.get)
         }
       }
